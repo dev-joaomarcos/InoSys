@@ -48,7 +48,7 @@ Cadastro de usuário é feito exclusivamente pelo Administrador, que gera uma se
 ### Fase 1 — Base do sistema
 *Dependência: nenhuma. Obrigatória antes de tudo.*
 
-- [ ] Projeto Django configurado, `venv` documentado no README/guia de setup
+- [x] Projeto Django configurado, `venv` documentado no README/guia de setup
 - [ ] Configuração do banco via `.env` (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`)
 - [ ] `tb_usuarios` criada e migrada
 - [ ] RF01 — Login com redirecionamento por perfil
