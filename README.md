@@ -16,8 +16,8 @@ Este README serve como guia de referência rápida do projeto.
 | Django | 6.1.1 |
 | PostgreSQL | 18 |
 | psycopg (driver) | 3.3.5 |
-| python-decouple | 3.8 | (opcional)
-| Frontend | HTML + HTMX + Bootstrap 5 ou DaisyUI(tailwind) |
+| python-decouple (opcional) | 3.8 |
+| Frontend | HTML + HTMX + Bootstrap 5 ou DaisyUI (tailwind) |
 
 ## Estrutura de apps
 
@@ -209,4 +209,4 @@ Cadastro de usuário é feito exclusivamente pelo Administrador, que gera uma se
 ## Pendências em aberto
 
 - [ ] Confirmar se o diagrama original do modelo lógico (relatório do PIM) define tipos de dado, tamanhos de campo ou constraints além dos listados aqui
-- [ ] Definir biblioteca de gráficos para o dashboard de visão geral (possivelmente chart.js)
+- [ ] Definir biblioteca de gráficos para o dashboard de visão geral (provavelmente chart.js)
