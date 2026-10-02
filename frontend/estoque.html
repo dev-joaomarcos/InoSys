@@ -16,8 +16,8 @@
 <body data-pagina="estoque" data-perfis="estoque gestor admin">
   <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- Sidebar · no Django vira {% include "partials/sidebar.html" %}.
-       Os itens com data-perfis entram com {% if %} pelo perfil de request.user. -->
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
   <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
     <a class="is-marca" href="selecao.html">
       <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
@@ -232,8 +232,8 @@
             </table>
           </div>
 
-          <!-- Linha da tabela · no Django é o corpo do {% for material in page_obj %}.
-               __ID__ vira {{ material.id }}; cada data-se vira um {% if %}. -->
+          <!-- Linha da tabela · no Django é o corpo do laço for sobre page_obj.
+               __ID__ vira o id do material; cada data-se vira uma condição no template. -->
           <template data-lista-linha>
             <tr>
               <td>
@@ -441,7 +441,7 @@
             </fieldset>
             <div class="mb-3">
               <label class="form-label is-obrigatorio" for="mov-material">Material</label>
-              <!-- Só materiais ativos. No Django: {% for m in materiais %}. -->
+              <!-- Só materiais ativos. No Django: laço for sobre os materiais ativos. -->
               <select class="form-select" id="mov-material" name="material" required aria-describedby="mov-saldo">
                 <option value="">Selecione…</option>
               </select>

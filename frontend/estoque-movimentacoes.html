@@ -17,8 +17,8 @@
 <body data-pagina="movimentacoes" data-perfis="estoque gestor admin">
   <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- Sidebar · no Django vira {% include "partials/sidebar.html" %}.
-       Os itens com data-perfis entram com {% if %} pelo perfil de request.user. -->
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
   <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
     <a class="is-marca" href="selecao.html">
       <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
@@ -183,7 +183,7 @@
             </table>
           </div>
 
-          <!-- Linha · corpo do {% for mov in page_obj %}. Motivo só existe em saída. -->
+          <!-- Linha · corpo do laço for sobre page_obj. Motivo só existe em saída. -->
           <template data-lista-linha>
             <tr>
               <td><span class="is-metric" data-campo="data" data-formato="data"></span></td>

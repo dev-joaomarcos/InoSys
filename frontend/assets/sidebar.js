@@ -224,6 +224,12 @@
     }
   });
 
+  // Ao abrir um modal com formulário, o cursor já vai para o primeiro campo.
+  document.addEventListener('shown.bs.modal', function (e) {
+    var campo = e.target.querySelector('form input:not([type=hidden]):not([type=radio]):not([type=checkbox]):not([readonly]), form select, form textarea');
+    if (campo) campo.focus();
+  });
+
   // Formulário dentro de modal que o Django respondeu com 204 = salvo.
   // O HX-Trigger da resposta recarrega a lista; aqui só fechamos o modal.
   document.addEventListener('htmx:afterRequest', function (e) {
