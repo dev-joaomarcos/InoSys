@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuários · Administração · InoSys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF13 CRUD de usuários com senha temporária (exibida uma única vez)
+     RF15 anonimização: troca dos dados pessoais por valores fixos genéricos
+     tb_usuarios: nome, username, perfil, status, senha_temporaria, data_criacao
+     Perfil: Administrador -->
+<body data-pagina="usuarios" data-perfis="admin">
+  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="is-marca" href="selecao.html">
+      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
+    </a>
+
+    <nav class="is-nav">
+      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Estoque</div>
+        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
+        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Fretes</div>
+        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
+        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Gestão</div>
+        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
+        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Administração</div>
+        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
+        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
+      </div>
+    </nav>
+
+    <div class="is-sidebar-rodape">
+      <div class="is-usuario">
+        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+        <span>
+          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
+          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
+        </span>
+      </div>
+      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+
+      <!-- Só no mockup: some no Django. -->
+      <div class="is-mockup-perfil" data-somente-mockup>
+        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
+        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
+          <option value="estoque">Operacional de Estoque</option>
+          <option value="fretes">Operacional de Fretes</option>
+          <option value="gestor">Gestor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+  <div class="is-fundo-sidebar" aria-hidden="true"></div>
+
+  <div class="is-principal">
+    <header class="is-topo">
+      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="is-marca" href="selecao.html">
+        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+        <span class="is-marca-nome">InoSys</span>
+      </a>
+    </header>
+
+    <main class="is-conteudo" id="conteudo">
+      <div data-conteudo-tela>
+        <div class="is-cabecalho">
+          <div>
+            <div class="is-trilha">Administração</div>
+            <h1>Usuários</h1>
+            <p>Só o administrador cadastra usuários. A senha temporária aparece uma única vez e é trocada no primeiro acesso.</p>
+          </div>
+          <div class="is-cabecalho-acoes">
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em "Novo usuário"
+                 Requisição: GET /usuarios/novo/
+                 Alvo-troca: #modal-usuario .modal-content · innerHTML
+                 Django devolve: _form_usuario.html vazio
+                 Mockup: abre o modal estático com o formulário limpo
+                 ─────────────────── -->
+            <button class="btn btn-primary" type="button"
+                    hx-get="/usuarios/novo/"
+                    hx-target="#modal-usuario .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-usuario" data-acao="novo">
+              <i class="bi bi-person-plus" aria-hidden="true"></i> Novo usuário
+            </button>
+          </div>
+        </div>
+
+        <!-- ▸ HTMX ───────────
+             Gatilho: evento usuariosAtualizados (HX-Trigger após salvar, gerar senha, desativar ou anonimizar)
+             Requisição: GET /usuarios/ (filtros atuais via hx-include)
+             Alvo-troca: o card inteiro · outerHTML
+             Django devolve: _lista_usuarios.html
+             Mockup: a simulação redesenha as linhas
+             ─────────────────── -->
+        <section class="card" id="card-usuarios" aria-labelledby="titulo-usuarios"
+                 hx-get="/usuarios/" hx-trigger="usuariosAtualizados from:body"
+                 hx-include="#form-filtro-usuarios" hx-target="this" hx-swap="outerHTML">
+          <div class="card-header">
+            <h2 class="is-card-titulo" id="titulo-usuarios">Lista de usuários</h2>
+          </div>
+
+          <!-- ▸ HTMX ───────────
+               Gatilho: digitar na busca (400 ms) ou mudar um filtro
+               Requisição: GET /usuarios/?busca=&perfil=&status=
+               Alvo-troca: #card-usuarios · outerHTML · hx-push-url
+               Django devolve: _lista_usuarios.html filtrado, página 1
+               Mockup: filtra os dados de exemplo
+               ─────────────────── -->
+          <form class="is-filtros" id="form-filtro-usuarios" role="search" data-lista-filtros
+                hx-get="/usuarios/" hx-trigger="input delay:400ms, submit"
+                hx-target="#card-usuarios" hx-swap="outerHTML" hx-push-url="true">
+            <div>
+              <label class="form-label" for="filtro-busca">Buscar</label>
+              <div class="is-busca">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input class="form-control" type="search" id="filtro-busca" name="busca" placeholder="Nome ou usuário">
+              </div>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-perfil">Perfil</label>
+              <select class="form-select" id="filtro-perfil" name="perfil">
+                <option value="">Todos</option>
+                <option value="estoque">Operacional de Estoque</option>
+                <option value="fretes">Operacional de Fretes</option>
+                <option value="gestor">Gestor</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-status">Status</label>
+              <select class="form-select" id="filtro-status" name="status">
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Desativados</option>
+                <option value="">Todos</option>
+              </select>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Perfil</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Senha</th>
+                  <th scope="col">Criado em</th>
+                  <th scope="col" class="is-tabela-acoes"><span class="visually-hidden">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="6" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhum usuário encontrado com esses filtros.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do for sobre page_obj. Cada data-se vira um if no template. -->
+          <template data-lista-linha>
+            <tr>
+              <td>
+                <span class="is-celula-titulo" data-campo="nome"></span>
+                <span class="is-celula-sub is-metric" data-campo="username"></span>
+              </td>
+              <td>
+                <span class="is-badge is-badge-dark is-badge-sem-ponto" data-se="perfil_admin">Administrador</span>
+                <span data-se="perfil_outro" data-campo="perfil_rotulo"></span>
+              </td>
+              <td>
+                <span class="is-badge is-badge-success" data-se="ativo">Ativo</span>
+                <span class="is-badge is-badge-neutral" data-se="desativado">Desativado</span>
+                <span class="is-badge is-badge-dark" data-se="anonimizado">Anonimizado</span>
+              </td>
+              <td>
+                <span class="is-badge is-badge-warning" data-se="temporaria" title="Ainda não fez o primeiro acesso">Temporária</span>
+                <span class="text-secondary" data-se="definida">Definida pelo usuário</span>
+                <span class="text-secondary" data-se="anonimizado">—</span>
+              </td>
+              <td><span class="is-metric" data-campo="data_criacao" data-formato="data"></span></td>
+              <td class="is-tabela-acoes">
+                <!-- ▸ HTMX ───────────
+                     Gatilho: clique em Editar / Nova senha / Desativar / Reativar / Anonimizar
+                     Requisição: GET da URL de cada botão
+                     Alvo-troca: .modal-content do modal indicado · innerHTML
+                     Django devolve: o formulário ou a confirmação daquele usuário
+                     Mockup: preenche o modal estático com os dados da linha
+                     ─────────────────── -->
+                <span data-se="editavel">
+                  <button class="btn is-btn-icone" type="button" title="Editar usuário" aria-label="Editar usuário"
+                          hx-get="/usuarios/__ID__/editar/"
+                          hx-target="#modal-usuario .modal-content" hx-swap="innerHTML"
+                          data-abrir-modal="#modal-usuario" data-acao="editar">
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button class="btn is-btn-icone" type="button" title="Gerar nova senha temporária" aria-label="Gerar nova senha temporária"
+                          hx-get="/usuarios/__ID__/nova-senha/"
+                          hx-target="#modal-nova-senha .modal-content" hx-swap="innerHTML"
+                          data-abrir-modal="#modal-nova-senha" data-acao="nova-senha" data-se="ativo">
+                    <i class="bi bi-key" aria-hidden="true"></i>
+                  </button>
+                  <span class="dropdown">
+                    <button class="btn is-btn-icone" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="Mais ações">
+                      <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li data-se="ativo">
+                        <button class="dropdown-item" type="button"
+                                hx-get="/usuarios/__ID__/desativar/"
+                                hx-target="#modal-status-usuario .modal-content" hx-swap="innerHTML"
+                                data-abrir-modal="#modal-status-usuario" data-acao="desativar">
+                          <i class="bi bi-person-dash" aria-hidden="true"></i> Desativar acesso
+                        </button>
+                      </li>
+                      <li data-se="desativado">
+                        <button class="dropdown-item" type="button"
+                                hx-get="/usuarios/__ID__/reativar/"
+                                hx-target="#modal-status-usuario .modal-content" hx-swap="innerHTML"
+                                data-abrir-modal="#modal-status-usuario" data-acao="reativar">
+                          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Reativar acesso
+                        </button>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <button class="dropdown-item is-perigo" type="button"
+                                hx-get="/usuarios/__ID__/anonimizar/"
+                                hx-target="#modal-anonimizar .modal-content" hx-swap="innerHTML"
+                                data-abrir-modal="#modal-anonimizar" data-acao="anonimizar">
+                          <i class="bi bi-incognito" aria-hidden="true"></i> Anonimizar dados
+                        </button>
+                      </li>
+                    </ul>
+                  </span>
+                </span>
+              </td>
+            </tr>
+          </template>
+
+          <div class="is-lista-rodape">
+            <span data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /usuarios/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-usuarios · outerHTML
+                 Django devolve: _lista_usuarios.html da página pedida
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação de usuários">
+              <ul class="pagination">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/usuarios/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-usuarios"
+                     hx-target="#card-usuarios" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item"><span class="page-link border-0 bg-transparent text-secondary" data-pagina-texto></span></li>
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/usuarios/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-usuarios"
+                     hx-target="#card-usuarios" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== Resposta do servidor: senha temporária gerada =====================
+       É o parcial _senha_temporaria.html que o Django devolve (200 + HX-Trigger: usuariosAtualizados)
+       depois de criar o usuário ou gerar nova senha. A senha não é guardada em texto: só aparece aqui. -->
+  <template id="tpl-senha-temporaria">
+    <div>
+      <div class="modal-header">
+        <h2 class="modal-title" data-campo="titulo">Usuário cadastrado</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Entregue estes dados para <strong data-campo="nome"></strong>. No primeiro acesso, o sistema pede uma senha nova.</p>
+        <dl class="row mb-3">
+          <dt class="col-4 text-secondary fw-normal">Usuário</dt>
+          <dd class="col-8 is-metric mb-0" data-campo="username"></dd>
+        </dl>
+        <div class="is-senha-temporaria">
+          <span class="is-metric" data-senha data-campo="senha"></span>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-copiar-senha>
+            <i class="bi bi-clipboard" aria-hidden="true"></i> Copiar
+          </button>
+        </div>
+        <div class="alert alert-warning mt-3 mb-0">
+          <i class="bi bi-eye-slash" aria-hidden="true"></i>
+          <div><strong>Esta senha aparece só agora.</strong> Depois de fechar esta janela não dá para ver de novo; se perder, gere outra.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Concluir</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===================== Modal: novo / editar usuário (RF13) ===================== -->
+  <div class="modal fade" id="modal-usuario" tabindex="-1" aria-labelledby="modal-usuario-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: enviar o formulário
+             Requisição: POST /usuarios/novo/ (ou /usuarios/__ID__/editar/)
+             Alvo-troca: #modal-usuario .modal-content · innerHTML
+             Django devolve: com erro (ex.: usuário já existe), o formulário com as mensagens (200);
+                             novo salvo, _senha_temporaria.html (200) + HX-Trigger: usuariosAtualizados;
+                             edição salva, 204 + HX-Trigger: usuariosAtualizados
+             Mockup: valida no navegador, mostra a senha gerada e atualiza a tabela
+             ─────────────────── -->
+        <form id="form-usuario" novalidate
+              hx-post="/usuarios/novo/"
+              hx-target="#modal-usuario .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-usuario-titulo">Novo usuário</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label is-obrigatorio" for="usuario-nome">Nome</label>
+              <input class="form-control" type="text" id="usuario-nome" name="nome" maxlength="120" autocomplete="off" required>
+              <div class="invalid-feedback">Informe o nome.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label is-obrigatorio" for="usuario-username">Usuário</label>
+              <input class="form-control is-metric" type="text" id="usuario-username" name="username" maxlength="150" autocomplete="off" autocapitalize="none" pattern="[A-Za-z0-9.@+_\-]+" required aria-describedby="ajuda-username">
+              <div class="form-text" id="ajuda-username">Usado para entrar. Letras, números e . @ + - _, sem espaço.</div>
+              <div class="invalid-feedback" id="usuario-username-erro">Informe um usuário válido, sem espaços.</div>
+            </div>
+            <div>
+              <label class="form-label is-obrigatorio" for="usuario-perfil">Perfil</label>
+              <select class="form-select" id="usuario-perfil" name="perfil" required aria-describedby="ajuda-perfil">
+                <option value="">Selecione…</option>
+                <option value="estoque">Operacional de Estoque</option>
+                <option value="fretes">Operacional de Fretes</option>
+                <option value="gestor">Gestor</option>
+                <option value="admin">Administrador</option>
+              </select>
+              <div class="form-text" id="ajuda-perfil" data-campo="ajuda_perfil">Define quais módulos a pessoa enxerga.</div>
+              <div class="invalid-feedback">Escolha o perfil.</div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0" data-se="novo">
+              <i class="bi bi-key" aria-hidden="true"></i>
+              <div>Ao cadastrar, o sistema gera uma <strong>senha temporária</strong> e mostra uma única vez.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-campo="rotulo_salvar">Cadastrar e gerar senha</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Modal: gerar nova senha temporária ===================== -->
+  <div class="modal fade" id="modal-nova-senha" tabindex="-1" aria-labelledby="modal-nova-senha-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: confirmar
+             Requisição: POST /usuarios/__ID__/nova-senha/
+             Alvo-troca: #modal-nova-senha .modal-content · innerHTML
+             Django devolve: _senha_temporaria.html (200) + HX-Trigger: usuariosAtualizados
+                             (senha_temporaria volta a True: troca obrigatória no próximo acesso)
+             Mockup: mostra uma senha gerada no navegador
+             ─────────────────── -->
+        <form id="form-nova-senha"
+              hx-post="/usuarios/__ID__/nova-senha/"
+              hx-target="#modal-nova-senha .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-nova-senha-titulo">Gerar nova senha temporária</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2"><strong data-campo="nome"></strong> <span class="is-metric text-secondary" data-campo="username"></span></p>
+            <p class="text-secondary mb-0">A senha atual deixa de funcionar na hora. No próximo acesso, a pessoa entra com a senha
+              temporária e precisa criar uma nova. Use quando alguém esquecer a senha.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Gerar senha</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Modal: desativar / reativar acesso ===================== -->
+  <div class="modal fade" id="modal-status-usuario" tabindex="-1" aria-labelledby="modal-status-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: confirmar
+             Requisição: POST /usuarios/__ID__/desativar/ (ou /reativar/)
+             Alvo-troca: #modal-status-usuario .modal-content · innerHTML
+             Django devolve: 204 + HX-Trigger: usuariosAtualizados
+             Mockup: muda o status na tabela
+             ─────────────────── -->
+        <form id="form-status-usuario"
+              hx-post="/usuarios/__ID__/desativar/"
+              hx-target="#modal-status-usuario .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-status-titulo" data-campo="titulo">Desativar acesso</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2"><strong data-campo="nome"></strong></p>
+            <p class="text-secondary mb-0" data-se="desativar">A pessoa não consegue mais entrar. Os registros feitos por ela continuam no sistema (exclusão lógica).</p>
+            <p class="text-secondary mb-0" data-se="reativar">A pessoa volta a entrar com a senha que já tinha.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger" data-se="desativar">Desativar</button>
+            <button type="submit" class="btn btn-primary" data-se="reativar">Reativar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Modal: anonimizar (RF15) ===================== -->
+  <div class="modal fade" id="modal-anonimizar" tabindex="-1" aria-labelledby="modal-anonimizar-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: confirmar (com a caixa marcada)
+             Requisição: POST /usuarios/__ID__/anonimizar/
+             Alvo-troca: #modal-anonimizar .modal-content · innerHTML
+             Django devolve: 204 + HX-Trigger: usuariosAtualizados
+             Mockup: troca nome e usuário por valores genéricos na tabela
+             ─────────────────── -->
+        <form id="form-anonimizar" novalidate
+              hx-post="/usuarios/__ID__/anonimizar/"
+              hx-target="#modal-anonimizar .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-anonimizar-titulo">Anonimizar dados pessoais</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-3"><strong data-campo="nome"></strong> <span class="is-metric text-secondary" data-campo="username"></span></p>
+            <div class="alert alert-danger">
+              <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+              <div>O nome e o usuário serão trocados por valores genéricos fixos e o acesso será desativado.
+                <strong>Não dá para desfazer.</strong></div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="anonimizar-confirmo" name="confirmacao" value="1" required>
+              <label class="form-check-label" for="anonimizar-confirmo">Entendo que os dados pessoais não poderão ser recuperados.</label>
+              <div class="invalid-feedback">Marque para confirmar.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Anonimizar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Botão "Copiar" da senha temporária (vale também no Django).
+    document.addEventListener('click', function (e) {
+      var botao = e.target.closest('[data-copiar-senha]');
+      if (!botao) return;
+      var alvo = botao.parentNode.querySelector('[data-senha]');
+      function avisar() { botao.innerHTML = '<i class="bi bi-check2" aria-hidden="true"></i> Copiada'; }
+      function selecionar() {
+        var faixa = document.createRange();
+        faixa.selectNodeContents(alvo);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(faixa);
+      }
+      try {
+        navigator.clipboard.writeText(alvo.textContent.trim()).then(avisar, selecionar);
+      } catch (erro) { selecionar(); }
+    });
+
+    // Simulação da gestão de usuários.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+      var ROTULOS = { estoque: 'Operacional de Estoque', fretes: 'Operacional de Fretes', gestor: 'Gestor', admin: 'Administrador' };
+      var AJUDA = {
+        estoque: 'Acessa só o módulo de estoque.',
+        fretes: 'Acessa só o módulo de fretes.',
+        gestor: 'Acessa estoque, fretes, visão geral e relatórios.',
+        admin: 'Acesso completo, incluindo usuários, log de ações e anonimização.'
+      };
+
+      var usuarios = [
+        { id: 1, nome: 'Ana Souza', username: 'ana.souza', perfil: 'admin', status: 'ativo', senha_temporaria: false, data_criacao: '2026-08-03' },
+        { id: 2, nome: 'Marcos Lima', username: 'marcos.lima', perfil: 'gestor', status: 'ativo', senha_temporaria: false, data_criacao: '2026-08-03' },
+        { id: 3, nome: 'Paula Ribeiro', username: 'paula.ribeiro', perfil: 'estoque', status: 'ativo', senha_temporaria: false, data_criacao: '2026-08-10' },
+        { id: 4, nome: 'Diego Santos', username: 'diego.santos', perfil: 'fretes', status: 'ativo', senha_temporaria: false, data_criacao: '2026-08-10' },
+        { id: 5, nome: 'Lucas Ferreira', username: 'lucas.ferreira', perfil: 'estoque', status: 'ativo', senha_temporaria: true, data_criacao: '2026-09-28' },
+        { id: 6, nome: 'Renata Gomes', username: 'renata.gomes', perfil: 'fretes', status: 'inativo', senha_temporaria: false, data_criacao: '2026-08-15' },
+        { id: 7, nome: 'Usuário anonimizado', username: 'anonimizado-7', perfil: 'fretes', status: 'inativo', senha_temporaria: false, data_criacao: '2026-08-12', anonimizado: true }
+      ];
+      var proximoId = 8;
+
+      var lista = is.lista({
+        card: document.getElementById('card-usuarios'),
+        dados: usuarios,
+        ordenar: function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); },
+        filtro: function (u, f) {
+          var termo = (f.busca || '').trim().toLowerCase();
+          if (termo && (u.nome + ' ' + u.username).toLowerCase().indexOf(termo) === -1) return false;
+          if (f.perfil && u.perfil !== f.perfil) return false;
+          if (f.status && u.status !== f.status) return false;
+          return true;
+        },
+        preencher: function (tr, u) {
+          var ativo = u.status === 'ativo';
+          var anon = !!u.anonimizado;
+          is.preencher(tr, Object.assign({}, u, { perfil_rotulo: ROTULOS[u.perfil] }));
+          is.mostrarSe(tr, {
+            perfil_admin: u.perfil === 'admin', perfil_outro: u.perfil !== 'admin',
+            ativo: ativo, desativado: !ativo && !anon, anonimizado: anon,
+            temporaria: !anon && u.senha_temporaria, definida: !anon && !u.senha_temporaria,
+            editavel: !anon
+          });
+          if (!ativo) tr.classList.add('is-linha-inativa');
+        }
+      });
+      function atualizados(msg) { lista.render(); if (msg) is.toast(msg); }  // = HX-Trigger: usuariosAtualizados
+
+      // Senha temporária de exemplo. No Django: gerada no servidor e salva só como hash.
+      function gerarSenha() {
+        var letras = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        var bytes = new Uint32Array(10);
+        window.crypto.getRandomValues(bytes);
+        return Array.prototype.map.call(bytes, function (b) { return letras[b % letras.length]; }).join('');
+      }
+
+      // Faz o papel da resposta _senha_temporaria.html: troca o conteúdo do modal
+      // e devolve o formulário original quando o modal fecha.
+      function mostrarSenha(seletorModal, titulo, u) {
+        var modal = document.querySelector(seletorModal);
+        var conteudo = modal.querySelector('.modal-content');
+        if (!conteudo.originais) conteudo.originais = Array.prototype.slice.call(conteudo.childNodes);
+        var bloco = document.getElementById('tpl-senha-temporaria').content.firstElementChild.cloneNode(true);
+        is.preencher(bloco, { titulo: titulo, nome: u.nome, username: u.username, senha: gerarSenha() });
+        conteudo.replaceChildren.apply(conteudo, Array.prototype.slice.call(bloco.childNodes));
+      }
+      ['#modal-usuario', '#modal-nova-senha'].forEach(function (sel) {
+        document.querySelector(sel).addEventListener('hidden.bs.modal', function () {
+          var conteudo = this.querySelector('.modal-content');
+          if (conteudo.originais) { conteudo.replaceChildren.apply(conteudo, conteudo.originais); conteudo.originais = null; }
+        });
+      });
+
+      /* ---------- novo / editar ---------- */
+      var form = document.getElementById('form-usuario');
+      var campoUser = document.getElementById('usuario-username');
+      var emEdicao = null;
+      function ajudaPerfil() {
+        is.preencher(form, { ajuda_perfil: AJUDA[form.elements.perfil.value] || 'Define quais módulos a pessoa enxerga.' });
+      }
+      function abrirForm(u) {
+        emEdicao = u;
+        form.reset();
+        form.classList.remove('was-validated');
+        campoUser.setCustomValidity('');
+        if (u) is.preencherForm(form, { nome: u.nome, username: u.username, perfil: u.perfil });
+        document.getElementById('modal-usuario-titulo').textContent = u ? 'Editar usuário' : 'Novo usuário';
+        is.preencher(form, { rotulo_salvar: u ? 'Salvar alterações' : 'Cadastrar e gerar senha' });
+        is.mostrarSe(form, { novo: !u });
+        ajudaPerfil();
+      }
+      form.addEventListener('change', ajudaPerfil);
+      campoUser.addEventListener('input', function () { campoUser.setCustomValidity(''); });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var d = is.lerForm(form);
+        // Username único: no Django quem confere é o banco/formulário.
+        var repetido = usuarios.some(function (u) { return u !== emEdicao && u.username.toLowerCase() === d.username.trim().toLowerCase(); });
+        campoUser.setCustomValidity(repetido ? 'repetido' : '');
+        document.getElementById('usuario-username-erro').textContent = repetido ? 'Já existe um usuário com esse nome de acesso.' : 'Informe um usuário válido, sem espaços.';
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+        var dados = { nome: d.nome.trim(), username: d.username.trim(), perfil: d.perfil };
+        if (emEdicao) {
+          Object.assign(emEdicao, dados);
+          is.fecharModal('#modal-usuario');
+          atualizados('Usuário atualizado.');
+        } else {
+          var novo = Object.assign({ id: proximoId++, status: 'ativo', senha_temporaria: true, data_criacao: is.hoje() }, dados);
+          usuarios.push(novo);
+          mostrarSenha('#modal-usuario', 'Usuário cadastrado', novo);
+          atualizados();
+        }
+      });
+
+      /* ---------- nova senha ---------- */
+      var alvo = null;
+      document.getElementById('form-nova-senha').addEventListener('submit', function (e) {
+        e.preventDefault();
+        alvo.senha_temporaria = true;
+        mostrarSenha('#modal-nova-senha', 'Nova senha temporária', alvo);
+        atualizados();
+      });
+
+      /* ---------- desativar / reativar ---------- */
+      var formStatus = document.getElementById('form-status-usuario');
+      formStatus.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var desativar = alvo.status === 'ativo';
+        alvo.status = desativar ? 'inativo' : 'ativo';
+        is.fecharModal('#modal-status-usuario');
+        atualizados(desativar ? 'Acesso desativado.' : 'Acesso reativado.');
+      });
+
+      /* ---------- anonimizar ---------- */
+      var formAnon = document.getElementById('form-anonimizar');
+      formAnon.addEventListener('submit', function (e) {
+        e.preventDefault();
+        formAnon.classList.add('was-validated');
+        if (!formAnon.checkValidity()) return;
+        Object.assign(alvo, { nome: 'Usuário anonimizado', username: 'anonimizado-' + alvo.id, status: 'inativo', senha_temporaria: false, anonimizado: true });
+        is.fecharModal('#modal-anonimizar');
+        atualizados('Dados pessoais anonimizados.');
+      });
+
+      document.addEventListener('click', function (e) {
+        var botao = e.target.closest('[data-acao]');
+        if (!botao) return;
+        var acao = botao.getAttribute('data-acao');
+        var u = lista.daLinha(botao);
+        alvo = u;
+        if (acao === 'novo') abrirForm(null);
+        else if (acao === 'editar') abrirForm(u);
+        else if (acao === 'nova-senha') is.preencher(document.getElementById('form-nova-senha'), { nome: u.nome, username: u.username });
+        else if (acao === 'desativar' || acao === 'reativar') {
+          is.preencher(formStatus, { nome: u.nome, titulo: acao === 'desativar' ? 'Desativar acesso' : 'Reativar acesso' });
+          is.mostrarSe(formStatus, { desativar: acao === 'desativar', reativar: acao === 'reativar' });
+        } else if (acao === 'anonimizar') {
+          formAnon.reset();
+          formAnon.classList.remove('was-validated');
+          is.preencher(formAnon, { nome: u.nome, username: u.username });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
