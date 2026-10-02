@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · InoSys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- Login não usa HTMX de propósito: POST comum do Django (RF01). -->
+<body>
+  <main class="is-tela-acesso">
+    <div class="is-moldura">
+      <section class="is-moldura-painel" aria-label="Sobre o InoSys">
+        <div class="is-marca">
+          <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+          <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
+        </div>
+        <h1>Estoque e fretes <span>no mesmo lugar.</span></h1>
+        <ul>
+          <li><i class="bi bi-arrow-repeat" aria-hidden="true"></i><span>Saldo atualizado a cada entrada e saída de material.</span></li>
+          <li><i class="bi bi-bell" aria-hidden="true"></i><span>Alerta quando um material fica abaixo da quantidade mínima.</span></li>
+          <li><i class="bi bi-truck" aria-hidden="true"></i><span>Valor sugerido do frete calculado pela distância.</span></li>
+        </ul>
+        <p class="is-rodape-painel">Acesso restrito a colaboradores cadastrados pelo administrador.</p>
+      </section>
+
+      <section class="is-moldura-form">
+        <h2>Entrar</h2>
+        <p class="text-secondary mb-4">Use o usuário e a senha recebidos do administrador.</p>
+
+        <!-- Erro de autenticação: o Django exibe este alerta quando o login falha. -->
+        <div class="alert alert-danger" role="alert" id="erro-login" hidden>
+          <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+          <div>Usuário ou senha incorretos. Confira os dados e tente novamente.</div>
+        </div>
+
+        <form method="post" action="/login/" id="form-login" novalidate>
+          <!-- Django: incluir a tag csrf_token aqui -->
+          <div class="mb-3">
+            <label class="form-label" for="login-username">Usuário</label>
+            <input class="form-control" type="text" id="login-username" name="username" autocomplete="username" autocapitalize="none" required>
+            <div class="invalid-feedback">Informe o usuário.</div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="login-senha">Senha</label>
+            <div class="input-group">
+              <input class="form-control" type="password" id="login-senha" name="password" autocomplete="current-password" required>
+              <button class="btn btn-outline-secondary" type="button" data-mostrar-senha="#login-senha" aria-label="Mostrar senha">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+              <div class="invalid-feedback">Informe a senha.</div>
+            </div>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">Entrar</button>
+        </form>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-link btn-sm" type="button" data-abrir-modal="#modal-ajuda">
+            <i class="bi bi-life-preserver" aria-hidden="true"></i> Solicitar ajuda aos administradores
+          </button>
+        </div>
+
+        <div class="alert alert-secondary mt-4 mb-0" data-somente-mockup>
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <div>
+            <strong>Mockup:</strong> qualquer usuário e senha entram.
+            Use <code>erro</code> como senha para ver a mensagem de falha ou
+            <code>temporaria</code> para simular o primeiro acesso.
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Ajuda: não há recuperação por e-mail (README). -->
+  <div class="modal fade" id="modal-ajuda" tabindex="-1" aria-labelledby="modal-ajuda-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modal-ajuda-titulo">Esqueceu a senha ou está sem acesso?</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>O InoSys não envia senhas por e-mail. Procure um administrador do sistema:
+            ele gera uma <strong>nova senha temporária</strong>, que aparece uma única vez na tela dele.</p>
+          <p class="mb-0 text-secondary">No primeiro acesso com essa senha, você vai precisar criar uma senha nova.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Mostrar/ocultar senha (vale também no Django).
+    document.querySelectorAll('[data-mostrar-senha]').forEach(function (botao) {
+      botao.addEventListener('click', function () {
+        var campo = document.querySelector(botao.getAttribute('data-mostrar-senha'));
+        var mostrar = campo.type === 'password';
+        campo.type = mostrar ? 'text' : 'password';
+        botao.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+        botao.querySelector('i').className = 'bi ' + (mostrar ? 'bi-eye-slash' : 'bi-eye');
+      });
+    });
+
+    // Simulação do login.
+    (function () {
+      if (!window.inosysMockup) return;
+      var form = document.getElementById('form-login');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+        var senha = document.getElementById('login-senha').value;
+        if (senha === 'erro') { document.getElementById('erro-login').hidden = false; return; }
+        window.location.href = senha === 'temporaria' ? 'troca-senha.html' : 'selecao.html';
+      });
+    })();
+  </script>
+</body>
+</html>
