@@ -4,98 +4,81 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Materiais · Estoque · InoSys</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="assets/estilos.css" rel="stylesheet">
 </head>
 <!-- RF02 CRUD de materiais · RF03/RF04 entradas e saídas · RF05 alerta de estoque baixo
      Perfis: Operacional de Estoque, Gestor, Administrador -->
-<body data-pagina="estoque" data-perfis="estoque gestor admin">
-  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+<body data-modulo="estoque" data-perfis="estoque gestor admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
 
   <!-- Sidebar · no Django vira o include de partials/sidebar.html.
        Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
-  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
-    <a class="is-marca" href="selecao.html">
-      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
-    </a>
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
 
-    <nav class="is-nav">
-      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Estoque</div>
-        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
-        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Fretes</div>
-        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
-        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Gestão</div>
-        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
-        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Administração</div>
-        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
-        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
-      </div>
-    </nav>
-
-    <div class="is-sidebar-rodape">
-      <div class="is-usuario">
-        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
-        <span>
-          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
-          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
-        </span>
-      </div>
-      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
-
-      <!-- Só no mockup: some no Django. -->
-      <div class="is-mockup-perfil" data-somente-mockup>
-        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
-        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
-          <option value="estoque">Operacional de Estoque</option>
-          <option value="fretes">Operacional de Fretes</option>
-          <option value="gestor">Gestor</option>
-          <option value="admin">Administrador</option>
-        </select>
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
       </div>
     </div>
   </aside>
-  <div class="is-fundo-sidebar" aria-hidden="true"></div>
 
-  <div class="is-principal">
-    <header class="is-topo">
-      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
-        <i class="bi bi-list" aria-hidden="true"></i>
-      </button>
-      <a class="is-marca" href="selecao.html">
-        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-        <span class="is-marca-nome">InoSys</span>
-      </a>
-    </header>
-
-    <main class="is-conteudo" id="conteudo">
+  <main class="conteudo" id="conteudo">
+    <div class="container">
       <div data-conteudo-tela>
-        <div class="is-cabecalho">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
           <div>
-            <div class="is-trilha">Estoque</div>
-            <h1>Materiais</h1>
-            <p>Cadastro de materiais e saldo atual. O saldo muda a cada entrada ou saída registrada.</p>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Estoque</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Estoque</h1>
+            <p class="text-muted small mb-0">Cadastro de materiais e saldo atual. O saldo muda a cada entrada ou saída registrada.</p>
           </div>
-          <div class="is-cabecalho-acoes">
+          <div class="d-flex flex-wrap gap-2">
             <!-- ▸ HTMX ───────────
                  Gatilho: clique em "Registrar movimentação"
                  Requisição: GET /estoque/movimentacoes/nova/
@@ -125,6 +108,11 @@
           </div>
         </div>
 
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="estoque.html">Materiais</a></li>
+          <li class="nav-item"><a class="nav-link" href="estoque-movimentacoes.html">Movimentações</a></li>
+        </ul>
+
         <!-- ▸ HTMX ───────────
              Gatilho: evento estoqueAtualizado (HX-Trigger do servidor após salvar)
              Requisição: GET /estoque/materiais/resumo/
@@ -136,29 +124,39 @@
                  hx-get="/estoque/materiais/resumo/" hx-trigger="estoqueAtualizado from:body"
                  hx-target="this" hx-swap="outerHTML">
           <!-- RF05: checagem simples ao carregar a tela. Só aparece se houver material ativo abaixo do mínimo. -->
-          <div class="alert alert-warning" role="status" id="alerta-estoque-baixo">
-            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+          <div class="alert alert-warning d-flex align-items-start gap-2" role="status" id="alerta-estoque-baixo">
+            <i class="bi bi-exclamation-triangle mt-1" aria-hidden="true"></i>
             <div class="flex-grow-1">
-              <p class="alert-heading"><span class="is-metric" data-campo="qtd_baixo">3</span> materiais abaixo da quantidade mínima</p>
+              <strong><span class="is-metric" data-campo="qtd_baixo">3</span> materiais abaixo da quantidade mínima:</strong>
               <span data-campo="nomes_baixo">Perfil montante 70 mm, Lã de vidro 50 mm, Massa para drywall</span>
             </div>
             <button class="btn btn-sm btn-outline-secondary flex-shrink-0" type="button" data-ver-baixo>Ver só esses</button>
           </div>
 
-          <div class="is-indicadores">
-            <div class="card is-indicador">
-              <div class="is-indicador-rotulo"><span class="is-indicador-icone"><i class="bi bi-box-seam" aria-hidden="true"></i></span> Materiais ativos</div>
-              <div class="is-indicador-valor" data-campo="qtd_ativos">11</div>
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-4">
+              <div class="card is-kpi">
+                <div class="is-kpi-label">Materiais ativos</div>
+                <div class="is-kpi-value is-metric" data-campo="qtd_ativos">11</div>
+                <a class="is-kpi-link" href="#card-materiais">Ver lista <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+                <span class="is-kpi-icon info" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+              </div>
             </div>
-            <div class="card is-indicador">
-              <div class="is-indicador-rotulo"><span class="is-indicador-icone is-warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Abaixo do mínimo</div>
-              <div class="is-indicador-valor" data-campo="qtd_baixo">3</div>
-              <div class="is-indicador-nota">precisam de reposição</div>
+            <div class="col-sm-6 col-xl-4">
+              <div class="card is-kpi">
+                <div class="is-kpi-label">Abaixo do mínimo</div>
+                <div class="is-kpi-value is-metric" data-campo="qtd_baixo">3</div>
+                <a class="is-kpi-link" href="#card-materiais" data-ver-baixo>Ver materiais <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+                <span class="is-kpi-icon warning" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+              </div>
             </div>
-            <div class="card is-indicador">
-              <div class="is-indicador-rotulo"><span class="is-indicador-icone is-neutral"><i class="bi bi-archive" aria-hidden="true"></i></span> Desativados</div>
-              <div class="is-indicador-valor" data-campo="qtd_inativos">1</div>
-              <div class="is-indicador-nota">fora das movimentações</div>
+            <div class="col-sm-6 col-xl-4">
+              <div class="card is-kpi">
+                <div class="is-kpi-label">Desativados</div>
+                <div class="is-kpi-value is-metric" data-campo="qtd_inativos">1</div>
+                <a class="is-kpi-link" href="#card-materiais" data-ver-inativos>Ver desativados <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+                <span class="is-kpi-icon neutral" aria-hidden="true"><i class="bi bi-pause-circle"></i></span>
+              </div>
             </div>
           </div>
         </section>
@@ -173,78 +171,82 @@
         <section class="card" id="card-materiais" aria-labelledby="titulo-materiais"
                  hx-get="/estoque/materiais/" hx-trigger="estoqueAtualizado from:body"
                  hx-include="#form-filtro-materiais" hx-target="this" hx-swap="outerHTML">
-          <div class="card-header">
-            <h2 class="is-card-titulo" id="titulo-materiais">Lista de materiais</h2>
-          </div>
+          <div class="card-body pb-2">
+            <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+              <div>
+                <h2 class="is-card-title" id="titulo-materiais">Lista de materiais</h2>
+                <div class="is-card-subtitle">Saldo atual e quantidade mínima de cada material</div>
+              </div>
+              <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+            </div>
 
-          <!-- ▸ HTMX ───────────
-               Gatilho: digitar na busca (400 ms) ou mudar um filtro
-               Requisição: GET /estoque/materiais/?busca=&situacao=&status=
-               Alvo-troca: #card-materiais · outerHTML · hx-push-url mantém os filtros na URL
-               Django devolve: _lista_materiais.html já filtrado e paginado (página 1)
-               Mockup: filtra os dados de exemplo
-               ─────────────────── -->
-          <form class="is-filtros" id="form-filtro-materiais" role="search" data-lista-filtros
-                hx-get="/estoque/materiais/" hx-trigger="input delay:400ms, submit"
-                hx-target="#card-materiais" hx-swap="outerHTML" hx-push-url="true">
-            <div>
-              <label class="form-label" for="filtro-busca">Buscar</label>
-              <div class="is-busca">
-                <i class="bi bi-search" aria-hidden="true"></i>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: digitar na busca (400 ms) ou mudar um filtro
+                 Requisição: GET /estoque/materiais/?busca=&situacao=&status=
+                 Alvo-troca: #card-materiais · outerHTML · hx-push-url mantém os filtros na URL
+                 Django devolve: _lista_materiais.html já filtrado e paginado (página 1)
+                 Mockup: filtra os dados de exemplo
+                 ─────────────────── -->
+            <form class="row g-2" id="form-filtro-materiais" role="search" data-lista-filtros
+                  hx-get="/estoque/materiais/" hx-trigger="input delay:400ms, submit"
+                  hx-target="#card-materiais" hx-swap="outerHTML" hx-push-url="true">
+              <div class="col-md-6">
+                <label class="form-label" for="filtro-busca">Buscar</label>
                 <input class="form-control" type="search" id="filtro-busca" name="busca" placeholder="Nome ou descrição">
               </div>
-            </div>
-            <div>
-              <label class="form-label" for="filtro-situacao">Situação do saldo</label>
-              <select class="form-select" id="filtro-situacao" name="situacao">
-                <option value="">Todas</option>
-                <option value="baixo">Estoque baixo</option>
-                <option value="normal">Normal</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label" for="filtro-status">Status</label>
-              <select class="form-select" id="filtro-status" name="status">
-                <option value="ativo">Ativos</option>
-                <option value="inativo">Desativados</option>
-                <option value="">Todos</option>
-              </select>
-            </div>
-          </form>
+              <div class="col-sm-6 col-md-3">
+                <label class="form-label" for="filtro-situacao">Situação do saldo</label>
+                <select class="form-select" id="filtro-situacao" name="situacao">
+                  <option value="">Todas</option>
+                  <option value="baixo">Estoque baixo</option>
+                  <option value="normal">Normal</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-3">
+                <label class="form-label" for="filtro-status">Status</label>
+                <select class="form-select" id="filtro-status" name="status">
+                  <option value="ativo">Ativos</option>
+                  <option value="inativo">Desativados</option>
+                  <option value="">Todos</option>
+                </select>
+              </div>
+            </form>
+          </div>
 
           <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
               <thead>
                 <tr>
                   <th scope="col">Material</th>
                   <th scope="col">Unidade</th>
-                  <th scope="col" class="is-num">Qtd. atual</th>
-                  <th scope="col" class="is-num">Qtd. mínima</th>
+                  <th scope="col" class="text-end">Qtd. atual</th>
+                  <th scope="col" class="text-end">Qtd. mínima</th>
                   <th scope="col">Situação</th>
                   <th scope="col">Status</th>
-                  <th scope="col" class="is-tabela-acoes"><span class="visually-hidden">Ações</span></th>
+                  <th scope="col" class="is-actions"><span class="visually-hidden">Ações</span></th>
                 </tr>
               </thead>
               <tbody data-lista-itens></tbody>
               <tbody data-lista-vazia hidden>
-                <tr><td colspan="7" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhum material encontrado com esses filtros.</td></tr>
+                <tr><td colspan="7" class="text-center text-muted py-4">Nenhum material com esses filtros. Limpe a busca ou mude o status.</td></tr>
               </tbody>
             </table>
           </div>
 
           <!-- Linha da tabela · no Django é o corpo do laço for sobre page_obj.
-               __ID__ vira o id do material; cada data-se vira uma condição no template. -->
+               __ID__ vira o id do material; cada data-se vira uma condição no template;
+               estoque baixo ganha a classe is-row-alert, desativado ganha is-row-inactive. -->
           <template data-lista-linha>
             <tr>
               <td>
-                <span class="is-celula-titulo" data-campo="nome"></span>
-                <span class="is-celula-sub" data-campo="descricao"></span>
+                <div class="fw-semibold" data-campo="nome"></div>
+                <div class="small text-muted" data-campo="descricao"></div>
               </td>
               <td data-campo="unidade_medida"></td>
-              <td class="is-num"><span class="is-metric" data-campo="qtd_atual" data-formato="numero"></span></td>
-              <td class="is-num"><span class="is-metric text-secondary" data-campo="quantidade_minima" data-formato="numero"></span></td>
+              <td class="text-end" data-campo="qtd_atual" data-formato="numero"></td>
+              <td class="text-end text-muted" data-campo="quantidade_minima" data-formato="numero"></td>
               <td>
-                <span class="is-badge is-badge-warning" data-se="baixo">Estoque baixo</span>
+                <span class="is-badge is-badge-warning" data-se="baixo"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Estoque baixo</span>
                 <span class="is-badge is-badge-success" data-se="normal">Normal</span>
                 <span class="is-badge is-badge-neutral" data-se="inativo">Sem dado</span>
               </td>
@@ -252,7 +254,7 @@
                 <span class="is-badge is-badge-success" data-se="ativo">Ativo</span>
                 <span class="is-badge is-badge-neutral" data-se="inativo">Desativado</span>
               </td>
-              <td class="is-tabela-acoes">
+              <td class="is-actions">
                 <!-- ▸ HTMX ───────────
                      Gatilho: clique em Entrada / Saída / Editar / Desativar / Reativar da linha
                      Requisição: GET da URL de cada botão (material já escolhido)
@@ -261,56 +263,43 @@
                      Mockup: preenche o modal estático com os dados da linha
                      ─────────────────── -->
                 <span data-se="ativo">
-                  <button class="btn is-btn-icone" type="button" title="Registrar entrada" aria-label="Registrar entrada"
+                  <button class="btn btn-sm btn-outline-primary" type="button" title="Registrar entrada" aria-label="Registrar entrada"
                           hx-get="/estoque/movimentacoes/nova/?material=__ID__&amp;tipo=entrada"
                           hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
                           data-abrir-modal="#modal-movimentacao" data-acao="entrada">
                     <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
                   </button>
-                  <button class="btn is-btn-icone" type="button" title="Registrar saída" aria-label="Registrar saída"
+                  <button class="btn btn-sm btn-outline-primary" type="button" title="Registrar saída" aria-label="Registrar saída"
                           hx-get="/estoque/movimentacoes/nova/?material=__ID__&amp;tipo=saida"
                           hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
                           data-abrir-modal="#modal-movimentacao" data-acao="saida">
                     <i class="bi bi-box-arrow-up" aria-hidden="true"></i>
                   </button>
                 </span>
-                <button class="btn is-btn-icone" type="button" title="Editar material" aria-label="Editar material"
+                <button class="btn btn-sm btn-outline-secondary" type="button" title="Editar material" aria-label="Editar material"
                         hx-get="/estoque/materiais/__ID__/editar/"
                         hx-target="#modal-material .modal-content" hx-swap="innerHTML"
                         data-abrir-modal="#modal-material" data-acao="editar">
                   <i class="bi bi-pencil" aria-hidden="true"></i>
                 </button>
-                <span class="dropdown">
-                  <button class="btn is-btn-icone" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="Mais ações">
-                    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li data-se="ativo">
-                      <button class="dropdown-item is-perigo" type="button"
-                              hx-get="/estoque/materiais/__ID__/desativar/"
-                              hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
-                              data-abrir-modal="#modal-status-material" data-acao="desativar">
-                        <i class="bi bi-archive" aria-hidden="true"></i> Desativar material
-                      </button>
-                    </li>
-                    <li data-se="inativo">
-                      <button class="dropdown-item" type="button"
-                              hx-get="/estoque/materiais/__ID__/reativar/"
-                              hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
-                              data-abrir-modal="#modal-status-material" data-acao="reativar">
-                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Reativar material
-                      </button>
-                    </li>
-                    <li><a class="dropdown-item" href="estoque-movimentacoes.html" data-ver-historico>
-                      <i class="bi bi-clock-history" aria-hidden="true"></i> Ver movimentações</a></li>
-                  </ul>
-                </span>
+                <button class="btn btn-sm btn-outline-danger" type="button" title="Desativar material" aria-label="Desativar material" data-se="ativo"
+                        hx-get="/estoque/materiais/__ID__/desativar/"
+                        hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-status-material" data-acao="desativar">
+                  <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" type="button" title="Reativar material" aria-label="Reativar material" data-se="inativo"
+                        hx-get="/estoque/materiais/__ID__/reativar/"
+                        hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-status-material" data-acao="reativar">
+                  <i class="bi bi-play-circle" aria-hidden="true"></i>
+                </button>
               </td>
             </tr>
           </template>
 
-          <div class="is-lista-rodape">
-            <span data-contador>Mostrando 1–11 de 11</span>
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-3 border-top">
+            <span class="small text-muted" data-contador>Mostrando 1–11 de 11</span>
             <!-- ▸ HTMX ───────────
                  Gatilho: clique em Anterior / Próxima
                  Requisição: GET /estoque/materiais/?pagina=N (filtros atuais via hx-include)
@@ -319,7 +308,7 @@
                  Mockup: troca a página nos dados de exemplo
                  ─────────────────── -->
             <nav aria-label="Paginação de materiais">
-              <ul class="pagination">
+              <ul class="pagination pagination-sm mb-0">
                 <li class="page-item disabled">
                   <a class="page-link" role="button" data-pagina-acao="anterior"
                      hx-get="/estoque/materiais/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-materiais"
@@ -327,7 +316,7 @@
                     <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
                   </a>
                 </li>
-                <li class="page-item"><span class="page-link border-0 bg-transparent text-secondary" data-pagina-texto>Página 1 de 1</span></li>
+                <li class="page-item disabled"><span class="page-link" data-pagina-texto>Página 1 de 1</span></li>
                 <li class="page-item disabled">
                   <a class="page-link" role="button" data-pagina-acao="proxima"
                      hx-get="/estoque/materiais/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-materiais"
@@ -340,8 +329,8 @@
           </div>
         </section>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <!-- ===================== Modal: novo / editar material (RF02) ===================== -->
   <div class="modal fade" id="modal-material" tabindex="-1" aria-labelledby="modal-material-titulo" aria-hidden="true">
@@ -365,8 +354,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body">
+            <div class="is-swap-error alert alert-danger" role="alert"></div>
             <div class="mb-3">
-              <label class="form-label is-obrigatorio" for="material-nome">Nome</label>
+              <label class="form-label is-required" for="material-nome">Nome</label>
               <input class="form-control" type="text" id="material-nome" name="nome" maxlength="120" required>
               <div class="invalid-feedback">Informe o nome do material.</div>
             </div>
@@ -376,7 +366,7 @@
             </div>
             <div class="row g-3">
               <div class="col-sm-6">
-                <label class="form-label is-obrigatorio" for="material-unidade">Unidade de medida</label>
+                <label class="form-label is-required" for="material-unidade">Unidade de medida</label>
                 <input class="form-control" type="text" id="material-unidade" name="unidade_medida" list="unidades-sugeridas" maxlength="10" required>
                 <datalist id="unidades-sugeridas">
                   <option value="un"></option><option value="m"></option><option value="m²"></option>
@@ -385,21 +375,21 @@
                 <div class="invalid-feedback">Informe a unidade (ex.: un, m², cx).</div>
               </div>
               <div class="col-sm-6">
-                <label class="form-label is-obrigatorio" for="material-minima">Quantidade mínima</label>
-                <input class="form-control is-metric" type="number" id="material-minima" name="quantidade_minima" min="0" step="1" inputmode="numeric" required aria-describedby="ajuda-minima">
+                <label class="form-label is-required" for="material-minima">Quantidade mínima</label>
+                <input class="form-control" type="number" id="material-minima" name="quantidade_minima" min="0" step="1" inputmode="numeric" required aria-describedby="ajuda-minima">
                 <div class="form-text" id="ajuda-minima">Abaixo deste saldo o material entra no alerta.</div>
                 <div class="invalid-feedback">Informe um número igual ou maior que zero.</div>
               </div>
             </div>
-            <div class="alert alert-info mt-3 mb-0" data-se="novo">
+            <p class="form-text mt-3 mb-0" data-se="novo">
               <i class="bi bi-info-circle" aria-hidden="true"></i>
-              <div>O saldo começa em <span class="is-metric">0</span>. Depois de salvar, registre uma <strong>entrada</strong> para lançar a quantidade em estoque.</div>
-            </div>
-            <div class="alert alert-secondary mt-3 mb-0" data-se="editar">
+              O saldo começa em <span class="is-metric">0</span>. Depois de salvar, registre uma entrada para lançar a quantidade em estoque.
+            </p>
+            <p class="form-text mt-3 mb-0" data-se="editar">
               <i class="bi bi-info-circle" aria-hidden="true"></i>
-              <div>Saldo atual: <strong class="is-metric" data-campo="qtd_atual" data-formato="numero">0</strong> <span data-campo="unidade_medida"></span>.
-                O saldo só muda por entrada ou saída, para manter o histórico correto.</div>
-            </div>
+              Saldo atual: <span class="is-metric" data-campo="qtd_atual" data-formato="numero">0</span> <span data-campo="unidade_medida"></span>.
+              O saldo só muda por entrada ou saída, para manter o histórico correto.
+            </p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -430,17 +420,18 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body">
+            <div class="is-swap-error alert alert-danger" role="alert"></div>
             <fieldset class="mb-3">
-              <legend class="form-label is-obrigatorio">Tipo</legend>
-              <div class="is-escolha">
+              <legend class="form-label is-required">Tipo</legend>
+              <div class="btn-group w-100" role="group">
                 <input class="btn-check" type="radio" name="tipo" id="tipo-entrada" value="entrada" required checked>
-                <label class="btn btn-outline-secondary is-escolha-opcao" for="tipo-entrada"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Entrada</label>
+                <label class="btn btn-outline-primary" for="tipo-entrada"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Entrada</label>
                 <input class="btn-check" type="radio" name="tipo" id="tipo-saida" value="saida">
-                <label class="btn btn-outline-secondary is-escolha-opcao" for="tipo-saida"><i class="bi bi-box-arrow-up" aria-hidden="true"></i> Saída</label>
+                <label class="btn btn-outline-primary" for="tipo-saida"><i class="bi bi-box-arrow-up" aria-hidden="true"></i> Saída</label>
               </div>
             </fieldset>
             <div class="mb-3">
-              <label class="form-label is-obrigatorio" for="mov-material">Material</label>
+              <label class="form-label is-required" for="mov-material">Material</label>
               <!-- Só materiais ativos. No Django: laço for sobre os materiais ativos. -->
               <select class="form-select" id="mov-material" name="material" required aria-describedby="mov-saldo">
                 <option value="">Selecione…</option>
@@ -450,19 +441,19 @@
             </div>
             <div class="row g-3">
               <div class="col-sm-6">
-                <label class="form-label is-obrigatorio" for="mov-quantidade">Quantidade</label>
-                <input class="form-control is-metric" type="number" id="mov-quantidade" name="quantidade" min="1" step="1" inputmode="numeric" required>
+                <label class="form-label is-required" for="mov-quantidade">Quantidade</label>
+                <input class="form-control" type="number" id="mov-quantidade" name="quantidade" min="1" step="1" inputmode="numeric" required>
                 <div class="invalid-feedback" id="mov-quantidade-erro">Informe uma quantidade maior que zero.</div>
               </div>
               <div class="col-sm-6">
-                <label class="form-label is-obrigatorio" for="mov-data">Data</label>
-                <input class="form-control is-metric" type="date" id="mov-data" name="data" required>
+                <label class="form-label is-required" for="mov-data">Data</label>
+                <input class="form-control" type="date" id="mov-data" name="data" required>
                 <div class="invalid-feedback">Informe a data.</div>
               </div>
             </div>
             <!-- Motivo: só para saída (README). -->
             <div class="mt-3" id="grupo-motivo" hidden>
-              <label class="form-label is-obrigatorio" for="mov-motivo">Motivo da saída</label>
+              <label class="form-label is-required" for="mov-motivo">Motivo da saída</label>
               <select class="form-select" id="mov-motivo" name="motivo">
                 <option value="">Selecione…</option>
                 <option value="uso_producao">Uso em produção</option>
@@ -504,15 +495,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body">
-            <p class="mb-2"><strong data-campo="nome"></strong></p>
-            <p class="text-secondary mb-0" data-se="desativar">O material sai das listas de movimentação e do alerta de estoque baixo.
+            <p class="fw-semibold mb-2" data-campo="nome"></p>
+            <p class="text-muted mb-0" data-se="desativar">O material sai das listas de movimentação e do alerta de estoque baixo.
               O histórico continua guardado: por isso o sistema desativa em vez de excluir (RNF02).</p>
-            <p class="text-secondary mb-0" data-se="reativar">O material volta a aparecer nas movimentações e no alerta de estoque baixo.</p>
+            <p class="text-muted mb-0" data-se="reativar">O material volta a aparecer nas movimentações e no alerta de estoque baixo.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-danger" data-se="desativar">Desativar</button>
-            <button type="submit" class="btn btn-primary" data-se="reativar">Reativar</button>
+            <button type="submit" class="btn btn-outline-danger" data-se="desativar"><i class="bi bi-pause-circle" aria-hidden="true"></i> Desativar</button>
+            <button type="submit" class="btn btn-primary" data-se="reativar"><i class="bi bi-play-circle" aria-hidden="true"></i> Reativar</button>
           </div>
         </form>
       </div>
@@ -547,6 +538,7 @@
       function baixo(m) { return m.status === 'ativo' && m.qtd_atual < m.quantidade_minima; }
 
       var card = document.getElementById('card-materiais');
+      var formFiltro = document.getElementById('form-filtro-materiais');
       var lista = is.lista({
         card: card,
         dados: materiais,
@@ -563,16 +555,15 @@
           is.preencher(tr, m);
           var ativo = m.status === 'ativo';
           is.mostrarSe(tr, { ativo: ativo, inativo: !ativo, baixo: baixo(m), normal: ativo && !baixo(m) });
-          if (!ativo) tr.classList.add('is-linha-inativa');
-          tr.querySelector('[data-ver-historico]').href = 'estoque-movimentacoes.html?material=' + m.id;
+          tr.classList.toggle('is-row-alert', baixo(m));
+          tr.classList.toggle('is-row-inactive', !ativo);
         }
       });
 
       function atualizarResumo() {
         var ativos = materiais.filter(function (m) { return m.status === 'ativo'; });
         var baixos = ativos.filter(baixo);
-        var resumo = document.getElementById('resumo-estoque');
-        is.preencher(resumo, {
+        is.preencher(document.getElementById('resumo-estoque'), {
           qtd_ativos: ativos.length,
           qtd_baixo: baixos.length,
           qtd_inativos: materiais.length - ativos.length,
@@ -589,11 +580,15 @@
         is.toast(mensagem);
       }
 
-      document.querySelector('[data-ver-baixo]').addEventListener('click', function () {
-        is.preencherForm(document.getElementById('form-filtro-materiais'), { situacao: 'baixo', status: 'ativo', busca: '' });
+      function filtrar(valores) {
+        is.preencherForm(formFiltro, Object.assign({ busca: '', situacao: '', status: 'ativo' }, valores));
         lista.render();
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.querySelectorAll('[data-ver-baixo]').forEach(function (el) {
+        el.addEventListener('click', function (e) { e.preventDefault(); filtrar({ situacao: 'baixo' }); });
       });
+      document.querySelector('[data-ver-inativos]').addEventListener('click', function (e) { e.preventDefault(); filtrar({ status: 'inativo' }); });
 
       /* ---------- material: novo / editar ---------- */
       var formMaterial = document.getElementById('form-material');
