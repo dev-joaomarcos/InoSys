@@ -15,15 +15,38 @@ Este README serve como guia de referência rápida do projeto.
 | Python | 3.14.6 |
 | Django | 6.1.1 |
 | PostgreSQL | 18 |
-| psycopg (driver) | 3.3.5 |
-| python-decouple (opcional) | 3.8 |
+| psycopg (driver) | 3.3.5 (`psycopg[binary]`) |
+| Configuração de ambiente | django-environ 0.13.0 |
+| Idioma / fuso horário | Português do Brasil / America/Sao_Paulo |
 | Frontend | HTML + HTMX + Bootstrap 5 ou DaisyUI (tailwind) |
+
+## Deploy no Railway
+
+O projeto usa `django-environ` para ler variáveis de ambiente. No Railway, adicione um serviço PostgreSQL e configure estas variáveis no serviço Django:
+
+| Variável | Valor |
+|---|---|
+| `SECRET_KEY` | Chave secreta forte e exclusiva para produção |
+| `DEBUG` | `False` |
+| `ALLOWED_HOSTS` | Domínio público do app, sem `https://`; múltiplos hosts separados por vírgula |
+| `CSRF_TRUSTED_ORIGINS` | Origem completa, como `https://seu-dominio.up.railway.app`; múltiplas origens separadas por vírgula |
+| `DATABASE_URL` | Referência à URL de conexão do serviço PostgreSQL provisionado |
+
+Localmente, sem `DATABASE_URL`, o projeto usa `db.sqlite3`. Em produção, configure `DATABASE_URL` para o PostgreSQL; não coloque segredos no repositório.
+
+Configure os comandos do serviço Railway assim:
+
+- **Build command:** `python manage.py collectstatic --noinput`
+- **Pre-deploy command:** `python manage.py migrate`
+- **Start command:** `gunicorn inosys.wsgi:application --bind 0.0.0.0:$PORT`
+
+O middleware do WhiteNoise serve os arquivos estáticos coletados. O Railway deve encaminhar `X-Forwarded-Proto` para que o Django reconheça HTTPS e aplique o redirecionamento seguro.
 
 ## Estrutura de apps
 
 | App | Responsabilidade | Complexidade |
 |---|---|---|
-| `auth` | Autenticação, perfis de usuário, permissões e log de ações | Alta |
+| `contas` | Autenticação, perfis de usuário, permissões e log de ações | Alta |
 | `estoque` | Materiais, entradas, saídas, alertas e histórico | Média |
 | `fretes` | Entregadores, entregas, cálculo de valor sugerido e histórico | Média |
 | `relatorios` | Dashboard de visão geral, relatórios e integração entre módulos | Baixa |
