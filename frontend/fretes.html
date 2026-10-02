@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entregas · Fretes · InoSys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF08 registro com valor sugerido · RF09 edição (qualquer status) · RF10 status
+     RF11 histórico com filtros (entregador, status, período) · 20 por página
+     Perfis: Operacional de Fretes, Gestor, Administrador -->
+<body data-pagina="entregas" data-perfis="fretes gestor admin">
+  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Sidebar · no Django vira {% include "partials/sidebar.html" %}.
+       Os itens com data-perfis entram com {% if %} pelo perfil de request.user. -->
+  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="is-marca" href="selecao.html">
+      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
+    </a>
+
+    <nav class="is-nav">
+      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Estoque</div>
+        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
+        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Fretes</div>
+        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
+        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Gestão</div>
+        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
+        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Administração</div>
+        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
+        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
+      </div>
+    </nav>
+
+    <div class="is-sidebar-rodape">
+      <div class="is-usuario">
+        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+        <span>
+          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
+          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
+        </span>
+      </div>
+      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+
+      <!-- Só no mockup: some no Django. -->
+      <div class="is-mockup-perfil" data-somente-mockup>
+        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
+        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
+          <option value="estoque">Operacional de Estoque</option>
+          <option value="fretes">Operacional de Fretes</option>
+          <option value="gestor">Gestor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+  <div class="is-fundo-sidebar" aria-hidden="true"></div>
+
+  <div class="is-principal">
+    <header class="is-topo">
+      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="is-marca" href="selecao.html">
+        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+        <span class="is-marca-nome">InoSys</span>
+      </a>
+    </header>
+
+    <main class="is-conteudo" id="conteudo">
+      <div data-conteudo-tela>
+        <div class="is-cabecalho">
+          <div>
+            <div class="is-trilha">Fretes</div>
+            <h1>Entregas</h1>
+            <p>O valor sugerido é calculado pela distância × valor por km do entregador.</p>
+          </div>
+          <div class="is-cabecalho-acoes">
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em "Nova entrega"
+                 Requisição: GET /fretes/entregas/nova/
+                 Alvo-troca: #modal-entrega .modal-content · innerHTML
+                 Django devolve: _form_entrega.html vazio (select só com entregadores ativos)
+                 Mockup: abre o modal estático com o formulário limpo
+                 ─────────────────── -->
+            <button class="btn btn-primary" type="button"
+                    hx-get="/fretes/entregas/nova/"
+                    hx-target="#modal-entrega .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-entrega" data-acao="nova">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Nova entrega
+            </button>
+          </div>
+        </div>
+
+        <!-- ▸ HTMX ───────────
+             Gatilho: evento fretesAtualizados (HX-Trigger após salvar uma entrega)
+             Requisição: GET /fretes/entregas/resumo/
+             Alvo-troca: este bloco · outerHTML
+             Django devolve: _resumo_fretes.html (contagem por status e divergências)
+             Mockup: a simulação recalcula a partir dos dados de exemplo
+             ─────────────────── -->
+        <section class="is-indicadores" id="resumo-fretes" aria-label="Resumo das entregas"
+                 hx-get="/fretes/entregas/resumo/" hx-trigger="fretesAtualizados from:body"
+                 hx-target="this" hx-swap="outerHTML">
+          <div class="card is-indicador">
+            <div class="is-indicador-rotulo"><span class="is-indicador-icone is-warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i></span> Pendentes</div>
+            <div class="is-indicador-valor" data-campo="pendentes">3</div>
+          </div>
+          <div class="card is-indicador">
+            <div class="is-indicador-rotulo"><span class="is-indicador-icone"><i class="bi bi-truck" aria-hidden="true"></i></span> Em andamento</div>
+            <div class="is-indicador-valor" data-campo="andamento">2</div>
+          </div>
+          <div class="card is-indicador">
+            <div class="is-indicador-rotulo"><span class="is-indicador-icone is-success"><i class="bi bi-check2-circle" aria-hidden="true"></i></span> Concluídas</div>
+            <div class="is-indicador-valor" data-campo="concluidas">19</div>
+          </div>
+          <div class="card is-indicador">
+            <div class="is-indicador-rotulo"><span class="is-indicador-icone is-danger"><i class="bi bi-exclamation-octagon" aria-hidden="true"></i></span> Divergência de valor</div>
+            <div class="is-indicador-valor" data-campo="divergencias">2</div>
+            <div class="is-indicador-nota">cobrado diferente do sugerido</div>
+          </div>
+        </section>
+
+        <!-- ▸ HTMX ───────────
+             Gatilho: evento fretesAtualizados
+             Requisição: GET /fretes/entregas/ (filtros atuais via hx-include)
+             Alvo-troca: o card inteiro · outerHTML
+             Django devolve: _lista_entregas.html
+             Mockup: a simulação redesenha as linhas
+             ─────────────────── -->
+        <section class="card" id="card-entregas" aria-labelledby="titulo-entregas"
+                 hx-get="/fretes/entregas/" hx-trigger="fretesAtualizados from:body"
+                 hx-include="#form-filtro-entregas" hx-target="this" hx-swap="outerHTML">
+          <div class="card-header">
+            <h2 class="is-card-titulo" id="titulo-entregas">Histórico de entregas</h2>
+          </div>
+
+          <!-- ▸ HTMX ───────────
+               Gatilho: mudar um filtro
+               Requisição: GET /fretes/entregas/?entregador=&status=&data_inicio=&data_fim=
+               Alvo-troca: #card-entregas · outerHTML · hx-push-url mantém os filtros na URL
+               Django devolve: _lista_entregas.html filtrado, página 1
+               Mockup: filtra os dados de exemplo
+               ─────────────────── -->
+          <form class="is-filtros" id="form-filtro-entregas" role="search" data-lista-filtros
+                hx-get="/fretes/entregas/" hx-trigger="input delay:400ms, submit"
+                hx-target="#card-entregas" hx-swap="outerHTML" hx-push-url="true">
+            <div>
+              <label class="form-label" for="filtro-entregador">Entregador</label>
+              <select class="form-select" id="filtro-entregador" name="entregador">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-status">Status</label>
+              <select class="form-select" id="filtro-status" name="status">
+                <option value="">Todos</option>
+                <option value="pendente">Pendente</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-inicio">De</label>
+              <input class="form-control is-metric" type="date" id="filtro-inicio" name="data_inicio">
+            </div>
+            <div>
+              <label class="form-label" for="filtro-fim">Até</label>
+              <input class="form-control is-metric" type="date" id="filtro-fim" name="data_fim">
+            </div>
+            <div>
+              <button class="btn btn-outline-secondary w-100" type="reset"><i class="bi bi-x-lg" aria-hidden="true"></i> Limpar filtros</button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Data</th>
+                  <th scope="col">Destino</th>
+                  <th scope="col">Entregador</th>
+                  <th scope="col" class="is-num">Distância</th>
+                  <th scope="col" class="is-num">Valor sugerido</th>
+                  <th scope="col" class="is-num">Valor cobrado</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="is-tabela-acoes"><span class="visually-hidden">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="8" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhuma entrega encontrada com esses filtros.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do {% for entrega in page_obj %}.
+               Divergência = valor_cobrado preenchido e diferente de valor_sugerido. -->
+          <template data-lista-linha>
+            <tr>
+              <td><span class="is-metric" data-campo="data" data-formato="data"></span></td>
+              <td class="is-celula-titulo" data-campo="destino"></td>
+              <td data-campo="entregador_nome"></td>
+              <td class="is-num"><span class="is-metric" data-campo="distancia" data-formato="decimal"></span> <span class="text-secondary">km</span></td>
+              <td class="is-num"><span class="is-metric" data-campo="valor_sugerido" data-formato="moeda"></span></td>
+              <td class="is-num">
+                <span class="is-metric" data-campo="valor_cobrado_texto"></span>
+                <span class="is-celula-sub is-texto-problema" data-se="divergente">
+                  <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+                  <span class="is-metric" data-campo="diferenca"></span>
+                </span>
+              </td>
+              <td>
+                <span class="is-badge is-badge-warning" data-se="pendente">Pendente</span>
+                <span class="is-badge is-badge-info" data-se="em_andamento">Em andamento</span>
+                <span class="is-badge is-badge-success" data-se="concluida">Concluída</span>
+              </td>
+              <td class="is-tabela-acoes">
+                <!-- ▸ HTMX ───────────
+                     Gatilho: clique em "Editar" (RF09: vale para qualquer status; é por aqui que o status muda, RF10)
+                     Requisição: GET /fretes/entregas/__ID__/editar/
+                     Alvo-troca: #modal-entrega .modal-content · innerHTML
+                     Django devolve: _form_entrega.html preenchido
+                     Mockup: preenche o modal estático com os dados da linha
+                     ─────────────────── -->
+                <button class="btn btn-sm btn-outline-secondary" type="button"
+                        hx-get="/fretes/entregas/__ID__/editar/"
+                        hx-target="#modal-entrega .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-entrega" data-acao="editar">
+                  <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                </button>
+              </td>
+            </tr>
+          </template>
+
+          <div class="is-lista-rodape">
+            <span data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /fretes/entregas/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-entregas · outerHTML
+                 Django devolve: _lista_entregas.html da página pedida (Paginator, 20 por página)
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação de entregas">
+              <ul class="pagination">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/fretes/entregas/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-entregas"
+                     hx-target="#card-entregas" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item"><span class="page-link border-0 bg-transparent text-secondary" data-pagina-texto></span></li>
+                <li class="page-item">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/fretes/entregas/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-entregas"
+                     hx-target="#card-entregas" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== Modal: nova / editar entrega (RF08, RF09, RF10) ===================== -->
+  <div class="modal fade" id="modal-entrega" tabindex="-1" aria-labelledby="modal-entrega-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <!-- Conteúdo = _form_entrega.html. Na edição o Django devolve o formulário preenchido
+             com hx-post="/fretes/entregas/__ID__/editar/". -->
+        <!-- ▸ HTMX ───────────
+             Gatilho: enviar o formulário
+             Requisição: POST /fretes/entregas/nova/ (ou /fretes/entregas/__ID__/editar/)
+             Alvo-troca: #modal-entrega .modal-content · innerHTML
+             Django devolve: com erro, o formulário com as mensagens (200);
+                             salvo, 204 + HX-Trigger: fretesAtualizados.
+                             O valor_sugerido é recalculado no servidor ao salvar.
+             Mockup: valida no navegador e atualiza a tabela
+             ─────────────────── -->
+        <form id="form-entrega" novalidate
+              hx-post="/fretes/entregas/nova/"
+              hx-target="#modal-entrega .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-entrega-titulo">Nova entrega</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label is-obrigatorio" for="entrega-entregador">Entregador</label>
+                <select class="form-select" id="entrega-entregador" name="entregador" required>
+                  <option value="">Selecione…</option>
+                </select>
+                <div class="invalid-feedback">Escolha o entregador.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label is-obrigatorio" for="entrega-data">Data</label>
+                <input class="form-control is-metric" type="date" id="entrega-data" name="data" required>
+                <div class="invalid-feedback">Informe a data.</div>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label is-obrigatorio" for="entrega-destino">Destino</label>
+                <input class="form-control" type="text" id="entrega-destino" name="destino" maxlength="200" placeholder="Endereço ou obra" required>
+                <div class="invalid-feedback">Informe o destino.</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label is-obrigatorio" for="entrega-distancia">Distância</label>
+                <div class="input-group">
+                  <input class="form-control is-metric" type="number" id="entrega-distancia" name="distancia" min="0.1" step="0.1" inputmode="decimal" required>
+                  <span class="input-group-text">km</span>
+                  <div class="invalid-feedback">Informe a distância em km.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ▸ HTMX ───────────
+                 Gatilho: mudar o entregador ou digitar a distância (300 ms)
+                 Requisição: GET /fretes/entregas/valor-sugerido/?entregador=&distancia=
+                 Alvo-troca: este bloco · innerHTML
+                 Django devolve: o trecho com o valor sugerido (distância × valor_por_km)
+                 Mockup: calcula no navegador
+                 ─────────────────── -->
+            <div class="is-calculo mt-3" id="calculo-sugerido" aria-live="polite"
+                 hx-get="/fretes/entregas/valor-sugerido/"
+                 hx-trigger="change from:#entrega-entregador, input delay:300ms from:#entrega-distancia"
+                 hx-include="#entrega-entregador, #entrega-distancia"
+                 hx-target="this" hx-swap="innerHTML">
+              <div>
+                <div class="is-calculo-rotulo">Valor sugerido</div>
+                <div class="small text-secondary"><span class="is-metric" data-campo="formula">Escolha o entregador e a distância</span></div>
+              </div>
+              <span class="is-calculo-valor" data-campo="sugerido">—</span>
+            </div>
+
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
+                <label class="form-label" for="entrega-cobrado">Valor cobrado</label>
+                <div class="input-group">
+                  <span class="input-group-text">R$</span>
+                  <input class="form-control is-metric" type="number" id="entrega-cobrado" name="valor_cobrado" min="0" step="0.01" inputmode="decimal" aria-describedby="ajuda-cobrado">
+                  <button class="btn btn-outline-secondary" type="button" data-usar-sugerido>Usar sugerido</button>
+                </div>
+                <div class="form-text" id="ajuda-cobrado">Digite o valor combinado ou aceite o sugerido.</div>
+                <div class="form-text is-texto-problema" data-aviso-divergencia hidden>
+                  <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+                  Diferente do sugerido em <span class="is-metric" data-campo="diferenca"></span>: vai aparecer como divergência no relatório.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label is-obrigatorio" for="entrega-status">Status</label>
+                <select class="form-select" id="entrega-status" name="status" required>
+                  <option value="pendente">Pendente</option>
+                  <option value="em_andamento">Em andamento</option>
+                  <option value="concluida">Concluída</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-campo="rotulo_salvar">Registrar entrega</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Simulação das entregas: no Django o servidor calcula, salva e devolve a lista.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+
+      var entregadores = [
+        { id: 1, nome: 'Carlos Menezes', valor_por_km: 2.80, status: 'ativo' },
+        { id: 2, nome: 'Juliana Prado',  valor_por_km: 3.10, status: 'ativo' },
+        { id: 3, nome: 'Roberto Alves',  valor_por_km: 2.50, status: 'ativo' },
+        { id: 4, nome: 'Sérgio Nunes',   valor_por_km: 2.90, status: 'inativo' }
+      ];
+      function entregador(id) { return entregadores.filter(function (x) { return String(x.id) === String(id); })[0]; }
+      function arred(v) { return Math.round(v * 100) / 100; }
+
+      // [entregador, destino, data, km, status, valor cobrado (null = igual ao sugerido, '' = não informado)]
+      var base = [
+        [2, 'Av. Goiás, 1.200 · São Caetano do Sul', '2026-10-02', 6.4, 'pendente', ''],
+        [1, 'Rua Senador Flaquer, 310 · Santo André', '2026-10-02', 9.8, 'pendente', ''],
+        [3, 'Av. Kennedy, 700 · São Bernardo do Campo', '2026-10-01', 14.2, 'em_andamento', null],
+        [1, 'Rua Oriente, 55 · São Caetano do Sul', '2026-10-01', 3.1, 'em_andamento', null],
+        [2, 'Av. Industrial, 600 · Santo André', '2026-10-01', 11.5, 'pendente', ''],
+        [3, 'Rua Marechal Deodoro, 1.500 · São Bernardo do Campo', '2026-09-30', 16.0, 'concluida', 45.00],
+        [1, 'Av. Presidente Kennedy, 2.100 · São Caetano do Sul', '2026-09-30', 4.7, 'concluida', null],
+        [2, 'Rua das Figueiras, 820 · Santo André', '2026-09-29', 8.9, 'concluida', null],
+        [1, 'Av. Lions, 450 · Diadema', '2026-09-29', 18.3, 'concluida', null],
+        [4, 'Rua Visconde de Inhaúma, 90 · São Caetano do Sul', '2026-09-26', 2.6, 'concluida', null],
+        [3, 'Av. Mauá, 1.000 · Mauá', '2026-09-26', 21.4, 'concluida', 60.00],
+        [2, 'Rua Coronel Oliveira Lima, 400 · Santo André', '2026-09-25', 9.2, 'concluida', null],
+        [1, 'Av. Barão de Mauá, 3.200 · Mauá', '2026-09-24', 22.0, 'concluida', null],
+        [3, 'Rua Jurubatuba, 1.100 · São Bernardo do Campo', '2026-09-24', 13.6, 'concluida', null],
+        [2, 'Av. Guido Aliberti, 2.500 · São Caetano do Sul', '2026-09-23', 5.3, 'concluida', null],
+        [1, 'Rua Giovanni Battista Pirelli, 155 · Santo André', '2026-09-22', 10.4, 'concluida', null],
+        [4, 'Av. Fábio Eduardo Ramos Esquivel, 2.000 · Diadema', '2026-09-19', 17.8, 'concluida', null],
+        [3, 'Rua Rio Grande do Sul, 320 · São Caetano do Sul', '2026-09-18', 2.9, 'concluida', null],
+        [2, 'Av. Atlântica, 950 · Santo André', '2026-09-17', 12.1, 'concluida', null],
+        [1, 'Rua Manoel Coelho, 600 · São Caetano do Sul', '2026-09-16', 3.8, 'concluida', null],
+        [3, 'Av. Robert Kennedy, 4.000 · São Bernardo do Campo', '2026-09-15', 15.5, 'concluida', null],
+        [2, 'Rua Catequese, 1.300 · Santo André', '2026-09-12', 8.1, 'concluida', null],
+        [1, 'Av. Senador Vergueiro, 2.900 · São Bernardo do Campo', '2026-09-11', 12.9, 'concluida', null],
+        [3, 'Rua Amazonas, 800 · São Caetano do Sul', '2026-09-10', 3.4, 'concluida', null]
+      ];
+      var entregas = base.map(function (b, i) {
+        var sugerido = arred(b[3] * entregador(b[0]).valor_por_km);
+        return {
+          id: 500 - i, entregador_id: b[0], destino: b[1], data: b[2], distancia: b[3], status: b[4],
+          valor_sugerido: sugerido, valor_cobrado: b[5] === null ? sugerido : b[5]
+        };
+      });
+      var proximoId = 501;
+
+      function divergente(e) { return e.valor_cobrado !== '' && arred(Number(e.valor_cobrado)) !== e.valor_sugerido; }
+      function diferenca(cobrado, sugerido) {
+        var d = arred(cobrado - sugerido);
+        return (d > 0 ? '+' : '−') + is.formatar.moeda(Math.abs(d));
+      }
+
+      var filtroEntregador = document.getElementById('filtro-entregador');
+      entregadores.forEach(function (x) { filtroEntregador.add(new Option(x.nome + (x.status === 'inativo' ? ' (desativado)' : ''), x.id)); });
+      // Vindo de "Ver entregas" na tela de entregadores.
+      var vindoDe = new URLSearchParams(location.search).get('entregador');
+      if (vindoDe) filtroEntregador.value = vindoDe;
+
+      var lista = is.lista({
+        card: document.getElementById('card-entregas'),
+        dados: entregas,
+        ordenar: function (a, b) { return a.data < b.data ? 1 : a.data > b.data ? -1 : b.id - a.id; },
+        filtro: function (e, f) {
+          if (f.entregador && String(e.entregador_id) !== f.entregador) return false;
+          if (f.status && e.status !== f.status) return false;
+          if (f.data_inicio && e.data < f.data_inicio) return false;
+          if (f.data_fim && e.data > f.data_fim) return false;
+          return true;
+        },
+        preencher: function (tr, e) {
+          var div = divergente(e);
+          is.preencher(tr, Object.assign({}, e, {
+            entregador_nome: entregador(e.entregador_id).nome,
+            valor_cobrado_texto: e.valor_cobrado === '' ? '—' : is.formatar.moeda(e.valor_cobrado),
+            diferenca: div ? diferenca(e.valor_cobrado, e.valor_sugerido) : ''
+          }));
+          is.mostrarSe(tr, { divergente: div, pendente: e.status === 'pendente', em_andamento: e.status === 'em_andamento', concluida: e.status === 'concluida' });
+        }
+      });
+
+      function atualizarResumo() {
+        function conta(fn) { return entregas.filter(fn).length; }
+        is.preencher(document.getElementById('resumo-fretes'), {
+          pendentes: conta(function (e) { return e.status === 'pendente'; }),
+          andamento: conta(function (e) { return e.status === 'em_andamento'; }),
+          concluidas: conta(function (e) { return e.status === 'concluida'; }),
+          divergencias: conta(divergente)
+        });
+      }
+      atualizarResumo();
+
+      /* ---------- modal da entrega ---------- */
+      var form = document.getElementById('form-entrega');
+      var selEntregador = document.getElementById('entrega-entregador');
+      var campoKm = document.getElementById('entrega-distancia');
+      var campoCobrado = document.getElementById('entrega-cobrado');
+      var emEdicao = null;
+
+      function sugeridoAtual() {
+        var x = entregador(selEntregador.value);
+        var km = Number(campoKm.value);
+        return x && km > 0 ? arred(km * x.valor_por_km) : null;
+      }
+
+      function recalcular() {
+        var x = entregador(selEntregador.value);
+        var km = Number(campoKm.value);
+        var s = sugeridoAtual();
+        is.preencher(form, {
+          sugerido: s === null ? '—' : is.formatar.moeda(s),
+          formula: s === null ? 'Escolha o entregador e a distância'
+            : is.formatar.decimal(km) + ' km × ' + is.formatar.moeda(x.valor_por_km) + '/km'
+        });
+        var cobrado = campoCobrado.value === '' ? null : arred(Number(campoCobrado.value));
+        var div = s !== null && cobrado !== null && cobrado !== s;
+        form.querySelector('[data-aviso-divergencia]').hidden = !div;
+        if (div) is.preencher(form, { diferenca: diferenca(cobrado, s) });
+      }
+
+      function abrirForm(e) {
+        emEdicao = e;
+        form.reset();
+        form.classList.remove('was-validated');
+        // Entregador desativado só aparece se já estiver na entrega em edição.
+        selEntregador.replaceChildren(new Option('Selecione…', ''));
+        entregadores.forEach(function (x) {
+          if (x.status === 'ativo' || (e && x.id === e.entregador_id)) {
+            selEntregador.add(new Option(x.nome + ' · ' + is.formatar.moeda(x.valor_por_km) + '/km', x.id));
+          }
+        });
+        if (e) {
+          is.preencherForm(form, { entregador: e.entregador_id, data: e.data, destino: e.destino, distancia: e.distancia, valor_cobrado: e.valor_cobrado, status: e.status });
+        } else {
+          is.preencherForm(form, { data: is.hoje(), status: 'pendente' });
+        }
+        document.getElementById('modal-entrega-titulo').textContent = e ? 'Editar entrega' : 'Nova entrega';
+        is.preencher(form, { rotulo_salvar: e ? 'Salvar alterações' : 'Registrar entrega' });
+        recalcular();
+      }
+
+      form.addEventListener('input', recalcular);
+      form.addEventListener('change', recalcular);
+      form.querySelector('[data-usar-sugerido]').addEventListener('click', function () {
+        var s = sugeridoAtual();
+        if (s !== null) { campoCobrado.value = s.toFixed(2); recalcular(); }
+      });
+
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+        var d = is.lerForm(form);
+        var dados = {
+          entregador_id: Number(d.entregador), destino: d.destino.trim(), data: d.data, distancia: Number(d.distancia),
+          valor_sugerido: sugeridoAtual(), valor_cobrado: d.valor_cobrado === '' ? '' : arred(Number(d.valor_cobrado)), status: d.status
+        };
+        if (emEdicao) Object.assign(emEdicao, dados);
+        else entregas.push(Object.assign({ id: proximoId++ }, dados));
+        is.fecharModal('#modal-entrega');
+        lista.render();          // equivale ao HX-Trigger: fretesAtualizados
+        atualizarResumo();
+        is.toast(emEdicao ? 'Entrega atualizada.' : 'Entrega registrada.');
+      });
+
+      document.addEventListener('click', function (ev) {
+        var botao = ev.target.closest('[data-acao]');
+        if (!botao) return;
+        var acao = botao.getAttribute('data-acao');
+        if (acao === 'nova') abrirForm(null);
+        else if (acao === 'editar') abrirForm(lista.daLinha(botao));
+      });
+    })();
+  </script>
+</body>
+</html>
