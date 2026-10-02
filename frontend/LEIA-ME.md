@@ -3,19 +3,28 @@
 Telas em HTML + Bootstrap 5.3.3 + HTMX 2.0.3, com dados de exemplo, para aprovar o
 visual e os fluxos antes da conversão para templates Django. Nada aqui depende do back-end.
 
+**Visual:** segue o [INOSYS-DESIGN-SYSTEM.md](INOSYS-DESIGN-SYSTEM.md). O `assets/estilos.css` é o
+Apêndice A do design system sem alteração, mais a seção **11. Complementos** no fim (classes `is-`
+que as telas precisam e que não têm equivalente no design system). A logo oficial está em `assets/img/`.
+
+**Menu:** a sidebar tem os 5 módulos do design system (Início · Estoque · Fretes · Visão Geral ·
+Administração). As subtelas de cada módulo ficam em abas no topo da página
+(ex.: Estoque → Materiais | Movimentações).
+
 ## Como testar
 
 1. Abra a pasta `frontend/` no Explorer e dê **duplo clique** em `login.html`
    (ou direto em `selecao.html`). A pasta `assets/` precisa estar ao lado dos HTML.
 2. **Não use o Live Server.** A simulação só roda em `file://` (`window.inosysMockup`).
 3. É preciso internet: Bootstrap, ícones, HTMX e as fontes vêm por CDN.
-4. **Trocar de perfil:** use o seletor "Perfil simulado" no rodapé da sidebar (ou no topo da
-   seleção). O perfil fica salvo no navegador. Telas fora do perfil mostram um aviso de acesso.
+4. **Trocar de perfil:** use o seletor "Simular perfil" no rodapé da sidebar. O perfil fica
+   salvo no navegador. Telas fora do perfil mostram um aviso de acesso.
 5. **Ver os ganchos do HTMX:** acrescente `?htmx=1` à URL (ex.: `estoque.html?htmx=1`).
-   Os elementos com `hx-*` ganham contorno tracejado e um painel lista todos; clique num item
-   para rolar até ele. O `?htmx=1` é mantido ao navegar pela sidebar.
+   Os elementos com `hx-get`/`hx-post` ganham contorno âmbar tracejado e o painel do canto lista
+   cada gancho (verbo, URL, gatilho, alvo e troca); clique num item para rolar até ele.
+   O `?htmx=1` é mantido ao navegar pela sidebar.
 6. **Celular:** F12 → modo dispositivo (Ctrl+Shift+M). Abaixo de 992px a sidebar vira painel
-   deslizante (botão ☰) e as tabelas rolam na horizontal.
+   deslizante (`offcanvas-lg`, botão ☰ na barra do topo) e as tabelas rolam na horizontal.
 
 Atalhos do login no mockup: qualquer usuário/senha entra; senha `erro` mostra a falha;
 senha `temporaria` simula o primeiro acesso (troca obrigatória).
