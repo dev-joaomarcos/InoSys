@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log de ações · Administração · InoSys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF14 log de ações (registro manual nas views) · paginação de 20 itens
+     tb_log_acoes: usuario_id, usuario_nome_snapshot, acao (criação/edição/exclusão), data_hora
+     Perfil: Administrador -->
+<body data-pagina="log" data-perfis="admin">
+  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="is-marca" href="selecao.html">
+      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
+    </a>
+
+    <nav class="is-nav">
+      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Estoque</div>
+        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
+        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Fretes</div>
+        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
+        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Gestão</div>
+        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
+        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Administração</div>
+        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
+        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
+      </div>
+    </nav>
+
+    <div class="is-sidebar-rodape">
+      <div class="is-usuario">
+        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+        <span>
+          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
+          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
+        </span>
+      </div>
+      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+
+      <!-- Só no mockup: some no Django. -->
+      <div class="is-mockup-perfil" data-somente-mockup>
+        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
+        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
+          <option value="estoque">Operacional de Estoque</option>
+          <option value="fretes">Operacional de Fretes</option>
+          <option value="gestor">Gestor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+  <div class="is-fundo-sidebar" aria-hidden="true"></div>
+
+  <div class="is-principal">
+    <header class="is-topo">
+      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="is-marca" href="selecao.html">
+        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+        <span class="is-marca-nome">InoSys</span>
+      </a>
+    </header>
+
+    <main class="is-conteudo" id="conteudo">
+      <div data-conteudo-tela>
+        <div class="is-cabecalho">
+          <div>
+            <div class="is-trilha">Administração</div>
+            <h1>Log de ações</h1>
+            <p>Quem criou, editou ou excluiu registros, e quando. O nome fica guardado mesmo se o usuário for removido.</p>
+          </div>
+        </div>
+
+        <section class="card" id="card-log" aria-labelledby="titulo-log">
+          <div class="card-header">
+            <h2 class="is-card-titulo" id="titulo-log">Registros</h2>
+          </div>
+
+          <!-- ▸ HTMX ───────────
+               Gatilho: mudar um filtro
+               Requisição: GET /log/?usuario=&acao=&data_inicio=&data_fim=
+               Alvo-troca: #card-log · outerHTML · hx-push-url
+               Django devolve: _lista_log.html filtrado, página 1
+               Mockup: filtra os dados de exemplo
+               ─────────────────── -->
+          <form class="is-filtros" id="form-filtro-log" role="search" data-lista-filtros
+                hx-get="/log/" hx-trigger="input delay:400ms, submit"
+                hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+            <div>
+              <label class="form-label" for="filtro-usuario">Usuário</label>
+              <select class="form-select" id="filtro-usuario" name="usuario">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-acao">Ação</label>
+              <select class="form-select" id="filtro-acao" name="acao">
+                <option value="">Todas</option>
+                <option value="criacao">Criação</option>
+                <option value="edicao">Edição</option>
+                <option value="exclusao">Exclusão</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-inicio">De</label>
+              <input class="form-control is-metric" type="date" id="filtro-inicio" name="data_inicio">
+            </div>
+            <div>
+              <label class="form-label" for="filtro-fim">Até</label>
+              <input class="form-control is-metric" type="date" id="filtro-fim" name="data_fim">
+            </div>
+            <div>
+              <button class="btn btn-outline-secondary w-100" type="reset"><i class="bi bi-x-lg" aria-hidden="true"></i> Limpar filtros</button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Data e hora</th>
+                  <th scope="col">Usuário</th>
+                  <th scope="col">Ação</th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="3" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhum registro com esses filtros.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do for sobre page_obj. Mostra usuario_nome_snapshot, não o nome atual. -->
+          <template data-lista-linha>
+            <tr>
+              <td><span class="is-metric" data-campo="data_hora_texto"></span></td>
+              <td class="is-celula-titulo" data-campo="usuario_nome_snapshot"></td>
+              <td>
+                <span class="is-badge is-badge-neutral is-badge-sem-ponto" data-se="criacao"><i class="bi bi-plus-circle" aria-hidden="true"></i> Criação</span>
+                <span class="is-badge is-badge-neutral is-badge-sem-ponto" data-se="edicao"><i class="bi bi-pencil" aria-hidden="true"></i> Edição</span>
+                <span class="is-badge is-badge-neutral is-badge-sem-ponto" data-se="exclusao"><i class="bi bi-trash3" aria-hidden="true"></i> Exclusão</span>
+              </td>
+            </tr>
+          </template>
+
+          <div class="is-lista-rodape">
+            <span data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /log/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-log · outerHTML
+                 Django devolve: _lista_log.html da página pedida (Paginator, 20 por página)
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação do log">
+              <ul class="pagination">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/log/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-log"
+                     hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item"><span class="page-link border-0 bg-transparent text-secondary" data-pagina-texto></span></li>
+                <li class="page-item">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/log/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-log"
+                     hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Simulação do log: 58 registros de exemplo, sempre os mesmos.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+      var nomes = ['Paula Ribeiro', 'Paula Ribeiro', 'Diego Santos', 'Diego Santos', 'Marcos Lima', 'Ana Souza', 'Renata Gomes'];
+      var acoes = ['criacao', 'criacao', 'criacao', 'edicao', 'edicao', 'exclusao'];
+      var semente = 11;
+      function sorteio(n) { semente = (semente * 9301 + 49297) % 233280; return Math.floor(semente / 233280 * n); }
+
+      var registros = [];
+      var momento = new Date(2026, 9, 2, 17, 40);
+      for (var i = 0; i < 58; i++) {
+        var nome = nomes[sorteio(nomes.length)];
+        registros.push({ id: 900 - i, usuario_nome_snapshot: nome, acao: acoes[sorteio(acoes.length)], data_hora: new Date(momento.getTime()) });
+        momento.setMinutes(momento.getMinutes() - (20 + sorteio(300)));
+      }
+      function dia(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+      var filtroUsuario = document.getElementById('filtro-usuario');
+      registros.map(function (r) { return r.usuario_nome_snapshot; })
+        .filter(function (n, i, todos) { return todos.indexOf(n) === i; })
+        .sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); })
+        .forEach(function (n) { filtroUsuario.add(new Option(n, n)); });
+
+      is.lista({
+        card: document.getElementById('card-log'),
+        dados: registros,
+        ordenar: function (a, b) { return b.data_hora - a.data_hora; },
+        filtro: function (r, f) {
+          if (f.usuario && r.usuario_nome_snapshot !== f.usuario) return false;
+          if (f.acao && r.acao !== f.acao) return false;
+          if (f.data_inicio && dia(r.data_hora) < f.data_inicio) return false;
+          if (f.data_fim && dia(r.data_hora) > f.data_fim) return false;
+          return true;
+        },
+        preencher: function (tr, r) {
+          var h = String(r.data_hora.getHours()).padStart(2, '0') + ':' + String(r.data_hora.getMinutes()).padStart(2, '0');
+          is.preencher(tr, { usuario_nome_snapshot: r.usuario_nome_snapshot, data_hora_texto: is.formatar.data(dia(r.data_hora)) + ' ' + h });
+          is.mostrarSe(tr, { criacao: r.acao === 'criacao', edicao: r.acao === 'edicao', exclusao: r.acao === 'exclusao' });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
