@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movimentações · Estoque · InoSys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF06 histórico de movimentações com filtros (material, tipo, período) · 20 por página
+     RF03/RF04 também podem ser registrados daqui.
+     Perfis: Operacional de Estoque, Gestor, Administrador -->
+<body data-pagina="movimentacoes" data-perfis="estoque gestor admin">
+  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Sidebar · no Django vira {% include "partials/sidebar.html" %}.
+       Os itens com data-perfis entram com {% if %} pelo perfil de request.user. -->
+  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="is-marca" href="selecao.html">
+      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
+    </a>
+
+    <nav class="is-nav">
+      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Estoque</div>
+        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
+        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Fretes</div>
+        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
+        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Gestão</div>
+        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
+        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
+      </div>
+
+      <div class="is-nav-grupo">
+        <div class="is-nav-secao">Administração</div>
+        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
+        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
+      </div>
+    </nav>
+
+    <div class="is-sidebar-rodape">
+      <div class="is-usuario">
+        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+        <span>
+          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
+          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
+        </span>
+      </div>
+      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+
+      <!-- Só no mockup: some no Django. -->
+      <div class="is-mockup-perfil" data-somente-mockup>
+        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
+        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
+          <option value="estoque">Operacional de Estoque</option>
+          <option value="fretes">Operacional de Fretes</option>
+          <option value="gestor">Gestor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+  <div class="is-fundo-sidebar" aria-hidden="true"></div>
+
+  <div class="is-principal">
+    <header class="is-topo">
+      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="is-marca" href="selecao.html">
+        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+        <span class="is-marca-nome">InoSys</span>
+      </a>
+    </header>
+
+    <main class="is-conteudo" id="conteudo">
+      <div data-conteudo-tela>
+        <div class="is-cabecalho">
+          <div>
+            <div class="is-trilha"><a href="estoque.html">Estoque</a></div>
+            <h1>Movimentações</h1>
+            <p>Histórico de entradas e saídas de material, da mais recente para a mais antiga.</p>
+          </div>
+          <div class="is-cabecalho-acoes">
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em "Registrar movimentação"
+                 Requisição: GET /estoque/movimentacoes/nova/
+                 Alvo-troca: #modal-movimentacao .modal-content · innerHTML
+                 Django devolve: _form_movimentacao.html (mesmo parcial da tela de materiais)
+                 Mockup: abre o modal estático abaixo
+                 ─────────────────── -->
+            <button class="btn btn-primary" type="button"
+                    hx-get="/estoque/movimentacoes/nova/"
+                    hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-movimentacao" data-acao="movimentar">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Registrar movimentação
+            </button>
+          </div>
+        </div>
+
+        <!-- ▸ HTMX ───────────
+             Gatilho: evento estoqueAtualizado (após registrar entrada ou saída)
+             Requisição: GET /estoque/movimentacoes/ (filtros atuais via hx-include)
+             Alvo-troca: o card inteiro · outerHTML
+             Django devolve: _lista_movimentacoes.html
+             Mockup: a simulação redesenha as linhas
+             ─────────────────── -->
+        <section class="card" id="card-movimentacoes" aria-labelledby="titulo-movimentacoes"
+                 hx-get="/estoque/movimentacoes/" hx-trigger="estoqueAtualizado from:body"
+                 hx-include="#form-filtro-movimentacoes" hx-target="this" hx-swap="outerHTML">
+          <div class="card-header">
+            <h2 class="is-card-titulo" id="titulo-movimentacoes">Histórico</h2>
+          </div>
+
+          <!-- ▸ HTMX ───────────
+               Gatilho: mudar um filtro
+               Requisição: GET /estoque/movimentacoes/?material=&tipo=&data_inicio=&data_fim=
+               Alvo-troca: #card-movimentacoes · outerHTML · hx-push-url mantém os filtros na URL
+               Django devolve: _lista_movimentacoes.html filtrado, página 1
+               Mockup: filtra os dados de exemplo
+               ─────────────────── -->
+          <form class="is-filtros" id="form-filtro-movimentacoes" role="search" data-lista-filtros
+                hx-get="/estoque/movimentacoes/" hx-trigger="input delay:400ms, submit"
+                hx-target="#card-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+            <div>
+              <label class="form-label" for="filtro-material">Material</label>
+              <select class="form-select" id="filtro-material" name="material">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-tipo">Tipo</label>
+              <select class="form-select" id="filtro-tipo" name="tipo">
+                <option value="">Entradas e saídas</option>
+                <option value="entrada">Entradas</option>
+                <option value="saida">Saídas</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="filtro-inicio">De</label>
+              <input class="form-control is-metric" type="date" id="filtro-inicio" name="data_inicio">
+            </div>
+            <div>
+              <label class="form-label" for="filtro-fim">Até</label>
+              <input class="form-control is-metric" type="date" id="filtro-fim" name="data_fim">
+            </div>
+            <div>
+              <button class="btn btn-outline-secondary w-100" type="reset"><i class="bi bi-x-lg" aria-hidden="true"></i> Limpar filtros</button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Data</th>
+                  <th scope="col">Material</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col" class="is-num">Quantidade</th>
+                  <th scope="col">Motivo</th>
+                  <th scope="col">Responsável</th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="6" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhuma movimentação encontrada com esses filtros.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do {% for mov in page_obj %}. Motivo só existe em saída. -->
+          <template data-lista-linha>
+            <tr>
+              <td><span class="is-metric" data-campo="data" data-formato="data"></span></td>
+              <td class="is-celula-titulo" data-campo="material_nome"></td>
+              <td>
+                <span class="is-badge is-badge-info" data-se="entrada">Entrada</span>
+                <span class="is-badge is-badge-neutral" data-se="saida">Saída</span>
+              </td>
+              <td class="is-num"><span class="is-metric" data-campo="quantidade_sinal"></span> <span class="text-secondary" data-campo="unidade_medida"></span></td>
+              <td data-campo="motivo_rotulo"></td>
+              <td data-campo="usuario_nome"></td>
+            </tr>
+          </template>
+
+          <div class="is-lista-rodape">
+            <span data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /estoque/movimentacoes/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-movimentacoes · outerHTML
+                 Django devolve: _lista_movimentacoes.html da página pedida (Paginator, 20 por página)
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação de movimentações">
+              <ul class="pagination">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/estoque/movimentacoes/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-movimentacoes"
+                     hx-target="#card-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item"><span class="page-link border-0 bg-transparent text-secondary" data-pagina-texto></span></li>
+                <li class="page-item">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/estoque/movimentacoes/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-movimentacoes"
+                     hx-target="#card-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== Modal: entrada / saída (RF03, RF04) =====================
+       Mesmo parcial _form_movimentacao.html da tela de materiais. -->
+  <div class="modal fade" id="modal-movimentacao" tabindex="-1" aria-labelledby="modal-movimentacao-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: enviar o formulário
+             Requisição: POST /estoque/movimentacoes/nova/
+             Alvo-troca: #modal-movimentacao .modal-content · innerHTML
+             Django devolve: com erro (ex.: saldo insuficiente, RF04), o formulário com a mensagem (200);
+                             salvo, 204 + HX-Trigger: estoqueAtualizado
+             Mockup: valida o saldo no navegador e acrescenta a linha no histórico
+             ─────────────────── -->
+        <form id="form-movimentacao" novalidate
+              hx-post="/estoque/movimentacoes/nova/"
+              hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-movimentacao-titulo">Registrar movimentação</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <fieldset class="mb-3">
+              <legend class="form-label is-obrigatorio">Tipo</legend>
+              <div class="is-escolha">
+                <input class="btn-check" type="radio" name="tipo" id="tipo-entrada" value="entrada" required checked>
+                <label class="btn btn-outline-secondary is-escolha-opcao" for="tipo-entrada"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Entrada</label>
+                <input class="btn-check" type="radio" name="tipo" id="tipo-saida" value="saida">
+                <label class="btn btn-outline-secondary is-escolha-opcao" for="tipo-saida"><i class="bi bi-box-arrow-up" aria-hidden="true"></i> Saída</label>
+              </div>
+            </fieldset>
+            <div class="mb-3">
+              <label class="form-label is-obrigatorio" for="mov-material">Material</label>
+              <select class="form-select" id="mov-material" name="material" required aria-describedby="mov-saldo">
+                <option value="">Selecione…</option>
+              </select>
+              <div class="form-text" id="mov-saldo">Saldo atual: <span class="is-metric" data-campo="saldo">—</span></div>
+              <div class="invalid-feedback">Escolha o material.</div>
+            </div>
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <label class="form-label is-obrigatorio" for="mov-quantidade">Quantidade</label>
+                <input class="form-control is-metric" type="number" id="mov-quantidade" name="quantidade" min="1" step="1" inputmode="numeric" required>
+                <div class="invalid-feedback" id="mov-quantidade-erro">Informe uma quantidade maior que zero.</div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label is-obrigatorio" for="mov-data">Data</label>
+                <input class="form-control is-metric" type="date" id="mov-data" name="data" required>
+                <div class="invalid-feedback">Informe a data.</div>
+              </div>
+            </div>
+            <div class="mt-3" id="grupo-motivo" hidden>
+              <label class="form-label is-obrigatorio" for="mov-motivo">Motivo da saída</label>
+              <select class="form-select" id="mov-motivo" name="motivo">
+                <option value="">Selecione…</option>
+                <option value="uso_producao">Uso em produção</option>
+                <option value="perda_dano">Perda ou dano</option>
+                <option value="ajuste_inventario">Ajuste de inventário</option>
+              </select>
+              <div class="invalid-feedback">Escolha o motivo da saída.</div>
+            </div>
+            <div class="is-calculo mt-3">
+              <span class="is-calculo-rotulo">Saldo depois do registro</span>
+              <span class="is-calculo-valor" data-campo="saldo_depois">—</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Simulação do histórico: no Django a lista vem do banco, já filtrada e paginada.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+
+      var materiais = [
+        { id: 1,  nome: 'Placa de gesso acartonado ST 12,5 mm', unidade_medida: 'un', qtd_atual: 128 },
+        { id: 2,  nome: 'Perfil montante 70 mm', unidade_medida: 'un', qtd_atual: 34 },
+        { id: 3,  nome: 'Perfil guia 70 mm', unidade_medida: 'un', qtd_atual: 85 },
+        { id: 4,  nome: 'Forro de PVC branco 200 mm', unidade_medida: 'm²', qtd_atual: 212 },
+        { id: 5,  nome: 'Lã de vidro 50 mm', unidade_medida: 'm²', qtd_atual: 46 },
+        { id: 6,  nome: 'Parafuso GN25', unidade_medida: 'cx', qtd_atual: 22 },
+        { id: 7,  nome: 'Massa para drywall', unidade_medida: 'un', qtd_atual: 9 },
+        { id: 8,  nome: 'Fita telada 50 mm', unidade_medida: 'un', qtd_atual: 41 },
+        { id: 9,  nome: 'Placa de forro mineral 625 × 625 mm', unidade_medida: 'cx', qtd_atual: 30 },
+        { id: 10, nome: 'Painel de divisória 35 mm', unidade_medida: 'un', qtd_atual: 26 },
+        { id: 11, nome: 'Cantoneira de aço para forro', unidade_medida: 'un', qtd_atual: 64 }
+      ];
+      var MOTIVOS = { uso_producao: 'Uso em produção', perda_dano: 'Perda ou dano', ajuste_inventario: 'Ajuste de inventário' };
+      var RESPONSAVEIS = ['Paula Ribeiro', 'Paula Ribeiro', 'Paula Ribeiro', 'Marcos Lima'];
+
+      // 46 movimentações de exemplo (sempre as mesmas a cada abertura).
+      var semente = 7;
+      function sorteio(n) { semente = (semente * 9301 + 49297) % 233280; return Math.floor(semente / 233280 * n); }
+      var movimentacoes = [];
+      var dia = new Date(2026, 9, 2);
+      for (var i = 0; i < 46; i++) {
+        var m = materiais[sorteio(materiais.length)];
+        var tipo = sorteio(10) < 4 ? 'entrada' : 'saida';
+        var motivo = tipo === 'saida' ? ['uso_producao', 'uso_producao', 'uso_producao', 'perda_dano', 'ajuste_inventario'][sorteio(5)] : '';
+        movimentacoes.push({
+          id: 1000 - i, material_id: m.id, tipo: tipo, quantidade: tipo === 'entrada' ? 20 + sorteio(80) : 1 + sorteio(25),
+          data: dia.toISOString().slice(0, 10), motivo: motivo, usuario_nome: RESPONSAVEIS[sorteio(4)]
+        });
+        if (sorteio(3) === 0) dia.setDate(dia.getDate() - 1);
+      }
+      var proximoId = 1001;
+
+      function material(id) { return materiais.filter(function (x) { return String(x.id) === String(id); })[0]; }
+
+      var filtroMaterial = document.getElementById('filtro-material');
+      materiais.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); })
+        .forEach(function (m) { filtroMaterial.add(new Option(m.nome, m.id)); });
+      // Vindo de "Ver movimentações" na tela de materiais.
+      var vindoDe = new URLSearchParams(location.search).get('material');
+      if (vindoDe) filtroMaterial.value = vindoDe;
+
+      var lista = is.lista({
+        card: document.getElementById('card-movimentacoes'),
+        dados: movimentacoes,
+        ordenar: function (a, b) { return a.data < b.data ? 1 : a.data > b.data ? -1 : b.id - a.id; },
+        filtro: function (mov, f) {
+          if (f.material && String(mov.material_id) !== f.material) return false;
+          if (f.tipo && mov.tipo !== f.tipo) return false;
+          if (f.data_inicio && mov.data < f.data_inicio) return false;
+          if (f.data_fim && mov.data > f.data_fim) return false;
+          return true;
+        },
+        preencher: function (tr, mov) {
+          var m = material(mov.material_id);
+          var entrada = mov.tipo === 'entrada';
+          is.preencher(tr, {
+            data: mov.data, material_nome: m.nome, unidade_medida: m.unidade_medida,
+            quantidade_sinal: (entrada ? '+' : '−') + is.formatar.numero(mov.quantidade),
+            motivo_rotulo: MOTIVOS[mov.motivo] || '—', usuario_nome: mov.usuario_nome
+          });
+          tr.querySelector('[data-campo="quantidade_sinal"]').classList.toggle('is-texto-ok', entrada);
+          is.mostrarSe(tr, { entrada: entrada, saida: !entrada });
+        }
+      });
+
+      /* ---------- modal de movimentação ---------- */
+      var formMov = document.getElementById('form-movimentacao');
+      var selMaterial = document.getElementById('mov-material');
+      var campoQtd = document.getElementById('mov-quantidade');
+      var campoMotivo = document.getElementById('mov-motivo');
+      materiais.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); })
+        .forEach(function (m) { selMaterial.add(new Option(m.nome, m.id)); });
+
+      function atualizar() {
+        var m = material(selMaterial.value);
+        var saida = formMov.elements.tipo.value === 'saida';
+        document.getElementById('grupo-motivo').hidden = !saida;
+        campoMotivo.required = saida;
+        var qtd = Number(campoQtd.value) || 0;
+        var erro = m && saida && qtd > m.qtd_atual
+          ? 'Saldo insuficiente: há ' + is.formatar.numero(m.qtd_atual) + ' ' + m.unidade_medida + ' em estoque.' : '';
+        campoQtd.setCustomValidity(erro);
+        document.getElementById('mov-quantidade-erro').textContent = erro || 'Informe uma quantidade maior que zero.';
+        if (erro) formMov.classList.add('was-validated');
+        is.preencher(formMov, {
+          saldo: m ? is.formatar.numero(m.qtd_atual) + ' ' + m.unidade_medida : '—',
+          saldo_depois: m && qtd ? is.formatar.numero(m.qtd_atual + (saida ? -qtd : qtd)) + ' ' + m.unidade_medida : '—'
+        });
+      }
+      formMov.addEventListener('input', atualizar);
+      formMov.addEventListener('change', atualizar);
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('[data-acao="movimentar"]')) return;
+        formMov.reset();
+        formMov.classList.remove('was-validated');
+        is.preencherForm(formMov, { tipo: 'entrada', data: is.hoje(), material: filtroMaterial.value });
+        atualizar();
+      });
+
+      formMov.addEventListener('submit', function (e) {
+        e.preventDefault();
+        atualizar();
+        formMov.classList.add('was-validated');
+        if (!formMov.checkValidity()) return;
+        var d = is.lerForm(formMov);
+        var m = material(d.material);
+        var qtd = Number(d.quantidade);
+        m.qtd_atual += d.tipo === 'saida' ? -qtd : qtd;
+        movimentacoes.push({
+          id: proximoId++, material_id: m.id, tipo: d.tipo, quantidade: qtd, data: d.data,
+          motivo: d.tipo === 'saida' ? d.motivo : '', usuario_nome: window.inosys.PERFIS[is.perfil()].nome
+        });
+        is.fecharModal('#modal-movimentacao');
+        lista.render();
+        is.toast((d.tipo === 'saida' ? 'Saída' : 'Entrada') + ' registrada.');
+      });
+    })();
+  </script>
+</body>
+</html>
