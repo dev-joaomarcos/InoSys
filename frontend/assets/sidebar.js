@@ -10,8 +10,10 @@
 (function () {
   'use strict';
 
-  // Só existe simulação quando a tela é aberta com duplo clique.
-  window.inosysMockup = window.location.protocol === 'file:';
+  // Só existe simulação quando a tela é aberta com duplo clique (file://)
+  // ou pela prévia do runserver (frontend/previa_settings.py, endereço /mockup/).
+  window.inosysMockup = window.location.protocol === 'file:' ||
+    window.location.pathname.indexOf('/mockup/') === 0;
 
   var parametros = new URLSearchParams(window.location.search);
   var verGanchos = window.inosysMockup && parametros.has('htmx');
