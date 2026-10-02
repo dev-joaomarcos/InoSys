@@ -3,10 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Relatórios · InoSys</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Relatórios · Visão Geral · InoSys</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="assets/estilos.css" rel="stylesheet">
@@ -14,170 +12,163 @@
 <!-- RF12 relatórios em tela (sem exportação por ora): movimentações e fretes,
      com destaque de divergência entre valor sugerido e cobrado. RNF01: até 5 s.
      Perfis: Gestor, Administrador -->
-<body data-pagina="relatorios" data-perfis="gestor admin">
-  <a class="is-pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+<body data-modulo="visao" data-perfis="gestor admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
 
   <!-- Sidebar · no Django vira o include de partials/sidebar.html.
        Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
-  <aside class="is-sidebar" id="sidebar" aria-label="Menu principal">
-    <a class="is-marca" href="selecao.html">
-      <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-      <span class="is-marca-nome">InoSys<small>INOVE Divisórias e Forros</small></span>
-    </a>
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
 
-    <nav class="is-nav">
-      <a class="is-nav-link" href="selecao.html" data-pagina="selecao"><i class="bi bi-house" aria-hidden="true"></i> Início</a>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Estoque</div>
-        <a class="is-nav-link" href="estoque.html" data-pagina="estoque" data-perfis="estoque gestor admin"><i class="bi bi-box-seam" aria-hidden="true"></i> Materiais</a>
-        <a class="is-nav-link" href="estoque-movimentacoes.html" data-pagina="movimentacoes" data-perfis="estoque gestor admin"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Movimentações</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Fretes</div>
-        <a class="is-nav-link" href="fretes.html" data-pagina="entregas" data-perfis="fretes gestor admin"><i class="bi bi-truck" aria-hidden="true"></i> Entregas</a>
-        <a class="is-nav-link" href="fretes-entregadores.html" data-pagina="entregadores" data-perfis="fretes gestor admin"><i class="bi bi-person-vcard" aria-hidden="true"></i> Entregadores</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Gestão</div>
-        <a class="is-nav-link" href="visao-geral.html" data-pagina="visao-geral" data-perfis="gestor admin"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Visão geral</a>
-        <a class="is-nav-link" href="relatorios.html" data-pagina="relatorios" data-perfis="gestor admin"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Relatórios</a>
-      </div>
-
-      <div class="is-nav-grupo">
-        <div class="is-nav-secao">Administração</div>
-        <a class="is-nav-link" href="admin-usuarios.html" data-pagina="usuarios" data-perfis="admin"><i class="bi bi-people" aria-hidden="true"></i> Usuários</a>
-        <a class="is-nav-link" href="admin-log.html" data-pagina="log" data-perfis="admin"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</a>
-      </div>
-    </nav>
-
-    <div class="is-sidebar-rodape">
-      <div class="is-usuario">
-        <span class="is-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
-        <span>
-          <span class="is-usuario-nome d-block" data-usuario-nome>Ana Souza</span>
-          <span class="is-usuario-perfil" data-usuario-perfil>Administrador</span>
-        </span>
-      </div>
-      <a class="is-sair" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
-
-      <!-- Só no mockup: some no Django. -->
-      <div class="is-mockup-perfil" data-somente-mockup>
-        <label class="form-label" for="mockup-perfil">Perfil simulado</label>
-        <select class="form-select form-select-sm" id="mockup-perfil" data-mockup-perfil>
-          <option value="estoque">Operacional de Estoque</option>
-          <option value="fretes">Operacional de Fretes</option>
-          <option value="gestor">Gestor</option>
-          <option value="admin">Administrador</option>
-        </select>
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
       </div>
     </div>
   </aside>
-  <div class="is-fundo-sidebar" aria-hidden="true"></div>
 
-  <div class="is-principal">
-    <header class="is-topo">
-      <button class="is-botao-menu" type="button" data-abrir-sidebar aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
-        <i class="bi bi-list" aria-hidden="true"></i>
-      </button>
-      <a class="is-marca" href="selecao.html">
-        <span class="is-marca-simbolo"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-        <span class="is-marca-nome">InoSys</span>
-      </a>
-    </header>
-
-    <main class="is-conteudo" id="conteudo">
+  <main class="conteudo" id="conteudo">
+    <div class="container">
       <div data-conteudo-tela>
-        <div class="is-cabecalho">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
           <div>
-            <div class="is-trilha">Gestão</div>
-            <h1>Relatórios</h1>
-            <p>Escolha o período e os filtros; o relatório aparece aqui na tela.</p>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item"><a href="visao-geral.html">Visão Geral</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Relatórios</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Visão Geral</h1>
+            <p class="text-muted small mb-0">Escolha o período e os filtros; o relatório aparece aqui na tela.</p>
           </div>
         </div>
 
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="aba-movimentacoes" data-bs-toggle="tab" data-bs-target="#painel-movimentacoes" type="button" role="tab" aria-controls="painel-movimentacoes" aria-selected="true">
-              <i class="bi bi-box-seam" aria-hidden="true"></i> Movimentações
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aba-fretes" data-bs-toggle="tab" data-bs-target="#painel-fretes" type="button" role="tab" aria-controls="painel-fretes" aria-selected="false">
-              <i class="bi bi-truck" aria-hidden="true"></i> Fretes
-            </button>
-          </li>
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="visao-geral.html">Resumo</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="relatorios.html">Relatórios</a></li>
         </ul>
+
+        <div class="btn-group mb-3" role="tablist" aria-label="Tipo de relatório">
+          <button class="btn btn-sm btn-outline-primary active" id="aba-movimentacoes" data-bs-toggle="tab" data-bs-target="#painel-movimentacoes" type="button" role="tab" aria-controls="painel-movimentacoes" aria-selected="true">
+            <i class="bi bi-box-seam" aria-hidden="true"></i> Movimentações
+          </button>
+          <button class="btn btn-sm btn-outline-primary" id="aba-fretes" data-bs-toggle="tab" data-bs-target="#painel-fretes" type="button" role="tab" aria-controls="painel-fretes" aria-selected="false">
+            <i class="bi bi-truck" aria-hidden="true"></i> Fretes
+          </button>
+        </div>
 
         <div class="tab-content">
           <!-- ======================= Relatório de movimentações ======================= -->
           <div class="tab-pane fade show active" id="painel-movimentacoes" role="tabpanel" aria-labelledby="aba-movimentacoes" tabindex="0">
             <section class="card" id="card-rel-movimentacoes" aria-labelledby="titulo-rel-mov">
-              <div class="card-header">
-                <h2 class="is-card-titulo" id="titulo-rel-mov">Movimentações por material</h2>
-                <p class="is-card-subtitulo">Total de entradas e de saídas por motivo no período, com o saldo atual.</p>
+              <div class="card-body pb-2">
+                <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-rel-mov">Movimentações por material</h2>
+                    <div class="is-card-subtitle">Total de entradas e de saídas por motivo no período, com o saldo atual</div>
+                  </div>
+                  <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+                </div>
+
+                <!-- ▸ HTMX ───────────
+                     Gatilho: mudar um filtro
+                     Requisição: GET /relatorios/movimentacoes/?material=&data_inicio=&data_fim=
+                     Alvo-troca: #card-rel-movimentacoes · outerHTML · hx-push-url
+                     Django devolve: _relatorio_movimentacoes.html (agregado por material)
+                     Mockup: recalcula com os dados de exemplo
+                     ─────────────────── -->
+                <form class="row g-2" id="form-rel-movimentacoes" role="search"
+                      hx-get="/relatorios/movimentacoes/" hx-trigger="input delay:400ms, submit"
+                      hx-target="#card-rel-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+                  <div class="col-md-6">
+                    <label class="form-label" for="rel-mov-material">Material</label>
+                    <select class="form-select" id="rel-mov-material" name="material">
+                      <option value="">Todos</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <label class="form-label" for="rel-mov-inicio">De</label>
+                    <input class="form-control" type="date" id="rel-mov-inicio" name="data_inicio" value="2026-09-02">
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <label class="form-label" for="rel-mov-fim">Até</label>
+                    <input class="form-control" type="date" id="rel-mov-fim" name="data_fim" value="2026-10-02">
+                  </div>
+                </form>
               </div>
 
-              <!-- ▸ HTMX ───────────
-                   Gatilho: mudar um filtro
-                   Requisição: GET /relatorios/movimentacoes/?material=&data_inicio=&data_fim=
-                   Alvo-troca: #card-rel-movimentacoes · outerHTML · hx-push-url
-                   Django devolve: _relatorio_movimentacoes.html (agregado por material)
-                   Mockup: recalcula com os dados de exemplo
-                   ─────────────────── -->
-              <form class="is-filtros" id="form-rel-movimentacoes" role="search"
-                    hx-get="/relatorios/movimentacoes/" hx-trigger="input delay:400ms, submit"
-                    hx-target="#card-rel-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
-                <div>
-                  <label class="form-label" for="rel-mov-material">Material</label>
-                  <select class="form-select" id="rel-mov-material" name="material">
-                    <option value="">Todos</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="form-label" for="rel-mov-inicio">De</label>
-                  <input class="form-control is-metric" type="date" id="rel-mov-inicio" name="data_inicio" value="2026-09-02">
-                </div>
-                <div>
-                  <label class="form-label" for="rel-mov-fim">Até</label>
-                  <input class="form-control is-metric" type="date" id="rel-mov-fim" name="data_fim" value="2026-10-02">
-                </div>
-              </form>
-
               <div class="table-responsive">
-                <table class="table">
+                <table class="table align-middle">
                   <thead>
                     <tr>
                       <th scope="col">Material</th>
-                      <th scope="col" class="is-num">Entradas</th>
-                      <th scope="col" class="is-num">Saídas · produção</th>
-                      <th scope="col" class="is-num">Saídas · perda/dano</th>
-                      <th scope="col" class="is-num">Saídas · ajuste</th>
-                      <th scope="col" class="is-num">Saldo atual</th>
+                      <th scope="col" class="text-end">Entradas</th>
+                      <th scope="col" class="text-end">Saídas · produção</th>
+                      <th scope="col" class="text-end">Saídas · perda/dano</th>
+                      <th scope="col" class="text-end">Saídas · ajuste</th>
+                      <th scope="col" class="text-end">Saldo atual</th>
                     </tr>
                   </thead>
                   <tbody data-rel-itens></tbody>
                   <tbody data-rel-vazio hidden>
-                    <tr><td colspan="6" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhuma movimentação no período.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma movimentação no período. Amplie as datas.</td></tr>
                   </tbody>
                 </table>
               </div>
-              <!-- Linha · corpo do for sobre o agregado por material. -->
+              <!-- Linha · corpo do laço for sobre o agregado por material. -->
               <template data-rel-linha>
                 <tr>
-                  <td><span class="is-celula-titulo" data-campo="nome"></span>
-                    <span class="is-celula-sub">em <span data-campo="unidade_medida"></span>
-                      <span class="is-badge is-badge-warning ms-1" data-se="baixo">Estoque baixo</span></span></td>
-                  <td class="is-num"><span class="is-metric is-texto-ok" data-campo="entradas"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="uso_producao"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="perda_dano"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="ajuste_inventario"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="qtd_atual" data-formato="numero"></span></td>
+                  <td>
+                    <div class="fw-semibold" data-campo="nome"></div>
+                    <div class="small text-muted">em <span data-campo="unidade_medida"></span></div>
+                  </td>
+                  <td class="text-end" data-campo="entradas"></td>
+                  <td class="text-end" data-campo="uso_producao"></td>
+                  <td class="text-end" data-campo="perda_dano"></td>
+                  <td class="text-end" data-campo="ajuste_inventario"></td>
+                  <td class="text-end" data-campo="qtd_atual" data-formato="numero"></td>
                 </tr>
               </template>
-              <div class="is-lista-rodape">
+              <div class="d-flex flex-wrap justify-content-between gap-2 px-3 py-3 border-top small text-muted">
                 <span data-rel-resumo></span>
                 <span>Quantidades na unidade de cada material.</span>
               </div>
@@ -187,122 +178,129 @@
           <!-- ========================== Relatório de fretes ========================== -->
           <div class="tab-pane fade" id="painel-fretes" role="tabpanel" aria-labelledby="aba-fretes" tabindex="0">
             <section class="card" id="card-rel-fretes" aria-labelledby="titulo-rel-fretes">
-              <div class="card-header">
-                <h2 class="is-card-titulo" id="titulo-rel-fretes">Fretes: sugerido × cobrado</h2>
-                <p class="is-card-subtitulo">Divergência = valor cobrado diferente do valor sugerido pela distância.</p>
+              <div class="card-body pb-2">
+                <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-rel-fretes">Fretes: sugerido × cobrado</h2>
+                    <div class="is-card-subtitle">Divergência = valor cobrado diferente do valor sugerido pela distância</div>
+                  </div>
+                  <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+                </div>
+
+                <!-- ▸ HTMX ───────────
+                     Gatilho: mudar um filtro
+                     Requisição: GET /relatorios/fretes/?entregador=&status=&data_inicio=&data_fim=&so_divergencias=
+                     Alvo-troca: #card-rel-fretes · outerHTML · hx-push-url
+                     Django devolve: _relatorio_fretes.html (resumo por entregador + entregas)
+                     Mockup: recalcula com os dados de exemplo
+                     ─────────────────── -->
+                <form class="row g-2 align-items-end" id="form-rel-fretes" role="search"
+                      hx-get="/relatorios/fretes/" hx-trigger="input delay:400ms, submit"
+                      hx-target="#card-rel-fretes" hx-swap="outerHTML" hx-push-url="true">
+                  <div class="col-md-3">
+                    <label class="form-label" for="rel-fre-entregador">Entregador</label>
+                    <select class="form-select" id="rel-fre-entregador" name="entregador">
+                      <option value="">Todos</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-status">Status</label>
+                    <select class="form-select" id="rel-fre-status" name="status">
+                      <option value="">Todos</option>
+                      <option value="pendente">Pendente</option>
+                      <option value="em_andamento">Em andamento</option>
+                      <option value="concluida">Concluída</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-inicio">De</label>
+                    <input class="form-control" type="date" id="rel-fre-inicio" name="data_inicio" value="2026-09-02">
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-fim">Até</label>
+                    <input class="form-control" type="date" id="rel-fre-fim" name="data_fim" value="2026-10-02">
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="rel-fre-divergencias" name="so_divergencias" value="1">
+                      <label class="form-check-label" for="rel-fre-divergencias">Só divergências</label>
+                    </div>
+                  </div>
+                </form>
               </div>
 
-              <!-- ▸ HTMX ───────────
-                   Gatilho: mudar um filtro
-                   Requisição: GET /relatorios/fretes/?entregador=&status=&data_inicio=&data_fim=&so_divergencias=
-                   Alvo-troca: #card-rel-fretes · outerHTML · hx-push-url
-                   Django devolve: _relatorio_fretes.html (resumo por entregador + entregas)
-                   Mockup: recalcula com os dados de exemplo
-                   ─────────────────── -->
-              <form class="is-filtros" id="form-rel-fretes" role="search"
-                    hx-get="/relatorios/fretes/" hx-trigger="input delay:400ms, submit"
-                    hx-target="#card-rel-fretes" hx-swap="outerHTML" hx-push-url="true">
-                <div>
-                  <label class="form-label" for="rel-fre-entregador">Entregador</label>
-                  <select class="form-select" id="rel-fre-entregador" name="entregador">
-                    <option value="">Todos</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="form-label" for="rel-fre-status">Status</label>
-                  <select class="form-select" id="rel-fre-status" name="status">
-                    <option value="">Todos</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="em_andamento">Em andamento</option>
-                    <option value="concluida">Concluída</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="form-label" for="rel-fre-inicio">De</label>
-                  <input class="form-control is-metric" type="date" id="rel-fre-inicio" name="data_inicio" value="2026-09-02">
-                </div>
-                <div>
-                  <label class="form-label" for="rel-fre-fim">Até</label>
-                  <input class="form-control is-metric" type="date" id="rel-fre-fim" name="data_fim" value="2026-10-02">
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="rel-fre-divergencias" name="so_divergencias" value="1">
-                  <label class="form-check-label" for="rel-fre-divergencias">Só divergências</label>
-                </div>
-              </form>
-
-              <div class="card-body pb-0">
-                <h3 class="h6 mb-3">Resumo por entregador</h3>
+              <div class="card-body pt-2 pb-2">
+                <h3 class="is-card-title">Resumo por entregador</h3>
               </div>
               <div class="table-responsive">
-                <table class="table">
+                <table class="table align-middle">
                   <thead>
                     <tr>
                       <th scope="col">Entregador</th>
-                      <th scope="col" class="is-num">Entregas</th>
-                      <th scope="col" class="is-num">Distância</th>
-                      <th scope="col" class="is-num">Sugerido</th>
-                      <th scope="col" class="is-num">Cobrado</th>
-                      <th scope="col" class="is-num">Diferença</th>
+                      <th scope="col" class="text-end">Entregas</th>
+                      <th scope="col" class="text-end">Distância</th>
+                      <th scope="col" class="text-end">Sugerido</th>
+                      <th scope="col" class="text-end">Cobrado</th>
+                      <th scope="col" class="text-end">Diferença</th>
                     </tr>
                   </thead>
                   <tbody data-rel-resumo-itens></tbody>
                   <tfoot>
-                    <tr>
+                    <tr class="fw-semibold">
                       <td>Total</td>
-                      <td class="is-num"><span class="is-metric" data-campo="total_entregas"></span></td>
-                      <td class="is-num"><span class="is-metric" data-campo="total_km"></span> km</td>
-                      <td class="is-num"><span class="is-metric" data-campo="total_sugerido"></span></td>
-                      <td class="is-num"><span class="is-metric" data-campo="total_cobrado"></span></td>
-                      <td class="is-num"><span class="is-metric" data-campo="total_diferenca"></span></td>
+                      <td class="text-end" data-campo="total_entregas"></td>
+                      <td class="text-end"><span data-campo="total_km"></span> km</td>
+                      <td class="text-end" data-campo="total_sugerido"></td>
+                      <td class="text-end" data-campo="total_cobrado"></td>
+                      <td class="text-end" data-campo="total_diferenca"></td>
                     </tr>
                   </tfoot>
                 </table>
               </div>
               <template data-rel-resumo-linha>
                 <tr>
-                  <td class="is-celula-titulo" data-campo="nome"></td>
-                  <td class="is-num"><span class="is-metric" data-campo="entregas"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="km"></span> <span class="text-secondary">km</span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="sugerido"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="cobrado"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="diferenca"></span></td>
+                  <td class="fw-semibold" data-campo="nome"></td>
+                  <td class="text-end" data-campo="entregas"></td>
+                  <td class="text-end"><span data-campo="km"></span> km</td>
+                  <td class="text-end" data-campo="sugerido"></td>
+                  <td class="text-end" data-campo="cobrado"></td>
+                  <td class="text-end" data-campo="diferenca"></td>
                 </tr>
               </template>
 
-              <div class="card-body pb-0 border-top">
-                <h3 class="h6 mb-1">Entregas do período</h3>
-                <p class="is-card-subtitulo mb-3">Entregas sem valor cobrado ficam fora da soma do cobrado e da diferença.</p>
+              <div class="card-body pt-4 pb-2 border-top">
+                <h3 class="is-card-title">Entregas do período</h3>
+                <div class="is-card-subtitle">Entregas sem valor cobrado ficam fora da soma do cobrado e da diferença</div>
               </div>
               <div class="table-responsive">
-                <table class="table">
+                <table class="table table-hover align-middle">
                   <thead>
                     <tr>
                       <th scope="col">Data</th>
                       <th scope="col">Destino</th>
                       <th scope="col">Entregador</th>
-                      <th scope="col" class="is-num">Sugerido</th>
-                      <th scope="col" class="is-num">Cobrado</th>
-                      <th scope="col" class="is-num">Diferença</th>
+                      <th scope="col" class="text-end">Sugerido</th>
+                      <th scope="col" class="text-end">Cobrado</th>
+                      <th scope="col" class="text-end">Diferença</th>
                       <th scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody data-rel-entregas></tbody>
                   <tbody data-rel-entregas-vazio hidden>
-                    <tr><td colspan="7" class="is-tabela-vazia"><i class="bi bi-inbox" aria-hidden="true"></i>Nenhuma entrega com esses filtros.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma entrega com esses filtros. Amplie o período ou desmarque "Só divergências".</td></tr>
                   </tbody>
                 </table>
               </div>
               <template data-rel-entrega-linha>
                 <tr>
-                  <td><span class="is-metric" data-campo="data" data-formato="data"></span></td>
-                  <td class="is-celula-titulo" data-campo="destino"></td>
+                  <td class="is-metric fw-normal" data-campo="data" data-formato="data"></td>
+                  <td class="fw-semibold" data-campo="destino"></td>
                   <td data-campo="entregador_nome"></td>
-                  <td class="is-num"><span class="is-metric" data-campo="valor_sugerido" data-formato="moeda"></span></td>
-                  <td class="is-num"><span class="is-metric" data-campo="cobrado_texto"></span></td>
-                  <td class="is-num">
-                    <span class="is-badge is-badge-danger is-metric" data-se="divergente" data-campo="diferenca"></span>
-                    <span class="text-secondary" data-se="igual">—</span>
+                  <td class="text-end" data-campo="valor_sugerido" data-formato="moeda"></td>
+                  <td class="text-end" data-campo="cobrado_texto"></td>
+                  <td class="text-end">
+                    <span class="is-badge is-badge-danger" data-se="divergente"><i class="bi bi-cash-coin" aria-hidden="true"></i> <span data-campo="diferenca"></span></span>
+                    <span class="text-muted" data-se="igual">—</span>
                   </td>
                   <td>
                     <span class="is-badge is-badge-warning" data-se="pendente">Pendente</span>
@@ -311,21 +309,21 @@
                   </td>
                 </tr>
               </template>
-              <div class="is-lista-rodape">
+              <div class="px-3 py-3 border-top small text-muted">
                 <span data-rel-fretes-resumo></span>
               </div>
             </section>
           </div>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
   <script src="assets/sidebar.js"></script>
   <script>
-    // Abre a aba pelo endereço (relatorios.html#fretes). Vale também no Django.
+    // Abre o relatório pelo endereço (relatorios.html#fretes). Vale também no Django.
     (function () {
       if (location.hash === '#fretes' && window.bootstrap) {
         window.bootstrap.Tab.getOrCreateInstance(document.getElementById('aba-fretes')).show();
@@ -440,7 +438,9 @@
           function n(v) { return v ? f.numero(v) : '—'; }
           is.preencher(tr, { nome: x.nome, unidade_medida: x.unidade_medida, qtd_atual: x.qtd_atual,
             entradas: a.entradas ? '+' + f.numero(a.entradas) : '—', uso_producao: n(a.uso_producao), perda_dano: n(a.perda_dano), ajuste_inventario: n(a.ajuste_inventario) });
-          is.mostrarSe(tr, { baixo: x.qtd_atual < x.quantidade_minima });
+          var baixo = x.qtd_atual < x.quantidade_minima;
+          is.mostrarSe(tr, { baixo: baixo });
+          tr.classList.toggle('is-row-alert', baixo);
           corpo.appendChild(tr);
         });
         cardMov.querySelector('[data-rel-vazio]').hidden = linhas.length > 0;
@@ -486,14 +486,14 @@
           if (!r) return;
           var tr = clonar(cardFre, '[data-rel-resumo-linha]');
           is.preencher(tr, { nome: x.nome, entregas: f.numero(r.entregas), km: f.decimal(r.km), sugerido: f.moeda(r.sugerido), cobrado: f.moeda(r.cobrado), diferenca: sinal(r.diferenca) });
-          tr.querySelector('[data-campo="diferenca"]').classList.toggle('is-texto-problema', arred(r.diferenca) !== 0);
+          tr.querySelector('[data-campo="diferenca"]').classList.toggle('text-danger', arred(r.diferenca) !== 0);
           corpoResumo.appendChild(tr);
         });
         is.preencher(cardFre, {
           total_entregas: f.numero(total.entregas), total_km: f.decimal(total.km),
           total_sugerido: f.moeda(total.sugerido), total_cobrado: f.moeda(total.cobrado), total_diferenca: sinal(total.diferenca)
         });
-        cardFre.querySelector('[data-campo="total_diferenca"]').classList.toggle('is-texto-problema', arred(total.diferenca) !== 0);
+        cardFre.querySelector('[data-campo="total_diferenca"]').classList.toggle('text-danger', arred(total.diferenca) !== 0);
 
         var corpo = cardFre.querySelector('[data-rel-entregas]');
         corpo.replaceChildren();
