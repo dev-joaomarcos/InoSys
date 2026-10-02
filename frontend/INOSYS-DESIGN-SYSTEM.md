@@ -1,3 +1,370 @@
+# InoSys — Design System
+
+Sistema de gestão de estoque e monitor financeiro de fretes da **INOVE Divisórias e Forros** (PIM IV, ADS/USCS).
+Interface web interna, usada no dia a dia por quatro perfis. Stack do front: HTML + **Bootstrap 5.3.3** + **HTMX** + Bootstrap Icons, fonte **IBM Plex**.
+
+![Logo InoSys](assets/img/logo-inosys.png)
+
+Este documento é **só o design system**: marca, cores, tipografia, forma, componentes, padrões e estados.
+Telas, regras de negócio e endpoints ficam fora. O CSS completo está no **Apêndice A** e os arquivos da logo
+vão junto (pasta `assets/img/`).
+
+---
+
+## Para o Claude Code: como usar este documento
+
+1. Crie `assets/estilos.css` com o conteúdo **exato** do Apêndice A.
+2. Copie os arquivos de logo para `assets/img/` (lista na seção 1.2).
+3. Os `.html` referenciam `assets/estilos.css` por caminho **relativo**: `assets/` fica na mesma pasta dos `.html`.
+4. Carregue na ordem: Bootstrap CSS, Bootstrap Icons, `assets/estilos.css`.
+5. **Não** coloque cor, fonte, raio ou sombra solta no HTML (`style="..."`). Tudo vem das variáveis `--is-*`.
+6. Prefira os componentes do Bootstrap (já reestilizados). Só crie classe nova (prefixo `is-`) se não houver equivalente, e registre-a no `estilos.css`.
+7. Se este texto divergir do `estilos.css`, **o CSS vence**.
+
+---
+
+## 1. Marca e logo
+
+### 1.1 A logo oficial
+
+Monitor azul com linha de crescimento e seta, seguido do nome **InoSys** em azul-marinho.
+É um arquivo de imagem aprovado: **não é para recriar em SVG, redesenhar nem adicionar elementos.**
+
+| | Cor | Hex |
+|---|---|---|
+| Ícone (monitor, linha e seta) | azul da logo | `#1D7DFF` |
+| Nome "InoSys" | azul-marinho da logo | `#233347` |
+
+> **Atenção:** o azul da logo (`#1D7DFF`) é cor de **identidade**. Com texto branco por cima ele dá só 3,87:1 de contraste
+> (abaixo dos 4,5:1 exigidos). Por isso a interface usa um azul mais escuro para ação, o `#175CD3` (seção 3).
+> Nunca use `#1D7DFF` como fundo de botão com texto, nem como cor de texto.
+
+### 1.2 Variantes e quando usar cada uma
+
+| Arquivo (`assets/img/`) | Aparência | Use sobre | Onde |
+|---|---|---|---|
+| `logo-inosys.png` | ícone azul + nome azul-marinho | fundo **claro** (branco, `#F1F3F6`) | cabeçalhos claros, documentos, e-mails |
+| `logo-inosys-reversed.png` | ícone azul + nome **branco** | fundo **navy** `#0D2340` | **sidebar** e painel do login |
+| `logo-inosys-mono-white.png` | tudo branco | fundo de cor sólida (ex.: azul `#175CD3`) | uso monocromático |
+| `logo-inosys-icon.png` | só o monitor, azul | fundo claro, espaço pequeno | favicon, avatar, ícone de app |
+| `logo-inosys-original.png` | arquivo enviado, sem corte | — | **arquivo-fonte**: não usar na interface |
+
+Todas têm fundo **transparente**, 600 × 171 px (a do ícone, 193 × 171 px) — cerca de 2× o maior tamanho de exibição, para ficar nítida em telas de alta densidade — e proporção fixa de aproximadamente 3,5 : 1.
+
+Pré-visualização das variantes sobre os fundos corretos:
+
+| Fundo | Variante |
+|---|---|
+| branco | ![logo sobre branco](assets/img/logo-inosys.png) |
+| navy `#0D2340` | usar `logo-inosys-reversed.png` |
+| azul `#175CD3` | usar `logo-inosys-mono-white.png` |
+
+### 1.3 Tamanhos e espaço livre
+
+| Contexto | Tamanho |
+|---|---|
+| Sidebar | altura **33px** (largura ≈ 116px), `width: auto` |
+| Painel do login | largura **150px**, `height: auto` |
+| Mínimo (logo completa) | largura **96px** |
+| Mínimo (só ícone) | **24px** |
+
+- **Espaço livre mínimo** ao redor: metade da altura da logo (≈ a altura da letra "I").
+- Sempre `alt="InoSys"` e `width`/`height` informados no HTML (evita salto de layout). A proporção nunca é alterada.
+
+### 1.4 Aplicação em HTML
+
+```html
+<!-- Sidebar (fundo navy) -->
+<img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+
+<!-- Fundo claro -->
+<img src="assets/img/logo-inosys.png" alt="InoSys" width="150" height="43">
+```
+
+### 1.5 Não fazer
+
+- Não recolorir, aplicar sombra, contorno, degradê ou efeito.
+- Não esticar nem cortar. Não girar.
+- Não usar a versão colorida (`logo-inosys.png`) sobre navy: o nome em azul-marinho desaparece. Use a `reversed`.
+- Não colocar sobre foto ou estampa sem uma camada sólida por trás.
+- Não separar o ícone do nome, exceto com a variante `icon`.
+- **Não acrescentar o ponto âmbar.** Um rascunho anterior da logo recriada em SVG tinha um ponto âmbar; ele **não existe** na logo oficial e foi removido.
+
+---
+
+## 2. Princípios
+
+- **Utilitário antes de bonito.** É uma ferramenta operacional, não uma página comercial. Densidade e clareza de números vêm primeiro.
+- **Cor com significado.** O azul é ação. Verde, âmbar, vermelho e azul-claro só comunicam estado. Nunca decoração.
+- **Cards limpos.** Fundo branco, borda fina, cantos de 16px, sombra muito discreta, bastante espaço interno.
+- **Sidebar como âncora.** Navy institucional fixo à esquerda em toda tela interna.
+- **Separar design de regra de negócio.** Melhorar espaçamento, cor, hierarquia, responsividade, ícones e estados é design. Inventar campo, módulo ou fluxo não é.
+
+---
+
+## 3. Cores
+
+### 3.1 Tokens (extraídos do `:root` do `estilos.css`)
+
+| Variável | Valor | Observação |
+|---|---|---|
+| `--is-brand` | `#175CD3` |  |
+| `--is-brand-light` | `#2F7CF6` |  |
+| `--is-brand-strong` | `#0F3F8F` |  |
+| `--is-amber` | `#F5A524` | destaque pontual (NÃO faz parte da logo) — só sobre fundo escuro |
+| `--is-navy` | `#0D2340` |  |
+| `--is-navy-2` | `#123F72` | cores da logo oficial — identidade, não usar como cor de botão/texto de UI |
+| `--is-logo-blue` | `#1D7DFF` | ícone da logo (contraste com branco 3,87:1 → não serve para texto) |
+| `--is-logo-ink` | `#233347` | wordmark "InoSys" sobre fundo claro |
+| `--is-ink` | `#16212F` |  |
+| `--is-muted` | `#62707F` |  |
+| `--is-border` | `#D6DDE6` |  |
+| `--is-border-soft` | `#EDF0F3` |  |
+| `--is-page-bg` | `#F1F3F6` |  |
+| `--is-surface` | `#FFFFFF` |  |
+| `--is-success` | `#15803D` |  |
+| `--is-success-tint` | `rgba(21,128,61,.10)` |  |
+| `--is-warning-text` | `#92400E` | texto/ícone de atenção sobre fundo claro |
+| `--is-warning-tint` | `rgba(245,165,36,.18)` |  |
+| `--is-danger` | `#B42318` |  |
+| `--is-danger-tint` | `rgba(180,35,24,.09)` |  |
+| `--is-info-tint` | `rgba(23,92,211,.09)` |  |
+| `--is-radius` | `10px` | botões, inputs |
+| `--is-radius-card` | `16px` | cards, tabelas, modais |
+| `--is-radius-lg` | `20px` | moldura do login |
+| `--is-shadow` | `0 1px 2px rgba(22,33,47,.04), 0 4px 14px -8px rgba(22,33,47,.12)` |  |
+| `--is-font` | `"IBM Plex Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif` |  |
+| `--is-font-mono` | `"IBM Plex Mono", "SFMono-Regular", Consolas, monospace` |  |
+| `--is-sidebar-w` | `240px` |  |
+
+### 3.2 Papéis
+
+| Papel | Token | Uso |
+|---|---|---|
+| Ação | `--is-brand` `#175CD3` | botão primário, links, foco, item ativo da sidebar |
+| Ação (hover) | `--is-brand-strong` `#0F3F8F` | hover e pressionado do botão primário |
+| Institucional | `--is-navy` `#0D2340` | sidebar e painel escuro do login (degradê para `--is-navy-2` `#123F72`) |
+| Texto | `--is-ink` `#16212F` | texto principal |
+| Texto secundário | `--is-muted` `#62707F` | legendas, breadcrumb, rótulos de tabela |
+| Fundo da página | `--is-page-bg` `#F1F3F6` | fundo geral |
+| Superfície | `--is-surface` `#FFFFFF` | cards, inputs, modais — **sempre branco** |
+| Bordas | `--is-border` `#D6DDE6` · `--is-border-soft` `#EDF0F3` | contorno de card/input · divisórias internas |
+| Identidade | `--is-logo-blue` `#1D7DFF` · `--is-logo-ink` `#233347` | **só** a logo (seção 1) |
+| Destaque pontual | `--is-amber` `#F5A524` | detalhe sobre fundo **escuro**; moderação; não é cor principal |
+
+### 3.3 Status — a cor só comunica estado
+
+| Cor | Classe | Significado | Exemplos |
+|---|---|---|---|
+| verde | `is-badge-success` | normal / concluído / ativo | Concluída, Ativo, Normal |
+| azul | `is-badge-info` | em andamento / informativo | Em andamento, Entrada, perfil Gestor |
+| âmbar | `is-badge-warning` | atenção | Pendente, Estoque baixo |
+| vermelho | `is-badge-danger` | problema | divergência de valor, erro |
+| cinza | `is-badge-neutral` | inativo / sem dado | Desativado, Saída, perfis operacionais |
+| navy | `is-badge-dark` | destaque neutro | Administrador, Anonimizado |
+
+Padrão visual: **fundo em tinta suave + texto na cor saturada**, forma de pílula. Nunca texto branco sobre âmbar ou vermelho claro.
+Os `badge text-bg-*` do Bootstrap são reestilizados no mesmo padrão como rede de segurança; em markup novo use `is-badge`.
+
+---
+
+## 4. Acessibilidade — contrastes verificados
+
+| Par | Razão | Resultado |
+|---|---|---|
+| branco sobre `#175CD3` | 5,99:1 | ✅ texto de botão primário |
+| `#15803D` sobre branco | 5,02:1 | ✅ status "sucesso" |
+| `#B42318` sobre branco | 6,57:1 | ✅ status "problema" |
+| `#92400E` sobre branco | 7,09:1 | ✅ texto/ícone de "atenção" sobre fundo claro |
+| `#233347` (nome da logo) sobre branco | 12,84:1 | ✅ |
+| `#F5A524` sobre `#0D2340` | 7,73:1 | ✅ âmbar sobre fundo escuro |
+| `#1D7DFF` sobre `#0D2340` | 4,08:1 | ✅ ícone da logo sobre navy (elemento gráfico, mínimo 3:1) |
+| `#1D7DFF` sobre branco / branco sobre `#1D7DFF` | 3,87:1 | ❌ **reprova para texto** |
+| `#F5A524` sobre branco | 2,04:1 | ❌ **nunca** usar âmbar puro sobre fundo claro |
+
+- Texto e ícone de "atenção" sobre fundo claro usam `--is-warning-text` `#92400E`, nunca o âmbar puro.
+- Foco visível padronizado (`:focus-visible`, contorno azul). Respeita `prefers-reduced-motion`.
+- A informação nunca depende só da cor: badges levam texto; alertas levam ícone.
+
+---
+
+## 5. Tipografia
+
+- **IBM Plex Sans** (400, 500, 600, 700) no texto. **IBM Plex Mono** (500, 600) em **números**: quantidades, km, R$, códigos.
+- Fontes carregadas do Google Fonts (já no `@import` do CSS). Fallback: `-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`.
+
+| Elemento | Tamanho | Peso | Observação |
+|---|---|---|---|
+| Título de tela `h1.h4` | 1,5rem | 700 | `letter-spacing: -.02em` |
+| Título de card | 0,95rem | 600 | |
+| Texto | 0,875–1rem | 400 | |
+| Rótulo de campo | 0,8125rem | 600 | |
+| Cabeçalho de tabela | 0,75rem | 600 | cor secundária, sem quebra de linha |
+| Número de KPI | 2rem | 600 | **Plex Mono** (`.is-metric`) |
+| Valores em tabela (`td.text-end`) | 0,82rem | 400 | **Plex Mono** |
+| Legenda / breadcrumb | 0,75–0,8rem | 400 | cor secundária |
+
+---
+
+## 6. Forma
+
+| Elemento | Raio | Token |
+|---|---|---|
+| botões, inputs, badges | 10px | `--is-radius` |
+| cards, tabelas, modais | 16px | `--is-radius-card` |
+| moldura do login | 20px | `--is-radius-lg` |
+
+- **Sombra:** sempre `--is-shadow` (duas camadas muito suaves). Nunca a `shadow` forte do Bootstrap.
+- **Borda:** 1px `--is-border` em cards e inputs; 1px `--is-border-soft` em divisórias dentro do card.
+- **Espaçamento:** escala do Bootstrap (`g-3`, `p-3`, `mb-3`, `gap-2`). Padding de card: `1.25rem`. Bastante espaço em branco.
+- **Largura:** conteúdo interno em `container` de até 1180px; sidebar 240px (`--is-sidebar-w`).
+
+---
+
+## 7. Ícones
+
+**Bootstrap Icons 1.11.3** (fonte via CDN). Cor herda do texto; tamanho acompanha a fonte.
+
+| Uso | Ícone |
+|---|---|
+| Início | `bi-grid` |
+| Estoque | `bi-box-seam` |
+| Fretes / entregas | `bi-truck` |
+| Visão geral | `bi-speedometer2` |
+| Administração | `bi-shield-lock` |
+| Usuário / senha (campos) | `bi-person`, `bi-lock` |
+| Atenção / estoque baixo | `bi-exclamation-triangle` |
+| Divergência de valor | `bi-cash-coin` |
+| Entrada / saída | `bi-box-arrow-in-down`, `bi-box-arrow-up` |
+| Histórico | `bi-clock-history` |
+| Adicionar | `bi-plus-lg` |
+| Desativar / reativar | `bi-pause-circle` / `bi-play-circle` |
+| Anonimizar | `bi-eraser` |
+| Sair / seguir | `bi-box-arrow-right` / `bi-arrow-right` |
+| Menu (celular) | `bi-list` |
+| Ajuda / segurança | `bi-question-circle`, `bi-shield-check` |
+
+Ícones decorativos levam `aria-hidden="true"`. Ícone sozinho num botão precisa de `title` ou `aria-label`.
+
+---
+
+## 8. Bootstrap — como foi reestilizado
+
+O Bootstrap 5.3.3 continua sendo a base. O `estilos.css` o reestiliza em **duas camadas**, então **não é preciso trocar classes no HTML**:
+
+1. **Variáveis globais `--bs-*`** (fonte, cor do texto, fundo, primária, sucesso, perigo, atenção, links, raios). Os utilitários (`.text-primary`, `.text-danger`, `.bg-light`...) leem essas variáveis em tempo real.
+2. **Variáveis locais de cada componente** (`--bs-btn-*`, `--bs-card-*`, `--bs-pagination-*`, `--bs-alert-*`...). O Bootstrap **não** herda a cor de componente a partir de `--bs-primary`, então cada componente é sobrescrito à parte.
+
+Componentes cobertos: `btn` (primary, outline-primary, outline-secondary, outline-success, outline-danger, btn-group), `card`, `table` (hover, cabeçalho), `nav-tabs`, `modal` (e backdrop navy), `alert` (success, danger, warning), `badge` (`text-bg-*`), `pagination`, `breadcrumb`, `form-control`, `form-select`, `form-label`, `offcanvas-lg`, `spinner-border`.
+
+Regra: **use a classe do Bootstrap**. Não recrie botão, card, tabela ou modal com CSS próprio.
+
+---
+
+## 9. Componentes
+
+### 9.1 Botões
+- **Primário** (`btn btn-primary`): azul `#175CD3`, texto branco, peso 600, raio 10px, sombra discreta, hover `#0F3F8F`. Uma ação principal por tela ou modal.
+- **Secundário** (`btn btn-outline-secondary`): "Cancelar", "Fechar". Borda neutra, texto `--is-ink`.
+- **De ação leve** (`btn btn-outline-primary`): atalhos e ações secundárias, normalmente `btn-sm`.
+- **Destrutivo** (`btn-outline-danger`): Desativar, Excluir, Anonimizar. **Nunca** é a ação principal da tela; fica em linha de tabela ou dentro de modal, com confirmação.
+- Sem efeitos exagerados: nada de gradiente, brilho ou animação longa.
+
+### 9.2 Formulários
+- Rótulo **acima** do campo (`form-label`), peso 600. Campo com borda `--is-border`, raio 10px.
+- Foco: borda azul + anel suave (`rgba(23,92,211,.16)`).
+- Campos de login levam ícone Bootstrap dentro do campo, à esquerda.
+- Formulários vivem em **modal centralizado**: "Cancelar" (secundário) + ação primária no rodapé.
+- Erro de validação: texto de erro abaixo do campo ou `alert-danger` no topo do modal.
+
+### 9.3 Cards
+- Fundo branco, borda 1px `--is-border`, raio 16px, `--is-shadow`, padding `1.25rem`.
+- **Card de indicador (KPI):** rótulo pequeno em cinza → número grande em Plex Mono → link "Ver ..." com seta → ícone em quadrado de 38px no canto superior direito (`is-kpi-icon danger / info / warning / success`).
+- **Cabeçalho de card:** título 0,95rem/600 + subtítulo cinza 0,76rem, com divisória `--is-border-soft` embaixo.
+
+### 9.4 Tabelas
+- Dentro de card, com `table-responsive`. Cabeçalho em fundo `#F7F9FB`, texto cinza 0,75rem/600, sem quebra de linha. Linhas com hover azul bem suave.
+- Células numéricas alinhadas à direita e em **Plex Mono**.
+- Linha em alerta (ex.: estoque baixo): marcador âmbar de 3px na borda esquerda (`tr.is-row-alert`).
+- **Paginação** de 20 itens por página, abaixo da tabela, com o contador "Mostrando X de Y" à esquerda.
+
+### 9.5 Badges de status
+`is-badge is-badge-success | info | warning | danger | neutral | dark` (seção 3.3). Pílula, 0,72rem, peso 600, ícone opcional à esquerda.
+
+### 9.6 Abas
+`nav-tabs`: texto cinza, aba ativa em azul, peso 600, fundo branco, cantos superiores de 10px.
+
+### 9.7 Modais
+Centralizados, raio 16px, título 1,05rem/700, fundo escurecido em navy (opacidade 0,45).
+
+### 9.8 Alertas
+`alert-success`, `alert-danger`, `alert-warning`: fundo em tinta suave, texto na cor saturada, raio 10px, ícone à esquerda. Alerta de estoque baixo usa `alert-warning`.
+
+### 9.9 Sidebar (telas internas)
+- Largura 240px, fixa à esquerda; fundo degradê navy (170°, `#0D2340` → `#123F72`).
+- Topo: **logo reversa** (33px de altura). Abaixo, rótulo de seção "MÓDULOS" (0,66rem, caixa alta, `#8FA3BA`).
+- Itens: ícone + texto, altura mínima 42px, raio 9px, texto `#D2DCE8`. Hover: fundo branco a 8%. **Ativo: fundo `--is-brand`, texto branco, peso 600.**
+- Rodapé: perfil (avatar circular, nome, papel) e botão "Sair" com contorno translúcido.
+- Abaixo de 992px vira painel deslizante (`offcanvas-lg`), aberto por botão de menu.
+- Ordem do menu: Início · Estoque · Fretes · Visão Geral · Administração. Mostra só o que o perfil pode acessar.
+
+### 9.10 Cabeçalho de tela
+Breadcrumb → título `h1.h4` → subtítulo cinza. Ações da tela à direita. Em celular, ações descem para baixo do título.
+
+### 9.11 Gráficos
+Barras e linhas em `--is-brand` (série principal) e `#A9B4C1` ou `--is-muted` tracejado (série secundária). Grade em `--is-border-soft`. Legenda em cinza, 0,75rem. Sempre com texto alternativo (`role="img"` + `aria-label`).
+
+### 9.12 Login
+Moldura única de 20px com borda e sombra discreta, dividida em dois painéis: **esquerda navy** (logo reversa, título "Gestão de estoque e monitor financeiro de fretes", mensagem institucional e chips de módulo decorativos) e **direita branca** ("Acesse sua conta", usuário e senha com ícone, botão Entrar, link de ajuda, aviso de acesso restrito). Em telas estreitas (< 820px) os painéis empilham. O CSS exclusivo do login fica no próprio `login.html`; tokens e base vêm do `estilos.css`.
+
+---
+
+## 10. Estados e feedback
+
+| Estado | Padrão |
+|---|---|
+| Foco | contorno azul visível (`:focus-visible`), anel suave em campos |
+| Hover | botão escurece para `#0F3F8F`; linha de tabela ganha tinta azul 4%; item de menu clareia |
+| Desabilitado | opacidade reduzida do Bootstrap, sem cursor de ação |
+| Carregando (HTMX) | `.htmx-indicator` (spinner) aparece; o alvo esmaece (`.htmx-request`, opacidade .55) |
+| Troca de conteúdo | `.htmx-swapping` apaga em 120 ms; `.htmx-settling` reaparece em 120 ms |
+| Erro dentro de modal | `.is-swap-error`: some quando vazio, aparece como `alert-danger` quando recebe texto |
+| Mensagem de sucesso/erro | aviso (`alert`) flutuante no canto inferior direito, some em 4 s |
+| Vazio | texto cinza curto dizendo o que fazer; sem ilustração |
+| Movimento | transições curtas (≤ 200 ms); `prefers-reduced-motion` desliga todas |
+
+---
+
+## 11. Responsividade
+
+| Largura | Comportamento |
+|---|---|
+| ≥ 992px | sidebar fixa; conteúdo com margem de 240px |
+| < 992px | sidebar vira painel deslizante; botão de menu aparece no cabeçalho |
+| < 820px | login empilha os dois painéis |
+| celular | tabelas com rolagem horizontal; ações do cabeçalho descem; botões ocupam a largura quando necessário |
+
+Testar sempre em largura de celular (F12 → Ctrl+Shift+M).
+
+---
+
+## 12. Checklist para tela nova
+
+- [ ] Só variáveis `--is-*` e componentes do Bootstrap; nenhum `style="..."` com cor, fonte ou raio.
+- [ ] Logo na variante certa para o fundo (`reversed` no navy, `logo-inosys.png` no claro).
+- [ ] Cards: branco, borda fina, 16px, sombra discreta, espaço interno.
+- [ ] Números em Plex Mono; status em `is-badge-*` seguindo o mapa de cores.
+- [ ] Atenção sobre fundo claro com `#92400E`, nunca âmbar puro.
+- [ ] Uma ação principal azul por tela; destrutivo nunca é o principal.
+- [ ] Foco visível e `alt`/`aria-label` nos ícones e imagens.
+- [ ] Testada em largura de celular.
+- [ ] Nenhum campo, módulo ou fluxo inventado.
+
+---
+
+## Apêndice A — `assets/estilos.css` (completo)
+
+```css
 /* ============================================================
    INOSYS — assets/estilos.css
    Folha de estilo ÚNICA do sistema. Todas as telas linkam este
@@ -412,66 +779,14 @@ svg polyline[stroke="#0d6efd"] { stroke: var(--is-brand); }
 svg polyline[stroke="#6c757d"] { stroke: var(--is-muted); }
 svg g[stroke="#dee2e6"] { stroke: var(--is-border-soft); }
 .bi.text-primary { color: var(--is-brand) !important; }
+```
 
-/* ============================================================
-   11. Complementos das telas (classes sem equivalente acima)
-   Registradas aqui conforme o design system: só tokens --is-*.
-   ============================================================ */
+## Apêndice B — Arquivos da logo (`assets/img/`)
 
-/* Barra do topo no celular (< 992px): botão de menu + logo */
-.is-topbar {
-  position: sticky; top: 0; z-index: 1020;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 16px; background: var(--is-surface); border-bottom: 1px solid var(--is-border);
-}
-
-/* Ícone neutro do KPI (ex.: itens desativados) */
-.is-kpi-icon.neutral { background: #EEF1F4; color: var(--is-muted); }
-
-/* Tabela encostada nas bordas do card: alinha com o padding do card-body */
-.card > .table-responsive > .table > :not(caption) > * > * { padding-top: .7rem; padding-bottom: .7rem; }
-.card > .table-responsive > .table > :not(caption) > * > *:first-child { padding-left: 1.25rem; }
-.card > .table-responsive > .table > :not(caption) > * > *:last-child { padding-right: 1.25rem; }
-.card > .table-responsive > .table > tbody > tr:last-child > * { border-bottom: 0; }
-
-/* Coluna de ações e de badges à direita: alinha à direita sem virar Plex Mono
-   (td.text-end é reservado para números) */
-.table .is-actions { text-align: right; white-space: nowrap; }
-
-/* Linha desativada: texto secundário */
-tr.is-row-inactive > td { color: var(--is-muted); }
-
-/* Valor sugerido do frete, calculado ao vivo no formulário */
-.is-calculo {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
-  padding: 12px 14px; border-radius: var(--is-radius); background: var(--is-info-tint);
-}
-.is-calculo-rotulo { color: var(--is-brand); font-size: .78rem; font-weight: 600; }
-.is-calculo-valor { font-family: var(--is-font-mono); font-weight: 600; font-size: 1.15rem; color: var(--is-ink); }
-
-/* Avisos flutuantes (canto inferior direito, somem em 4 s) */
-.is-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 1090; display: grid; gap: 8px; max-width: calc(100vw - 32px); }
-.is-toasts .alert {
-  margin: 0; box-shadow: var(--is-shadow);
-  /* a tinta do alerta é translúcida: base branca por baixo para não vazar o conteúdo */
-  background-image: linear-gradient(var(--bs-alert-bg), var(--bs-alert-bg));
-  background-color: var(--is-surface);
-}
-
-/* Validação: só o erro ganha cor; campo válido continua neutro */
-.was-validated .form-control:valid, .was-validated .form-select:valid { border-color: var(--is-border); }
-.was-validated .form-control:valid { background-image: none; padding-right: .75rem; }
-.was-validated .form-select:valid { --bs-form-select-bg-icon: none; }
-.was-validated .form-control:valid:focus, .was-validated .form-select:valid:focus {
-  border-color: var(--is-brand); box-shadow: 0 0 0 .2rem rgba(23,92,211,.16);
-}
-.was-validated .form-check-input:valid ~ .form-check-label { color: inherit; }
-.was-validated .form-check-input:valid { border-color: var(--is-border); }
-.was-validated .form-check-input:valid:checked { background-color: var(--is-brand); border-color: var(--is-brand); }
-.form-check-input:checked { background-color: var(--is-brand); border-color: var(--is-brand); }
-.invalid-feedback { color: var(--is-danger); }
-.form-control.is-invalid, .was-validated .form-control:invalid,
-.form-select.is-invalid, .was-validated .form-select:invalid { border-color: var(--is-danger); }
-
-/* Marcador de campo obrigatório */
-.is-required::after { content: " *"; color: var(--is-danger); }
+| Arquivo | Dimensão | Uso |
+|---|---|---|
+| `logo-inosys.png` | 600 × 171 px | fundo claro: cabeçalhos, documentos, e-mails |
+| `logo-inosys-reversed.png` | 600 × 171 px | fundo navy: sidebar e painel do login |
+| `logo-inosys-mono-white.png` | 600 × 171 px | fundo de cor sólida, uso monocromático |
+| `logo-inosys-icon.png` | 193 × 171 px | favicon, avatar, espaço pequeno |
+| `logo-inosys-original.png` | 1536 × 1024 px | arquivo-fonte enviado (não usar na interface) |

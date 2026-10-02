@@ -1,9 +1,9 @@
 /* ==========================================================================
    InoSys · comportamento comum a todas as telas
-   - Sidebar: link ativo e painel deslizante abaixo de 992px
-   - Modais: abertura por data-abrir-modal (com ou sem hx-get)
+   - Sidebar: marca o módulo ativo (o painel do celular é o offcanvas-lg do Bootstrap)
+   - Modais: abertura por data-abrir-modal (com ou sem hx-get) e foco no 1º campo
    - Mockup (file://): seletor de perfil, bloqueio das requisições HTMX,
-     avisos (toasts) e visualização dos ganchos com ?htmx=1
+     avisos flutuantes e modo de desenvolvimento do HTMX com ?htmx=1
    No Django, o perfil vem de request.user e o template já chega filtrado;
    a parte de mockup não roda fora de file://.
    ========================================================================== */
@@ -61,7 +61,7 @@
   }
 
   // Mostra só os [data-se="nome"] cujo nome está verdadeiro no mapa.
-  // No Django isso é um {% if %} no template.
+  // No Django isso é uma condição no template.
   function mostrarSe(raiz, mapa) {
     raiz.querySelectorAll('[data-se]').forEach(function (el) {
       el.hidden = !mapa[el.getAttribute('data-se')];
@@ -92,7 +92,7 @@
        <form data-lista-filtros>          filtros
        <tbody data-lista-itens>           linhas
        <tbody data-lista-vazia hidden>    "nenhum resultado"
-       <template data-lista-linha>        corpo do {% for %}
+       <template data-lista-linha>        corpo do laço for
        [data-contador] [data-pagina-texto] [data-pagina-acao="anterior|proxima"] */
   function lista(cfg) {
     var card = cfg.card;
@@ -176,7 +176,7 @@
     return d.getFullYear() + '-' + mes + '-' + dia;
   }
 
-  /* -------------------------------------------------------------- toasts */
+  /* ---------------------------------------- aviso flutuante (some em 4 s) */
   function toast(mensagem, icone) {
     var area = document.querySelector('.is-toasts');
     if (!area) {
@@ -186,16 +186,17 @@
       document.body.appendChild(area);
     }
     var item = document.createElement('div');
-    item.className = 'is-toast';
+    item.className = 'alert alert-success d-flex align-items-center gap-2';
+    item.setAttribute('role', 'status');
     var i = document.createElement('i');
-    i.className = 'bi ' + (icone || 'bi-check2-circle');
+    i.className = 'bi ' + (icone || 'bi-check-circle');
     i.setAttribute('aria-hidden', 'true');
     var texto = document.createElement('span');
     texto.textContent = mensagem;
     item.appendChild(i);
     item.appendChild(texto);
     area.appendChild(item);
-    window.setTimeout(function () { item.remove(); }, 3800);
+    window.setTimeout(function () { item.remove(); }, 4000);
   }
 
   /* -------------------------------------------------------------- modais */
@@ -247,33 +248,13 @@
   });
 
   /* ------------------------------------------------------------- sidebar */
-  function marcarLinkAtivo() {
-    var pagina = document.body.getAttribute('data-pagina');
-    if (!pagina) return;
-    document.querySelectorAll('.is-nav-link[data-pagina]').forEach(function (a) {
-      var ativo = a.getAttribute('data-pagina') === pagina;
+  function marcarModuloAtivo() {
+    var modulo = document.body.getAttribute('data-modulo');
+    if (!modulo) return;
+    document.querySelectorAll('.is-nav-link[data-modulo]').forEach(function (a) {
+      var ativo = a.getAttribute('data-modulo') === modulo;
       a.classList.toggle('active', ativo);
       if (ativo) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
-    });
-  }
-
-  function configurarSidebarMovel() {
-    var botao = document.querySelector('[data-abrir-sidebar]');
-    var fundo = document.querySelector('.is-fundo-sidebar');
-    if (!botao) return;
-    function definir(aberta) {
-      document.body.classList.toggle('is-sidebar-aberta', aberta);
-      botao.setAttribute('aria-expanded', aberta ? 'true' : 'false');
-    }
-    botao.addEventListener('click', function () {
-      definir(!document.body.classList.contains('is-sidebar-aberta'));
-    });
-    if (fundo) fundo.addEventListener('click', function () { definir(false); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && document.body.classList.contains('is-sidebar-aberta')) { definir(false); botao.focus(); }
-    });
-    document.querySelectorAll('.is-sidebar a').forEach(function (a) {
-      a.addEventListener('click', function () { definir(false); });
     });
   }
 
@@ -289,11 +270,6 @@
       if (el === document.body) return;
       el.hidden = el.getAttribute('data-perfis').split(/\s+/).indexOf(perfil) === -1;
     });
-    // Esconde títulos de seção da sidebar que ficaram sem nenhum link.
-    document.querySelectorAll('.is-nav-grupo').forEach(function (grupo) {
-      var visiveis = grupo.querySelectorAll('.is-nav-link:not([hidden])').length;
-      grupo.hidden = visiveis === 0;
-    });
 
     // Tela inteira fora do perfil: mostra aviso no lugar do conteúdo.
     var permitidos = document.body.getAttribute('data-perfis');
@@ -304,13 +280,14 @@
     if (!aviso) {
       aviso = document.createElement('div');
       aviso.id = 'is-sem-acesso';
-      aviso.className = 'card is-sem-acesso';
+      aviso.className = 'card mx-auto my-5';
       aviso.innerHTML =
-        '<i class="bi bi-lock" aria-hidden="true"></i>' +
+        '<div class="card-body text-center py-5 px-4">' +
+        '<i class="bi bi-shield-lock fs-2 text-muted" aria-hidden="true"></i>' +
         '<h1 class="h5 mt-3">Esta tela não faz parte do seu perfil</h1>' +
-        '<p class="text-secondary mb-4">No sistema real o acesso é bloqueado pelo servidor. ' +
+        '<p class="text-muted mb-4">No sistema real o acesso é bloqueado pelo servidor. ' +
         'No mockup, troque o perfil no rodapé da sidebar para visualizar.</p>' +
-        '<a class="btn btn-primary" href="selecao.html">Voltar ao início</a>';
+        '<a class="btn btn-primary" href="selecao.html">Voltar ao início</a></div>';
       conteudo.parentNode.insertBefore(aviso, conteudo);
     }
     aviso.hidden = liberado;
@@ -326,7 +303,6 @@
       sel.addEventListener('change', function () {
         gravarPerfil(sel.value);
         aplicarPerfil(sel.value);
-        document.querySelectorAll('select[data-mockup-perfil]').forEach(function (s) { s.value = sel.value; });
         document.dispatchEvent(new CustomEvent('inosys:perfil', { detail: { perfil: sel.value } }));
         toast('Perfil simulado: ' + PERFIS[sel.value].rotulo, 'bi-person-badge');
       });
@@ -334,66 +310,70 @@
     aplicarPerfil(perfil);
   }
 
-  /* ------------------------------------------- ganchos HTMX (?htmx=1) */
+  /* ---------------------- modo de desenvolvimento do HTMX (?htmx=1) */
   function mostrarGanchos() {
-    document.body.classList.add('is-ver-htmx');
+    // O CSS (.htmx-debug) contorna todo elemento com hx-get / hx-post.
+    document.body.classList.add('htmx-debug');
 
     // Mantém o ?htmx=1 ao navegar entre as telas.
     document.querySelectorAll('a[href$=".html"]').forEach(function (a) {
       a.setAttribute('href', a.getAttribute('href') + '?htmx=1');
     });
 
-    var ganchos = Array.prototype.filter.call(document.querySelectorAll('body *'), function (el) {
-      return Array.prototype.some.call(el.attributes, function (at) { return at.name.indexOf('hx-') === 0; });
-    });
+    var VERBOS = ['hx-get', 'hx-post', 'hx-put', 'hx-delete'];
+    var ganchos = document.querySelectorAll(VERBOS.map(function (v) { return '[' + v + ']'; }).join(','));
 
     var painel = document.createElement('aside');
-    painel.className = 'is-painel-htmx';
+    painel.className = 'is-htmx-panel';
     painel.setAttribute('aria-label', 'Ganchos HTMX desta tela');
-    var topo = document.createElement('header');
-    var titulo = document.createElement('div');
-    titulo.innerHTML = 'Ganchos HTMX <span></span>';
-    titulo.querySelector('span').textContent = '· ' + ganchos.length + ' nesta tela';
-    var recolher = document.createElement('button');
-    recolher.type = 'button';
-    recolher.textContent = 'recolher';
-    recolher.addEventListener('click', function () {
-      var r = painel.classList.toggle('is-recolhido');
-      recolher.textContent = r ? 'expandir' : 'recolher';
-    });
+    var topo = document.createElement('div');
+    topo.className = 'd-flex align-items-center justify-content-between gap-2';
+    var titulo = document.createElement('h2');
+    var fechar = document.createElement('button');
+    fechar.type = 'button';
+    fechar.className = 'btn-close btn-close-white';
+    fechar.setAttribute('aria-label', 'Fechar painel');
+    fechar.addEventListener('click', function () { painel.remove(); });
     topo.appendChild(titulo);
-    topo.appendChild(recolher);
+    topo.appendChild(fechar);
     painel.appendChild(topo);
 
     // Linhas de tabela repetem o mesmo gancho: agrupa e mostra "× N".
-    var lista = document.createElement('ol');
     var vistos = {};
-    ganchos.forEach(function (el) {
-      el.classList.add('is-gancho');
-      var partes = [];
-      Array.prototype.forEach.call(el.attributes, function (at) {
-        if (at.name.indexOf('hx-') === 0) partes.push(at.name + '="' + at.value + '"');
-      });
-      el.setAttribute('title', partes.join('\n'));
-      var noModal = el.closest('.modal') ? ' (dentro de modal)' : '';
-      var chave = '<' + el.tagName.toLowerCase() + '> ' + partes.join(' ') + noModal;
+    Array.prototype.forEach.call(ganchos, function (el) {
+      var verbo = VERBOS.filter(function (v) { return el.hasAttribute(v); })[0];
+      var url = el.getAttribute(verbo);
+      var meta = [
+        'gatilho: ' + (el.getAttribute('hx-trigger') || 'padrão'),
+        'alvo: ' + (el.getAttribute('hx-target') || 'o próprio elemento'),
+        'troca: ' + (el.getAttribute('hx-swap') || 'innerHTML')
+      ].join(' · ') + (el.closest('.modal') ? ' · dentro de modal' : '');
+      var chave = verbo + url + meta;
       if (vistos[chave]) {
         vistos[chave].total += 1;
-        vistos[chave].code.textContent = chave + '  × ' + vistos[chave].total;
+        vistos[chave].conta.textContent = ' × ' + vistos[chave].total;
         return;
       }
-      var li = document.createElement('li');
-      var code = document.createElement('code');
-      code.textContent = chave;
-      li.appendChild(code);
-      li.addEventListener('click', function () {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-      lista.appendChild(li);
-      vistos[chave] = { total: 1, code: code };
+      var botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'hook';
+      var v = document.createElement('span');
+      v.className = 'verbo';
+      v.textContent = verbo.slice(3).toUpperCase();
+      var u = document.createElement('span');
+      u.className = 'url';
+      u.textContent = url;
+      var conta = document.createElement('span');
+      conta.className = 'url';
+      var m = document.createElement('span');
+      m.className = 'meta';
+      m.textContent = meta;
+      botao.appendChild(v); botao.appendChild(u); botao.appendChild(conta); botao.appendChild(m);
+      botao.addEventListener('click', function () { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+      painel.appendChild(botao);
+      vistos[chave] = { total: 1, conta: conta };
     });
-    titulo.querySelector('span').textContent = '· ' + Object.keys(vistos).length + ' nesta tela';
-    painel.appendChild(lista);
+    titulo.textContent = 'Ganchos HTMX · ' + Object.keys(vistos).length + ' nesta tela';
     document.body.appendChild(painel);
   }
 
@@ -414,8 +394,7 @@
   };
 
   function iniciar() {
-    marcarLinkAtivo();
-    configurarSidebarMovel();
+    marcarModuloAtivo();
     configurarPerfil();
     if (verGanchos) mostrarGanchos();
   }
