@@ -1,0 +1,22 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-3 border-top">
+  <span class="small text-muted">{% if page_obj.paginator.count %}Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }}{% else %}Nenhum resultado{% endif %}</span>
+  <nav aria-label="Paginação de {{ rotulo }}">
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+        <a class="page-link" role="button"{% if page_obj.has_previous %}
+           hx-get="{{ url }}?pagina={{ page_obj.previous_page_number }}" hx-include="#{{ form_id }}"
+           hx-target="#{{ card_id }}" hx-swap="outerHTML" hx-push-url="true"{% else %} aria-disabled="true"{% endif %}>
+          <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+        </a>
+      </li>
+      <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+      <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+        <a class="page-link" role="button"{% if page_obj.has_next %}
+           hx-get="{{ url }}?pagina={{ page_obj.next_page_number }}" hx-include="#{{ form_id }}"
+           hx-target="#{{ card_id }}" hx-swap="outerHTML" hx-push-url="true"{% else %} aria-disabled="true"{% endif %}>
+          <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

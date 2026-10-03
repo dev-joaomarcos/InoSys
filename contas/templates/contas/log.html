@@ -1,0 +1,25 @@
+{% extends "inosys/base_app.html" %}
+{% block titulo %}Log de ações · Administração · InoSys{% endblock %}
+{% block modulo %}admin{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item"><a href="/usuarios/">Administração</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Log de ações</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Administração</h1>
+            <p class="text-muted small mb-0">Quem criou, editou ou excluiu registros, e quando. O nome fica guardado mesmo se o usuário for removido.</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="/usuarios/">Usuários</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/log/">Log de ações</a></li>
+        </ul>
+
+        {% include "contas/_lista_log.html" %}
+{% endblock %}

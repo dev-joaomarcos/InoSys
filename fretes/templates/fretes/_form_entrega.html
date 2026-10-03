@@ -1,0 +1,72 @@
+<form id="form-entrega" novalidate
+      hx-post="{{ acao }}"
+      hx-target="#modal-entrega .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-entrega-titulo">{% if entrega %}Editar entrega{% else %}Nova entrega{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label is-required" for="entrega-entregador">Entregador</label>
+        <select class="form-select{% if form.entregador.errors %} is-invalid{% endif %}" id="entrega-entregador" name="entregador" required>
+          <option value="">Selecione…</option>
+          {% for x in form.fields.entregador.queryset %}<option value="{{ x.pk }}"{% if form.entregador.value|stringformat:"s" == x.pk|stringformat:"s" %} selected{% endif %}>{{ x.nome }}{% if not x.esta_ativo %} (desativado){% endif %}</option>{% endfor %}
+        </select>
+        <div class="invalid-feedback">{{ form.entregador.errors.0 }}</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label is-required" for="entrega-data">Data</label>
+        <input class="form-control{% if form.data.errors %} is-invalid{% endif %}" type="date" id="entrega-data" name="data" value="{{ valores.data }}" required>
+        <div class="invalid-feedback">{{ form.data.errors.0 }}</div>
+      </div>
+      <div class="col-md-8">
+        <label class="form-label is-required" for="entrega-destino">Destino</label>
+        <input class="form-control{% if form.destino.errors %} is-invalid{% endif %}" type="text" id="entrega-destino" name="destino" maxlength="200" placeholder="Endereço ou obra" value="{{ form.destino.value|default_if_none:'' }}" required>
+        <div class="invalid-feedback">{{ form.destino.errors.0 }}</div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label is-required" for="entrega-distancia">Distância (km)</label>
+        <input class="form-control{% if form.distancia.errors %} is-invalid{% endif %}" type="number" id="entrega-distancia" name="distancia" min="0.1" step="0.1" inputmode="decimal" value="{{ valores.distancia }}" required>
+        <div class="invalid-feedback">{{ form.distancia.errors.0 }}</div>
+      </div>
+    </div>
+
+    <div class="is-calculo mt-3" id="calculo-sugerido" aria-live="polite"
+         hx-get="/fretes/entregas/valor-sugerido/"
+         hx-trigger="change from:#entrega-entregador, input delay:300ms from:#entrega-distancia"
+         hx-include="#entrega-entregador, #entrega-distancia"
+         hx-target="this" hx-swap="innerHTML">
+      {% if entrega %}{% include "fretes/_valor_sugerido.html" with formula="Valor registrado nesta entrega" texto=sugerido_texto valor=sugerido_iso %}
+      {% else %}{% include "fretes/_valor_sugerido.html" with formula="Escolha o entregador e a distância" texto="—" valor="" %}{% endif %}
+    </div>
+
+    <div class="row g-3 mt-0">
+      <div class="col-md-6">
+        <label class="form-label" for="entrega-cobrado">Valor cobrado (R$)</label>
+        <div class="input-group">
+          <input class="form-control{% if form.valor_cobrado.errors %} is-invalid{% endif %}" type="number" id="entrega-cobrado" name="valor_cobrado" min="0" step="0.01" inputmode="decimal" value="{{ valores.valor_cobrado }}" aria-describedby="ajuda-cobrado">
+          <button class="btn btn-outline-primary" type="button" data-usar-sugerido>Usar sugerido</button>
+          <div class="invalid-feedback">{{ form.valor_cobrado.errors.0 }}</div>
+        </div>
+        <div class="form-text" id="ajuda-cobrado">Digite o valor combinado ou aceite o sugerido.</div>
+        <div class="form-text text-danger" data-aviso-divergencia hidden>
+          <i class="bi bi-cash-coin" aria-hidden="true"></i>
+          Diferente do sugerido em <span class="is-metric" data-campo="diferenca"></span>: vai aparecer como divergência.
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label is-required" for="entrega-status">Status</label>
+        <select class="form-select{% if form.status.errors %} is-invalid{% endif %}" id="entrega-status" name="status" required>
+          {% for valor, rotulo in form.fields.status.choices %}<option value="{{ valor }}"{% if form.status.value == valor %} selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+        </select>
+        <div class="invalid-feedback">{{ form.status.errors.0 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">{% if entrega %}Salvar alterações{% else %}Registrar entrega{% endif %}</button>
+  </div>
+</form>

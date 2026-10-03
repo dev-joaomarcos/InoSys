@@ -1,0 +1,47 @@
+{% extends "inosys/base_app.html" %}
+{% load static %}
+{% block titulo %}Entregadores · Fretes · InoSys{% endblock %}
+{% block modulo %}fretes{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item"><a href="/fretes/entregas/">Fretes</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Entregadores</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Fretes</h1>
+            <p class="text-muted small mb-0">O valor por km de cada entregador é a base do valor sugerido das entregas.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" type="button"
+                    hx-get="/fretes/entregadores/novo/"
+                    hx-target="#modal-entregador .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-entregador" data-acao="novo">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo entregador
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="/fretes/entregas/">Entregas</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/fretes/entregadores/">Entregadores</a></li>
+        </ul>
+
+        {% include "fretes/_lista_entregadores.html" %}
+{% endblock %}
+{% block modais %}
+  <div class="modal fade" id="modal-entregador" tabindex="-1" aria-labelledby="modal-entregador-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-status-entregador" tabindex="-1" aria-labelledby="modal-status-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'fretes/fretes.js' %}"></script>{% endblock %}

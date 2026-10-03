@@ -1,0 +1,31 @@
+<form id="form-entregador" novalidate
+      hx-post="{{ acao }}"
+      hx-target="#modal-entregador .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-entregador-titulo">{% if entregador %}Editar entregador{% else %}Novo entregador{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>
+    <div class="mb-3">
+      <label class="form-label is-required" for="entregador-nome">Nome</label>
+      <input class="form-control{% if form.nome.errors %} is-invalid{% endif %}" type="text" id="entregador-nome" name="nome" maxlength="120" autocomplete="off" value="{{ form.nome.value|default_if_none:'' }}" required>
+      <div class="invalid-feedback">{{ form.nome.errors.0 }}</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="entregador-contato">Contato</label>
+      <input class="form-control{% if form.contato.errors %} is-invalid{% endif %}" type="text" id="entregador-contato" name="contato" maxlength="120" autocomplete="off" placeholder="Telefone ou e-mail" value="{{ form.contato.value|default_if_none:'' }}">
+      <div class="invalid-feedback">{{ form.contato.errors.0 }}</div>
+    </div>
+    <div>
+      <label class="form-label is-required" for="entregador-valor">Valor por km (R$)</label>
+      <input class="form-control{% if form.valor_por_km.errors %} is-invalid{% endif %}" type="number" id="entregador-valor" name="valor_por_km" min="0.01" step="0.01" inputmode="decimal" value="{{ valores.valor_por_km }}" required aria-describedby="ajuda-valor">
+      <div class="form-text" id="ajuda-valor">Mudar este valor não altera entregas já registradas: só as próximas.</div>
+      <div class="invalid-feedback">{{ form.valor_por_km.errors.0 }}</div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">{% if entregador %}Salvar alterações{% else %}Cadastrar entregador{% endif %}</button>
+  </div>
+</form>

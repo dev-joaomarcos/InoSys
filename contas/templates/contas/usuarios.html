@@ -1,0 +1,56 @@
+{% extends "inosys/base_app.html" %}
+{% load static %}
+{% block titulo %}Usuários · Administração · InoSys{% endblock %}
+{% block modulo %}admin{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Administração</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Administração</h1>
+            <p class="text-muted small mb-0">Só o administrador cadastra usuários. A senha temporária aparece uma única vez e é trocada no primeiro acesso.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" type="button"
+                    hx-get="/usuarios/novo/"
+                    hx-target="#modal-usuario .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-usuario" data-acao="novo">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo usuário
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/usuarios/">Usuários</a></li>
+          <li class="nav-item"><a class="nav-link" href="/log/">Log de ações</a></li>
+        </ul>
+
+        {% include "contas/_lista_usuarios.html" %}
+{% endblock %}
+{% block modais %}
+  <div class="modal fade" id="modal-usuario" tabindex="-1" aria-labelledby="modal-usuario-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-nova-senha" tabindex="-1" aria-labelledby="modal-nova-senha-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-status-usuario" tabindex="-1" aria-labelledby="modal-status-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-anonimizar" tabindex="-1" aria-labelledby="modal-anonimizar-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'inosys/usuarios.js' %}"></script>{% endblock %}

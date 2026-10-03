@@ -1,0 +1,68 @@
+<section class="card" id="card-log" aria-labelledby="titulo-log">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-log"><i class="bi bi-journal-text" aria-hidden="true"></i> Log de ações</h2>
+        <div class="is-card-subtitle">Filtre por usuário, ação e período</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2 align-items-end" id="form-filtro-log" role="search"
+          hx-get="/log/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-4">
+        <label class="form-label" for="filtro-usuario">Usuário</label>
+        <select class="form-select" id="filtro-usuario" name="usuario">
+          <option value="">Todos</option>
+          {% for u in usuarios_filtro %}<option value="{{ u.pk }}"{% if f.usuario == u.pk|stringformat:"s" %} selected{% endif %}>{{ u.nome_exibicao }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="filtro-acao">Ação</label>
+        <select class="form-select" id="filtro-acao" name="acao">
+          <option value="">Todas</option>
+          {% for valor, rotulo in acoes %}<option value="{{ valor }}"{% if f.acao == valor %} selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="filtro-inicio">De</label>
+        <input class="form-control" type="date" id="filtro-inicio" name="data_inicio" value="{{ f.data_inicio }}">
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="filtro-fim">Até</label>
+        <input class="form-control" type="date" id="filtro-fim" name="data_fim" value="{{ f.data_fim }}">
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <button class="btn btn-outline-secondary w-100" type="button"
+                hx-get="/log/" hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">Limpar</button>
+      </div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Data e hora</th>
+          <th scope="col">Usuário</th>
+          <th scope="col">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in page_obj %}
+        <tr>
+          <td class="is-metric fw-normal">{{ l.data_hora|date:"d/m/Y H:i" }}</td>
+          <td class="fw-semibold">{{ l.usuario_nome_snapshot }}</td>
+          <td>
+            {% if l.acao == "criacao" %}<span class="is-badge is-badge-neutral"><i class="bi bi-plus-lg" aria-hidden="true"></i> Criação</span>
+            {% elif l.acao == "edicao" %}<span class="is-badge is-badge-neutral"><i class="bi bi-pencil" aria-hidden="true"></i> Edição</span>
+            {% else %}<span class="is-badge is-badge-neutral"><i class="bi bi-trash3" aria-hidden="true"></i> Exclusão</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-center text-muted py-4">Nenhum registro com esses filtros. Amplie o período ou limpe os filtros.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "inosys/_paginacao.html" with rotulo="log de ações" url="/log/" form_id="form-filtro-log" card_id="card-log" %}
+</section>

@@ -59,6 +59,11 @@ INSTALLED_APPS = [
     'relatorios.apps.RelatoriosConfig',
 ]
 
+AUTH_USER_MODEL = "contas.Usuario"
+LOGIN_URL = "contas:login"
+LOGIN_REDIRECT_URL = "contas:selecao"
+LOGOUT_REDIRECT_URL = "contas:login"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -66,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'contas.middleware.TrocaSenhaObrigatoriaMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

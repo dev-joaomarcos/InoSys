@@ -1,0 +1,21 @@
+<form id="form-status-material" hx-post="{{ acao }}"
+      hx-target="#modal-status-material .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-status-titulo">{% if desativar %}Desativar material{% else %}Reativar material{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <p class="fw-semibold mb-2">{{ material.nome }}</p>
+    {% if desativar %}
+    <p class="text-muted mb-0">O material sai das listas de movimentação e do alerta de estoque baixo.
+      O histórico continua guardado: por isso o sistema desativa em vez de excluir (RNF02).</p>
+    {% else %}
+    <p class="text-muted mb-0">O material volta a aparecer nas movimentações e no alerta de estoque baixo.</p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    {% if desativar %}<button type="submit" class="btn btn-outline-danger"><i class="bi bi-pause-circle" aria-hidden="true"></i> Desativar</button>
+    {% else %}<button type="submit" class="btn btn-primary"><i class="bi bi-play-circle" aria-hidden="true"></i> Reativar</button>{% endif %}
+  </div>
+</form>

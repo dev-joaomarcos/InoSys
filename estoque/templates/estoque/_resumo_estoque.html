@@ -1,0 +1,41 @@
+<section id="resumo-estoque" aria-label="Resumo do estoque"
+         hx-get="/estoque/materiais/resumo/" hx-trigger="estoqueAtualizado from:body"
+         hx-target="this" hx-swap="outerHTML">
+  {% if qtd_baixo %}
+  <div class="alert alert-warning d-flex align-items-start gap-2" role="status" id="alerta-estoque-baixo">
+    <i class="bi bi-exclamation-triangle mt-1" aria-hidden="true"></i>
+    <div class="flex-grow-1">
+      <strong><span class="is-metric">{{ qtd_baixo }}</span> {{ qtd_baixo|pluralize:"material abaixo,materiais abaixo" }} da quantidade mínima:</strong>
+      {% for m in baixos %}{{ m.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    </div>
+    <button class="btn btn-sm btn-outline-secondary flex-shrink-0" type="button" data-ver-baixo>Ver só esses</button>
+  </div>
+  {% endif %}
+
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+      <div class="card is-kpi">
+        <div class="is-kpi-label">Materiais ativos</div>
+        <div class="is-kpi-value is-metric">{{ qtd_ativos }}</div>
+        <a class="is-kpi-link" href="#card-materiais">Ver lista <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        <span class="is-kpi-icon info" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+      <div class="card is-kpi">
+        <div class="is-kpi-label">Abaixo do mínimo</div>
+        <div class="is-kpi-value is-metric">{{ qtd_baixo }}</div>
+        <a class="is-kpi-link" href="#card-materiais" data-ver-baixo>Ver materiais <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        <span class="is-kpi-icon warning" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+      <div class="card is-kpi">
+        <div class="is-kpi-label">Desativados</div>
+        <div class="is-kpi-value is-metric">{{ qtd_inativos }}</div>
+        <a class="is-kpi-link" href="#card-materiais" data-ver-inativos>Ver desativados <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        <span class="is-kpi-icon neutral" aria-hidden="true"><i class="bi bi-pause-circle"></i></span>
+      </div>
+    </div>
+  </div>
+</section>

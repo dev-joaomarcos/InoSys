@@ -1,0 +1,58 @@
+{% extends "inosys/base_app.html" %}
+{% load static %}
+{% block titulo %}Materiais · Estoque · InoSys{% endblock %}
+{% block modulo %}estoque{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Estoque</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Estoque</h1>
+            <p class="text-muted small mb-0">Cadastro de materiais e saldo atual. O saldo muda a cada entrada ou saída registrada.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-secondary" type="button"
+                    hx-get="/estoque/movimentacoes/nova/"
+                    hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-movimentacao" data-acao="movimentar">
+              <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Registrar movimentação
+            </button>
+            <button class="btn btn-primary" type="button"
+                    hx-get="/estoque/materiais/novo/"
+                    hx-target="#modal-material .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-material" data-acao="novo">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo material
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/estoque/materiais/">Materiais</a></li>
+          <li class="nav-item"><a class="nav-link" href="/estoque/movimentacoes/">Movimentações</a></li>
+        </ul>
+
+        {% include "estoque/_resumo_estoque.html" %}
+        {% include "estoque/_lista_materiais.html" %}
+{% endblock %}
+{% block modais %}
+  <div class="modal fade" id="modal-material" tabindex="-1" aria-labelledby="modal-material-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-movimentacao" tabindex="-1" aria-labelledby="modal-movimentacao-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-status-material" tabindex="-1" aria-labelledby="modal-status-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'estoque/estoque.js' %}"></script>{% endblock %}

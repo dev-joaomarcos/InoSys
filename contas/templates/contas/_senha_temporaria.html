@@ -1,0 +1,26 @@
+<div>
+  <div class="modal-header">
+    <h2 class="modal-title">{{ titulo }}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <p>Entregue estes dados para <strong>{{ usuario.nome_exibicao }}</strong>. No primeiro acesso, o sistema pede uma senha nova.</p>
+    <div class="mb-2"><span class="form-label d-block mb-1">Usuário</span><span class="is-metric">{{ usuario.username }}</span></div>
+    <div class="mb-3">
+      <span class="form-label d-block mb-1">Senha temporária</span>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <code class="fs-5" data-senha>{{ senha }}</code>
+        <button class="btn btn-sm btn-outline-primary" type="button" data-copiar-senha>
+          <i class="bi bi-clipboard" aria-hidden="true"></i> Copiar
+        </button>
+      </div>
+    </div>
+    <div class="alert alert-warning d-flex align-items-start gap-2 mb-0">
+      <i class="bi bi-exclamation-triangle mt-1" aria-hidden="true"></i>
+      <div><strong>Esta senha aparece só agora.</strong> Depois de fechar esta janela não dá para ver de novo; se perder, gere outra.</div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Concluir</button>
+  </div>
+</div>

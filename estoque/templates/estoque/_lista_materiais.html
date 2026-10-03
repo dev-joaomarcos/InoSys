@@ -1,0 +1,114 @@
+<section class="card" id="card-materiais" aria-labelledby="titulo-materiais"
+         hx-get="/estoque/materiais/" hx-trigger="estoqueAtualizado from:body"
+         hx-include="#form-filtro-materiais" hx-target="this" hx-swap="outerHTML">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-materiais">Lista de materiais</h2>
+        <div class="is-card-subtitle">Saldo atual e quantidade mínima de cada material</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2" id="form-filtro-materiais" role="search"
+          hx-get="/estoque/materiais/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-materiais" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-6">
+        <label class="form-label" for="filtro-busca">Buscar</label>
+        <input class="form-control" type="search" id="filtro-busca" name="busca" value="{{ busca }}" placeholder="Nome ou descrição">
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <label class="form-label" for="filtro-situacao">Situação do saldo</label>
+        <select class="form-select" id="filtro-situacao" name="situacao">
+          <option value="">Todas</option>
+          <option value="baixo"{% if situacao == "baixo" %} selected{% endif %}>Estoque baixo</option>
+          <option value="normal"{% if situacao == "normal" %} selected{% endif %}>Normal</option>
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <label class="form-label" for="filtro-status">Status</label>
+        <select class="form-select" id="filtro-status" name="status">
+          <option value="ativo"{% if status == "ativo" %} selected{% endif %}>Ativos</option>
+          <option value="inativo"{% if status == "inativo" %} selected{% endif %}>Desativados</option>
+          <option value=""{% if status == "" %} selected{% endif %}>Todos</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Material</th>
+          <th scope="col">Unidade</th>
+          <th scope="col" class="text-end">Qtd. atual</th>
+          <th scope="col" class="text-end">Qtd. mínima</th>
+          <th scope="col">Situação</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="is-actions"><span class="visually-hidden">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in page_obj %}
+        <tr{% if m.esta_baixo %} class="is-row-alert"{% elif not m.esta_ativo %} class="is-row-inactive"{% endif %}>
+          <td>
+            <div class="fw-semibold">{{ m.nome }}</div>
+            <div class="small text-muted">{{ m.descricao }}</div>
+          </td>
+          <td>{{ m.unidade_medida }}</td>
+          <td class="text-end">{{ m.qtd_atual|floatformat:"0g" }}</td>
+          <td class="text-end text-muted">{{ m.quantidade_minima|floatformat:"0g" }}</td>
+          <td>
+            {% if not m.esta_ativo %}<span class="is-badge is-badge-neutral">Sem dado</span>
+            {% elif m.esta_baixo %}<span class="is-badge is-badge-warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Estoque baixo</span>
+            {% else %}<span class="is-badge is-badge-success">Normal</span>{% endif %}
+          </td>
+          <td>
+            {% if m.esta_ativo %}<span class="is-badge is-badge-success">Ativo</span>{% else %}<span class="is-badge is-badge-neutral">Desativado</span>{% endif %}
+          </td>
+          <td class="is-actions">
+            {% if m.esta_ativo %}
+            <button class="btn btn-sm btn-outline-primary" type="button" title="Registrar entrada" aria-label="Registrar entrada"
+                    hx-get="/estoque/movimentacoes/nova/?material={{ m.pk }}&amp;tipo=entrada"
+                    hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-movimentacao">
+              <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary" type="button" title="Registrar saída" aria-label="Registrar saída"
+                    hx-get="/estoque/movimentacoes/nova/?material={{ m.pk }}&amp;tipo=saida"
+                    hx-target="#modal-movimentacao .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-movimentacao">
+              <i class="bi bi-box-arrow-up" aria-hidden="true"></i>
+            </button>
+            {% endif %}
+            <button class="btn btn-sm btn-outline-secondary" type="button" title="Editar material" aria-label="Editar material"
+                    hx-get="/estoque/materiais/{{ m.pk }}/editar/"
+                    hx-target="#modal-material .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-material">
+              <i class="bi bi-pencil" aria-hidden="true"></i>
+            </button>
+            {% if m.esta_ativo %}
+            <button class="btn btn-sm btn-outline-danger" type="button" title="Desativar material" aria-label="Desativar material"
+                    hx-get="/estoque/materiais/{{ m.pk }}/desativar/"
+                    hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-material">
+              <i class="bi bi-pause-circle" aria-hidden="true"></i>
+            </button>
+            {% else %}
+            <button class="btn btn-sm btn-outline-success" type="button" title="Reativar material" aria-label="Reativar material"
+                    hx-get="/estoque/materiais/{{ m.pk }}/reativar/"
+                    hx-target="#modal-status-material .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-material">
+              <i class="bi bi-play-circle" aria-hidden="true"></i>
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum material com esses filtros. Limpe a busca ou mude o status.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "estoque/_paginacao.html" with rotulo="materiais" url="/estoque/materiais/" form_id="form-filtro-materiais" card_id="card-materiais" %}
+</section>

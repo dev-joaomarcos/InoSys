@@ -1,0 +1,119 @@
+<section class="card" id="card-usuarios" aria-labelledby="titulo-usuarios"
+         hx-get="/usuarios/" hx-trigger="usuariosAtualizados from:body"
+         hx-include="#form-filtro-usuarios" hx-target="this" hx-swap="outerHTML">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-usuarios">Usuários</h2>
+        <div class="is-card-subtitle">Perfil, status e situação da senha de cada pessoa</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2" id="form-filtro-usuarios" role="search"
+          hx-get="/usuarios/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-usuarios" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-5">
+        <label class="form-label" for="filtro-busca">Buscar</label>
+        <input class="form-control" type="search" id="filtro-busca" name="busca" value="{{ busca }}" placeholder="Nome ou usuário">
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <label class="form-label" for="filtro-perfil">Perfil</label>
+        <select class="form-select" id="filtro-perfil" name="perfil">
+          <option value="">Todos</option>
+          {% for valor, rotulo in perfis %}<option value="{{ valor }}"{% if perfil == valor %} selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <label class="form-label" for="filtro-status">Status</label>
+        <select class="form-select" id="filtro-status" name="status">
+          <option value="ativo"{% if status == "ativo" %} selected{% endif %}>Ativos</option>
+          <option value="inativo"{% if status == "inativo" %} selected{% endif %}>Desativados</option>
+          <option value=""{% if status == "" %} selected{% endif %}>Todos</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Perfil</th>
+          <th scope="col">Status</th>
+          <th scope="col">Senha</th>
+          <th scope="col">Criado em</th>
+          <th scope="col" class="is-actions"><span class="visually-hidden">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in page_obj %}
+        <tr{% if not u.ativo %} class="is-row-inactive"{% endif %}>
+          <td>
+            <div class="fw-semibold">{{ u.nome_exibicao }}</div>
+            <div class="small text-muted is-metric fw-normal">{{ u.username }}</div>
+          </td>
+          <td>
+            {% if u.perfil == "admin" %}<span class="is-badge is-badge-dark"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administrador</span>
+            {% elif u.perfil == "gestor" %}<span class="is-badge is-badge-info">Gestor</span>
+            {% else %}<span class="is-badge is-badge-neutral">{{ u.get_perfil_display }}</span>{% endif %}
+          </td>
+          <td>
+            {% if u.anonimizado %}<span class="is-badge is-badge-dark">Anonimizado</span>
+            {% elif u.ativo %}<span class="is-badge is-badge-success">Ativo</span>
+            {% else %}<span class="is-badge is-badge-neutral">Desativado</span>{% endif %}
+          </td>
+          <td>
+            {% if u.anonimizado %}<span class="text-muted">—</span>
+            {% elif u.senha_temporaria %}<span class="is-badge is-badge-warning" title="Ainda não fez o primeiro acesso">Temporária</span>
+            {% else %}<span class="small text-muted">Definida pelo usuário</span>{% endif %}
+          </td>
+          <td class="is-metric fw-normal">{{ u.data_criacao|date:"d/m/Y" }}</td>
+          <td class="is-actions">
+            {% if not u.anonimizado %}
+            <button class="btn btn-sm btn-outline-secondary" type="button" title="Editar usuário" aria-label="Editar usuário"
+                    hx-get="/usuarios/{{ u.pk }}/editar/"
+                    hx-target="#modal-usuario .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-usuario" data-acao="editar">
+              <i class="bi bi-pencil" aria-hidden="true"></i>
+            </button>
+            {% if u != request.user %}
+            {% if u.ativo %}
+            <button class="btn btn-sm btn-outline-primary" type="button" title="Gerar nova senha temporária" aria-label="Gerar nova senha temporária"
+                    hx-get="/usuarios/{{ u.pk }}/nova-senha/"
+                    hx-target="#modal-nova-senha .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-nova-senha" data-acao="nova-senha">
+              <i class="bi bi-key" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" type="button" title="Desativar acesso" aria-label="Desativar acesso"
+                    hx-get="/usuarios/{{ u.pk }}/desativar/"
+                    hx-target="#modal-status-usuario .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-usuario" data-acao="desativar">
+              <i class="bi bi-pause-circle" aria-hidden="true"></i>
+            </button>
+            {% else %}
+            <button class="btn btn-sm btn-outline-success" type="button" title="Reativar acesso" aria-label="Reativar acesso"
+                    hx-get="/usuarios/{{ u.pk }}/reativar/"
+                    hx-target="#modal-status-usuario .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-usuario" data-acao="reativar">
+              <i class="bi bi-play-circle" aria-hidden="true"></i>
+            </button>
+            {% endif %}
+            <button class="btn btn-sm btn-outline-danger" type="button" title="Anonimizar dados" aria-label="Anonimizar dados"
+                    hx-get="/usuarios/{{ u.pk }}/anonimizar/"
+                    hx-target="#modal-anonimizar .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-anonimizar" data-acao="anonimizar">
+              <i class="bi bi-eraser" aria-hidden="true"></i>
+            </button>
+            {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Nenhum usuário com esses filtros. Limpe a busca ou mude o status.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "inosys/_paginacao.html" with rotulo="usuários" url="/usuarios/" form_id="form-filtro-usuarios" card_id="card-usuarios" %}
+</section>

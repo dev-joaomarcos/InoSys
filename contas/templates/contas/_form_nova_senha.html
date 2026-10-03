@@ -1,0 +1,17 @@
+<form id="form-nova-senha" hx-post="{{ acao }}"
+      hx-target="#modal-nova-senha .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-nova-senha-titulo">Gerar nova senha temporária</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{{ erro|default_if_none:"" }}</div>
+    <p class="mb-2"><strong>{{ usuario.nome_exibicao }}</strong> <span class="is-metric text-muted fw-normal">{{ usuario.username }}</span></p>
+    <p class="text-muted mb-0">A senha atual deixa de funcionar na hora. No próximo acesso, a pessoa entra com a senha
+      temporária e precisa criar uma nova. Use quando alguém esquecer a senha.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-key" aria-hidden="true"></i> Gerar senha</button>
+  </div>
+</form>

@@ -1,0 +1,49 @@
+{% extends "inosys/base_app.html" %}
+{% block titulo %}Relatórios · InoSys{% endblock %}
+{% block modulo %}visao{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item"><a href="/visao-geral/">Visão Geral</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Relatórios</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Visão Geral</h1>
+            <p class="text-muted small mb-0">Escolha o período e os filtros; o relatório aparece aqui na tela.</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="/visao-geral/">Resumo</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/relatorios/">Relatórios</a></li>
+        </ul>
+
+        <div class="btn-group mb-3" role="tablist" aria-label="Tipo de relatório">
+          <button class="btn btn-sm btn-outline-primary{% if aba == 'movimentacoes' %} active{% endif %}" id="aba-movimentacoes" data-bs-toggle="tab" data-bs-target="#painel-movimentacoes" type="button" role="tab" aria-controls="painel-movimentacoes" aria-selected="{% if aba == 'movimentacoes' %}true{% else %}false{% endif %}">
+            <i class="bi bi-box-seam" aria-hidden="true"></i> Movimentações
+          </button>
+          <button class="btn btn-sm btn-outline-primary{% if aba == 'fretes' %} active{% endif %}" id="aba-fretes" data-bs-toggle="tab" data-bs-target="#painel-fretes" type="button" role="tab" aria-controls="painel-fretes" aria-selected="{% if aba == 'fretes' %}true{% else %}false{% endif %}">
+            <i class="bi bi-truck" aria-hidden="true"></i> Fretes
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <div class="tab-pane fade{% if aba == "movimentacoes" %} show active{% endif %}" id="painel-movimentacoes" role="tabpanel" aria-labelledby="aba-movimentacoes" tabindex="0">
+            {% include "relatorios/_relatorio_movimentacoes.html" %}
+          </div>
+          <div class="tab-pane fade{% if aba == "fretes" %} show active{% endif %}" id="painel-fretes" role="tabpanel" aria-labelledby="aba-fretes" tabindex="0">
+            {% include "relatorios/_relatorio_fretes.html" %}
+          </div>
+        </div>
+{% endblock %}
+{% block scripts %}<script>
+  // Abre o relatório de fretes pelo endereço /relatorios/#fretes (links da Visão Geral e de Fretes).
+  (function () {
+    if (location.hash === '#fretes' && window.bootstrap) {
+      window.bootstrap.Tab.getOrCreateInstance(document.getElementById('aba-fretes')).show();
+    }
+  })();
+</script>{% endblock %}

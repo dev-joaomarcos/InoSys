@@ -1,0 +1,41 @@
+<form id="form-usuario" novalidate
+      hx-post="{{ acao }}"
+      hx-target="#modal-usuario .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-usuario-titulo">{% if usuario %}Editar usuário{% else %}Novo usuário{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>
+    <div class="mb-3">
+      <label class="form-label is-required" for="usuario-nome">Nome</label>
+      <input class="form-control{% if form.nome.errors %} is-invalid{% endif %}" type="text" id="usuario-nome" name="nome" maxlength="120" autocomplete="off" value="{{ form.nome.value|default_if_none:'' }}" required>
+      <div class="invalid-feedback">{{ form.nome.errors.0 }}</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label is-required" for="usuario-username">Usuário</label>
+      <input class="form-control{% if form.username.errors %} is-invalid{% endif %}" type="text" id="usuario-username" name="username" maxlength="150" autocomplete="off" autocapitalize="none" pattern="[A-Za-z0-9.@+_\-]+" value="{{ form.username.value|default_if_none:'' }}" required aria-describedby="ajuda-username">
+      <div class="form-text" id="ajuda-username">Usado para entrar. Letras, números e . @ + - _, sem espaço.</div>
+      <div class="invalid-feedback" id="usuario-username-erro">{{ form.username.errors.0 }}</div>
+    </div>
+    <div>
+      <label class="form-label is-required" for="usuario-perfil">Perfil</label>
+      <select class="form-select{% if form.perfil.errors %} is-invalid{% endif %}" id="usuario-perfil" name="perfil" required aria-describedby="ajuda-perfil">
+        <option value="">Selecione…</option>
+        {% for valor, rotulo in perfis %}<option value="{{ valor }}"{% if form.perfil.value == valor %} selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+      </select>
+      <div class="form-text" id="ajuda-perfil">{{ ajuda_perfil }}</div>
+      <div class="invalid-feedback">{{ form.perfil.errors.0 }}</div>
+    </div>
+    {% if not usuario %}
+    <p class="form-text mt-3 mb-0">
+      <i class="bi bi-key" aria-hidden="true"></i>
+      Ao cadastrar, o sistema gera uma senha temporária e mostra uma única vez.
+    </p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">{% if usuario %}Salvar alterações{% else %}Cadastrar e gerar senha{% endif %}</button>
+  </div>
+</form>

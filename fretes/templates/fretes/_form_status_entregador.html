@@ -1,0 +1,21 @@
+<form id="form-status-entregador" hx-post="{{ acao }}"
+      hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-status-titulo">{% if desativar %}Desativar entregador{% else %}Reativar entregador{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <p class="fw-semibold mb-2">{{ entregador.nome }}</p>
+    {% if desativar %}
+    <p class="text-muted mb-0">Ele deixa de aparecer na hora de registrar novas entregas.
+      As entregas antigas continuam no histórico: por isso o sistema desativa em vez de excluir (RNF02).</p>
+    {% else %}
+    <p class="text-muted mb-0">Ele volta a aparecer na hora de registrar novas entregas.</p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    {% if desativar %}<button type="submit" class="btn btn-outline-danger"><i class="bi bi-pause-circle" aria-hidden="true"></i> Desativar</button>
+    {% else %}<button type="submit" class="btn btn-primary"><i class="bi bi-play-circle" aria-hidden="true"></i> Reativar</button>{% endif %}
+  </div>
+</form>

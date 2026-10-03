@@ -1,0 +1,170 @@
+{% extends "inosys/base_app.html" %}
+{% block titulo %}Visão Geral · InoSys{% endblock %}
+{% block modulo %}visao{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Visão Geral</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Visão Geral</h1>
+            <p class="text-muted small mb-0">Situação de hoje e números dos últimos 30 dias (<span class="is-metric">{{ inicio|date:"d/m/Y" }}</span> a <span class="is-metric">{{ fim|date:"d/m/Y" }}</span>).</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/visao-geral/">Resumo</a></li>
+          <li class="nav-item"><a class="nav-link" href="/relatorios/">Relatórios</a></li>
+        </ul>
+
+        <section class="row g-3 mb-4" aria-label="Indicadores">
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Abaixo do mínimo</div>
+              <div class="is-kpi-value is-metric">{{ n_baixos }}</div>
+              <a class="is-kpi-link" href="/estoque/materiais/">Ver estoque <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon warning" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Entregas em aberto</div>
+              <div class="is-kpi-value is-metric">{{ em_aberto }}</div>
+              <a class="is-kpi-link" href="/fretes/entregas/">Ver entregas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon info" aria-hidden="true"><i class="bi bi-truck"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Fretes cobrados · 30 dias</div>
+              <div class="is-kpi-value is-metric text-nowrap">R$ {{ cobrado_periodo|floatformat:"2g" }}</div>
+              <a class="is-kpi-link" href="/relatorios/#fretes">{{ n_concluidas }} {{ n_concluidas|pluralize:"entrega concluída,entregas concluídas" }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon success" aria-hidden="true"><i class="bi bi-check-circle"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Divergências de valor</div>
+              <div class="is-kpi-value is-metric">{{ n_divergencias }}</div>
+              <a class="is-kpi-link" href="/relatorios/#fretes">Ver relatório <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon danger" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+            </div>
+          </div>
+        </section>
+
+        <div class="row g-3">
+          <div class="col-xl-7">
+            <section class="card h-100" aria-labelledby="titulo-grafico">
+              <div class="card-body">
+                <div class="is-card-header">
+                  <h2 class="is-card-title" id="titulo-grafico">Fretes concluídos: sugerido × cobrado</h2>
+                  <div class="is-card-subtitle">Soma por entregador nos últimos 30 dias</div>
+                </div>
+                {% if grafico %}
+                <div class="is-chart-bars" role="img" aria-label="{{ aria_grafico }}">
+                  {% for g in grafico %}<div class="grupo"><div class="barra" style="height:{{ g.h_sugerido|floatformat:0 }}%"></div><div class="barra saida" style="height:{{ g.h_cobrado|floatformat:0 }}%"></div></div>{% endfor %}
+                </div>
+                <div class="d-flex text-center small text-muted mt-2" aria-hidden="true">
+                  {% for g in grafico %}<span class="flex-fill">{{ g.curto }}</span>{% endfor %}
+                </div>
+                <div class="is-legend">
+                  <span><span class="swatch"></span> Sugerido</span>
+                  <span><span class="swatch muted"></span> Cobrado</span>
+                  {% for n in notas_grafico %}<span class="text-danger"><i class="bi bi-cash-coin" aria-hidden="true"></i> {{ n.nome }} cobrou {{ n.valor }} a {% if n.mais %}mais{% else %}menos{% endif %}</span>{% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0 py-4 text-center">Nenhuma entrega concluída com valor cobrado nos últimos 30 dias.</p>
+                {% endif %}
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-5">
+            <section class="card h-100" aria-labelledby="titulo-baixo">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-baixo">Estoque baixo</h2>
+                    <div class="is-card-subtitle">Saldo atual / quantidade mínima</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="/estoque/materiais/">Ver estoque</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <tbody>
+                    {% for m in estoque_baixo %}
+                    <tr class="is-row-alert"><td class="fw-semibold">{{ m.nome }}</td><td class="text-end">{{ m.qtd_atual|floatformat:"0g" }} / {{ m.quantidade_minima|floatformat:"0g" }} {{ m.unidade_medida }}</td></tr>
+                    {% empty %}
+                    <tr><td class="text-center text-muted py-4">Nenhum material abaixo do mínimo.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-6">
+            <section class="card h-100" aria-labelledby="titulo-abertas">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-abertas">Entregas em aberto</h2>
+                    <div class="is-card-subtitle">Pendentes e em andamento, das mais recentes</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="/fretes/entregas/">Ver entregas</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <tbody>
+                    {% for e in abertas %}
+                    <tr>
+                      <td><div class="fw-semibold">{{ e.destino }}</div><div class="small text-muted">{{ e.entregador.nome }} · {{ e.data|date:"d/m/Y" }}</div></td>
+                      <td class="is-actions">{% if e.status == "pendente" %}<span class="is-badge is-badge-warning">Pendente</span>{% else %}<span class="is-badge is-badge-info">Em andamento</span>{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td class="text-center text-muted py-4">Nenhuma entrega em aberto.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-6">
+            <section class="card h-100" aria-labelledby="titulo-divergencias">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-divergencias">Divergências de valor</h2>
+                    <div class="is-card-subtitle">Cobrado diferente do sugerido</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="/relatorios/#fretes">Relatório</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr><th scope="col">Entrega</th><th scope="col" class="text-end">Sugerido</th><th scope="col" class="text-end">Cobrado</th><th scope="col" class="text-end">Diferença</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for e in divergentes %}
+                    <tr>
+                      <td><div class="fw-semibold">{{ e.destino }}</div><div class="small text-muted">{{ e.entregador.nome }} · {{ e.data|date:"d/m/Y" }}</div></td>
+                      <td class="text-end">R$ {{ e.valor_sugerido|floatformat:"2g" }}</td><td class="text-end">R$ {{ e.valor_cobrado|floatformat:"2g" }}</td>
+                      <td class="text-end"><span class="is-badge is-badge-danger">{% if e.diferenca > 0 %}+{% else %}−{% endif %}R$ {{ e.diferenca_abs|floatformat:"2g" }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma divergência nos últimos 30 dias.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "inosys/base_app.html" %}
+{% load static %}
+{% block titulo %}Entregas · Fretes · InoSys{% endblock %}
+{% block modulo %}fretes{% endblock %}
+{% block conteudo %}
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'contas:selecao' %}">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Fretes</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Fretes</h1>
+            <p class="text-muted small mb-0">O valor sugerido é calculado pela distância × valor por km do entregador.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" type="button"
+                    hx-get="/fretes/entregas/nova/"
+                    hx-target="#modal-entrega .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-entrega" data-acao="nova">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Nova entrega
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="/fretes/entregas/">Entregas</a></li>
+          <li class="nav-item"><a class="nav-link" href="/fretes/entregadores/">Entregadores</a></li>
+        </ul>
+
+        {% include "fretes/_resumo_fretes.html" %}
+        {% include "fretes/_lista_entregas.html" %}
+{% endblock %}
+{% block modais %}
+  <div class="modal fade" id="modal-entrega" tabindex="-1" aria-labelledby="modal-entrega-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'fretes/fretes.js' %}"></script>{% endblock %}

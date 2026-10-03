@@ -1,0 +1,54 @@
+<form id="form-material" novalidate
+      hx-post="{{ acao }}"
+      hx-target="#modal-material .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-material-titulo">{% if material %}Editar material{% else %}Novo material{% endif %}</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>
+    <div class="mb-3">
+      <label class="form-label is-required" for="material-nome">Nome</label>
+      <input class="form-control{% if form.nome.errors %} is-invalid{% endif %}" type="text" id="material-nome" name="nome" maxlength="120" value="{{ form.nome.value|default_if_none:'' }}" required>
+      <div class="invalid-feedback">{{ form.nome.errors.0 }}</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="material-descricao">Descrição</label>
+      <textarea class="form-control{% if form.descricao.errors %} is-invalid{% endif %}" id="material-descricao" name="descricao" rows="2" placeholder="Medidas, cor, embalagem…">{{ form.descricao.value|default_if_none:'' }}</textarea>
+      <div class="invalid-feedback">{{ form.descricao.errors.0 }}</div>
+    </div>
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label class="form-label is-required" for="material-unidade">Unidade de medida</label>
+        <input class="form-control{% if form.unidade_medida.errors %} is-invalid{% endif %}" type="text" id="material-unidade" name="unidade_medida" list="unidades-sugeridas" maxlength="10" value="{{ form.unidade_medida.value|default_if_none:'' }}" required>
+        <datalist id="unidades-sugeridas">
+          <option value="un"></option><option value="m"></option><option value="m²"></option>
+          <option value="kg"></option><option value="cx"></option>
+        </datalist>
+        <div class="invalid-feedback">{{ form.unidade_medida.errors.0 }}</div>
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label is-required" for="material-minima">Quantidade mínima</label>
+        <input class="form-control{% if form.quantidade_minima.errors %} is-invalid{% endif %}" type="number" id="material-minima" name="quantidade_minima" min="0" step="1" inputmode="numeric" value="{{ form.quantidade_minima.value|default_if_none:'' }}" required aria-describedby="ajuda-minima">
+        <div class="form-text" id="ajuda-minima">Abaixo deste saldo o material entra no alerta.</div>
+        <div class="invalid-feedback">{{ form.quantidade_minima.errors.0 }}</div>
+      </div>
+    </div>
+    {% if material %}
+    <p class="form-text mt-3 mb-0">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      Saldo atual: <span class="is-metric">{{ material.qtd_atual|floatformat:"0g" }}</span> {{ material.unidade_medida }}.
+      O saldo só muda por entrada ou saída, para manter o histórico correto.
+    </p>
+    {% else %}
+    <p class="form-text mt-3 mb-0">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      O saldo começa em <span class="is-metric">0</span>. Depois de salvar, registre uma entrada para lançar a quantidade em estoque.
+    </p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">{% if material %}Salvar alterações{% else %}Cadastrar material{% endif %}</button>
+  </div>
+</form>

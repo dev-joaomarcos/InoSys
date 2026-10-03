@@ -1,0 +1,82 @@
+<section class="card" id="card-entregadores" aria-labelledby="titulo-entregadores"
+         hx-get="/fretes/entregadores/" hx-trigger="entregadoresAtualizados from:body"
+         hx-include="#form-filtro-entregadores" hx-target="this" hx-swap="outerHTML">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-entregadores">Lista de entregadores</h2>
+        <div class="is-card-subtitle">Contato e valor cobrado por quilômetro</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2" id="form-filtro-entregadores" role="search"
+          hx-get="/fretes/entregadores/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-entregadores" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-8">
+        <label class="form-label" for="filtro-busca">Buscar</label>
+        <input class="form-control" type="search" id="filtro-busca" name="busca" value="{{ busca }}" placeholder="Nome ou contato">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="filtro-status">Status</label>
+        <select class="form-select" id="filtro-status" name="status">
+          <option value="ativo"{% if status == "ativo" %} selected{% endif %}>Ativos</option>
+          <option value="inativo"{% if status == "inativo" %} selected{% endif %}>Desativados</option>
+          <option value=""{% if status == "" %} selected{% endif %}>Todos</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Contato</th>
+          <th scope="col" class="text-end">Valor por km</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="is-actions"><span class="visually-hidden">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for x in page_obj %}
+        <tr{% if not x.esta_ativo %} class="is-row-inactive"{% endif %}>
+          <td class="fw-semibold">{{ x.nome }}</td>
+          <td>{{ x.contato|default:"—" }}</td>
+          <td class="text-end">R$ {{ x.valor_por_km|floatformat:"2g" }}</td>
+          <td>{% if x.esta_ativo %}<span class="is-badge is-badge-success">Ativo</span>{% else %}<span class="is-badge is-badge-neutral">Desativado</span>{% endif %}</td>
+          <td class="is-actions">
+            <a class="btn btn-sm btn-outline-secondary" href="/fretes/entregas/?entregador={{ x.pk }}" title="Ver entregas" aria-label="Ver entregas">
+              <i class="bi bi-clock-history" aria-hidden="true"></i>
+            </a>
+            <button class="btn btn-sm btn-outline-secondary" type="button" title="Editar entregador" aria-label="Editar entregador"
+                    hx-get="/fretes/entregadores/{{ x.pk }}/editar/"
+                    hx-target="#modal-entregador .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-entregador" data-acao="editar">
+              <i class="bi bi-pencil" aria-hidden="true"></i>
+            </button>
+            {% if x.esta_ativo %}
+            <button class="btn btn-sm btn-outline-danger" type="button" title="Desativar entregador" aria-label="Desativar entregador"
+                    hx-get="/fretes/entregadores/{{ x.pk }}/desativar/"
+                    hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-entregador">
+              <i class="bi bi-pause-circle" aria-hidden="true"></i>
+            </button>
+            {% else %}
+            <button class="btn btn-sm btn-outline-success" type="button" title="Reativar entregador" aria-label="Reativar entregador"
+                    hx-get="/fretes/entregadores/{{ x.pk }}/reativar/"
+                    hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-status-entregador">
+              <i class="bi bi-play-circle" aria-hidden="true"></i>
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum entregador com esses filtros. Limpe a busca ou mude o status.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "inosys/_paginacao.html" with rotulo="entregadores" url="/fretes/entregadores/" form_id="form-filtro-entregadores" card_id="card-entregadores" %}
+</section>

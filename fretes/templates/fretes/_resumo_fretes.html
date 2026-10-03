@@ -1,0 +1,36 @@
+<section class="row g-3 mb-4" id="resumo-fretes" aria-label="Resumo das entregas"
+         hx-get="/fretes/entregas/resumo/" hx-trigger="fretesAtualizados from:body"
+         hx-target="this" hx-swap="outerHTML">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card is-kpi">
+      <div class="is-kpi-label">Pendentes</div>
+      <div class="is-kpi-value is-metric">{{ pendentes }}</div>
+      <a class="is-kpi-link" href="#card-entregas" data-ver-status="pendente">Ver pendentes <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <span class="is-kpi-icon warning" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card is-kpi">
+      <div class="is-kpi-label">Em andamento</div>
+      <div class="is-kpi-value is-metric">{{ andamento }}</div>
+      <a class="is-kpi-link" href="#card-entregas" data-ver-status="em_andamento">Ver em andamento <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <span class="is-kpi-icon info" aria-hidden="true"><i class="bi bi-truck"></i></span>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card is-kpi">
+      <div class="is-kpi-label">Concluídas</div>
+      <div class="is-kpi-value is-metric">{{ concluidas }}</div>
+      <a class="is-kpi-link" href="#card-entregas" data-ver-status="concluida">Ver concluídas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      <span class="is-kpi-icon success" aria-hidden="true"><i class="bi bi-check-circle"></i></span>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card is-kpi">
+      <div class="is-kpi-label">Divergência de valor</div>
+      <div class="is-kpi-value is-metric">{{ divergencias }}</div>
+      {% if request.user.pode_visao %}<a class="is-kpi-link" href="/relatorios/#fretes">Ver relatório <i class="bi bi-arrow-right" aria-hidden="true"></i></a>{% endif %}
+      <span class="is-kpi-icon danger" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+    </div>
+  </div>
+</section>

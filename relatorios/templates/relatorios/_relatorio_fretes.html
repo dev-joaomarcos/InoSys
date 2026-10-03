@@ -1,0 +1,129 @@
+<section class="card" id="card-rel-fretes" aria-labelledby="titulo-rel-fretes">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-rel-fretes">Fretes: sugerido × cobrado</h2>
+        <div class="is-card-subtitle">Divergência = valor cobrado diferente do valor sugerido pela distância</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2 align-items-end" id="form-rel-fretes" role="search"
+          hx-get="/relatorios/fretes/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-rel-fretes" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-3">
+        <label class="form-label" for="rel-fre-entregador">Entregador</label>
+        <select class="form-select" id="rel-fre-entregador" name="entregador">
+          <option value="">Todos</option>
+          {% for x in entregadores %}<option value="{{ x.pk }}"{% if ff.entregador == x.pk|stringformat:"s" %} selected{% endif %}>{{ x.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="rel-fre-status">Status</label>
+        <select class="form-select" id="rel-fre-status" name="status">
+          <option value="">Todos</option>
+          {% for valor, rotulo in status_opcoes %}<option value="{{ valor }}"{% if ff.status == valor %} selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="rel-fre-inicio">De</label>
+        <input class="form-control" type="date" id="rel-fre-inicio" name="data_inicio" value="{{ ff.data_inicio|date:'Y-m-d' }}">
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <label class="form-label" for="rel-fre-fim">Até</label>
+        <input class="form-control" type="date" id="rel-fre-fim" name="data_fim" value="{{ ff.data_fim|date:'Y-m-d' }}">
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="rel-fre-divergencias" name="so_divergencias" value="1"{% if ff.so_divergencias %} checked{% endif %}>
+          <label class="form-check-label" for="rel-fre-divergencias">Só divergências</label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-body pt-2 pb-2">
+    <h3 class="is-card-title">Resumo por entregador</h3>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Entregador</th>
+          <th scope="col" class="text-end">Entregas</th>
+          <th scope="col" class="text-end">Distância</th>
+          <th scope="col" class="text-end">Sugerido</th>
+          <th scope="col" class="text-end">Cobrado</th>
+          <th scope="col" class="text-end">Diferença</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in fre.resumo %}
+        <tr>
+          <td class="fw-semibold">{{ r.nome }}</td>
+          <td class="text-end">{{ r.entregas|floatformat:"0g" }}</td>
+          <td class="text-end">{{ r.km|floatformat:"-1g" }} km</td>
+          <td class="text-end">R$ {{ r.sugerido|floatformat:"2g" }}</td>
+          <td class="text-end">R$ {{ r.cobrado|floatformat:"2g" }}</td>
+          <td class="text-end{% if r.diferenca != 0 %} text-danger{% endif %}">{% if r.diferenca > 0 %}+{% elif r.diferenca < 0 %}−{% endif %}R$ {{ r.diferenca_abs|floatformat:"2g" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="fw-semibold">
+          <td>Total</td>
+          <td class="text-end">{{ fre.total.entregas|floatformat:"0g" }}</td>
+          <td class="text-end">{{ fre.total.km|floatformat:"-1g" }} km</td>
+          <td class="text-end">R$ {{ fre.total.sugerido|floatformat:"2g" }}</td>
+          <td class="text-end">R$ {{ fre.total.cobrado|floatformat:"2g" }}</td>
+          <td class="text-end{% if fre.total.diferenca != 0 %} text-danger{% endif %}">{% if fre.total.diferenca > 0 %}+{% elif fre.total.diferenca < 0 %}−{% endif %}R$ {{ fre.total.diferenca_abs|floatformat:"2g" }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="card-body pt-4 pb-2 border-top">
+    <h3 class="is-card-title">Entregas do período</h3>
+    <div class="is-card-subtitle">Entregas sem valor cobrado ficam fora da soma do cobrado e da diferença</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Data</th>
+          <th scope="col">Destino</th>
+          <th scope="col">Entregador</th>
+          <th scope="col" class="text-end">Sugerido</th>
+          <th scope="col" class="text-end">Cobrado</th>
+          <th scope="col" class="text-end">Diferença</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in fre.entregas %}
+        <tr>
+          <td class="is-metric fw-normal">{{ e.data|date:"d/m/Y" }}</td>
+          <td class="fw-semibold">{{ e.destino }}</td>
+          <td>{{ e.entregador.nome }}</td>
+          <td class="text-end">R$ {{ e.valor_sugerido|floatformat:"2g" }}</td>
+          <td class="text-end">{% if e.valor_cobrado is None %}—{% else %}R$ {{ e.valor_cobrado|floatformat:"2g" }}{% endif %}</td>
+          <td class="text-end">
+            {% if e.divergente %}<span class="is-badge is-badge-danger"><i class="bi bi-cash-coin" aria-hidden="true"></i> {% if e.diferenca > 0 %}+{% else %}−{% endif %}R$ {{ e.diferenca_abs|floatformat:"2g" }}</span>
+            {% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td>
+            {% if e.status == "pendente" %}<span class="is-badge is-badge-warning">Pendente</span>
+            {% elif e.status == "em_andamento" %}<span class="is-badge is-badge-info">Em andamento</span>
+            {% else %}<span class="is-badge is-badge-success">Concluída</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma entrega com esses filtros. Amplie o período ou desmarque "Só divergências".</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="px-3 py-3 border-top small text-muted">
+    <span>{{ fre.total.entregas|floatformat:"0g" }} {{ fre.total.entregas|pluralize:"entrega,entregas" }} · {{ fre.n_divergentes|floatformat:"0g" }} com divergência de valor</span>
+    {% if fre.passou_do_limite %}<div class="text-danger mt-1">A tabela mostra só as {{ fre.limite }} mais recentes; os totais acima consideram todas. Reduza o período para ver as demais.</div>{% endif %}
+  </div>
+</section>

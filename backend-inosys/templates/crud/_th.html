@@ -1,3 +1,0 @@
-<th hx-get="{{ request.path }}?ordem={{ campo }}&dir={% if ordem == campo and dir == 'asc' %}desc{% else %}asc{% endif %}"
-    hx-include="#filtro" hx-target="#tb"
-    class="cursor-pointer select-none px-3 py-2.5 font-semibold mute {% if num %}text-right{% endif %}">{{ titulo }}{% if ordem == campo %}{% if dir == 'asc' %} ▲{% else %} ▼{% endif %}{% endif %}</th>

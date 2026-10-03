@@ -1,0 +1,24 @@
+<form id="form-anonimizar" novalidate hx-post="{{ acao }}"
+      hx-target="#modal-anonimizar .modal-content" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-anonimizar-titulo">Anonimizar dados pessoais</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+  </div>
+  <div class="modal-body">
+    <div class="is-swap-error alert alert-danger" role="alert">{{ erro|default_if_none:"" }}</div>
+    <p class="mb-3"><strong>{{ usuario.nome_exibicao }}</strong> <span class="is-metric text-muted fw-normal">{{ usuario.username }}</span></p>
+    <div class="alert alert-danger d-flex align-items-start gap-2">
+      <i class="bi bi-exclamation-triangle mt-1" aria-hidden="true"></i>
+      <div>O nome e o usuário serão trocados por valores genéricos fixos e o acesso será desativado.
+        <strong>Não dá para desfazer.</strong></div>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="anonimizar-confirmo" name="confirmacao" value="1" required>
+      <label class="form-check-label" for="anonimizar-confirmo">Entendo que os dados pessoais não poderão ser recuperados.</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-eraser" aria-hidden="true"></i> Anonimizar</button>
+  </div>
+</form>

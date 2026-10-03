@@ -1,0 +1,66 @@
+<section class="card" id="card-rel-movimentacoes" aria-labelledby="titulo-rel-mov">
+  <div class="card-body pb-2">
+    <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+      <div>
+        <h2 class="is-card-title" id="titulo-rel-mov">Movimentações por material</h2>
+        <div class="is-card-subtitle">Total de entradas e de saídas por motivo no período, com o saldo atual</div>
+      </div>
+      <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+    </div>
+    <form class="row g-2" id="form-rel-movimentacoes" role="search"
+          hx-get="/relatorios/movimentacoes/" hx-trigger="input delay:400ms, submit"
+          hx-target="#card-rel-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+      <div class="col-md-6">
+        <label class="form-label" for="rel-mov-material">Material</label>
+        <select class="form-select" id="rel-mov-material" name="material">
+          <option value="">Todos</option>
+          {% for m in materiais %}<option value="{{ m.pk }}"{% if fm.material == m.pk|stringformat:"s" %} selected{% endif %}>{{ m.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <label class="form-label" for="rel-mov-inicio">De</label>
+        <input class="form-control" type="date" id="rel-mov-inicio" name="data_inicio" value="{{ fm.data_inicio|date:'Y-m-d' }}">
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <label class="form-label" for="rel-mov-fim">Até</label>
+        <input class="form-control" type="date" id="rel-mov-fim" name="data_fim" value="{{ fm.data_fim|date:'Y-m-d' }}">
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Material</th>
+          <th scope="col" class="text-end">Entradas</th>
+          <th scope="col" class="text-end">Saídas · produção</th>
+          <th scope="col" class="text-end">Saídas · perda/dano</th>
+          <th scope="col" class="text-end">Saídas · ajuste</th>
+          <th scope="col" class="text-end">Saldo atual</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in mov.linhas %}
+        <tr{% if r.baixo %} class="is-row-alert"{% endif %}>
+          <td>
+            <div class="fw-semibold">{{ r.nome }}</div>
+            <div class="small text-muted">em {{ r.unidade }}</div>
+          </td>
+          <td class="text-end">{% if r.entradas %}+{{ r.entradas|floatformat:"0g" }}{% else %}—{% endif %}</td>
+          <td class="text-end">{% if r.uso_producao %}{{ r.uso_producao|floatformat:"0g" }}{% else %}—{% endif %}</td>
+          <td class="text-end">{% if r.perda_dano %}{{ r.perda_dano|floatformat:"0g" }}{% else %}—{% endif %}</td>
+          <td class="text-end">{% if r.ajuste_inventario %}{{ r.ajuste_inventario|floatformat:"0g" }}{% else %}—{% endif %}</td>
+          <td class="text-end">{{ r.qtd_atual|floatformat:"0g" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma movimentação no período. Amplie as datas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex flex-wrap justify-content-between gap-2 px-3 py-3 border-top small text-muted">
+    <span>{{ mov.total_mov|floatformat:"0g" }} {{ mov.total_mov|pluralize:"movimentação,movimentações" }} · {{ mov.linhas|length }} {{ mov.linhas|length|pluralize:"material,materiais" }}</span>
+    <span>Quantidades na unidade de cada material.</span>
+  </div>
+</section>
