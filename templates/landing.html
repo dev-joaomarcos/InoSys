@@ -5,6 +5,17 @@
 {% block content %}
 {# Ícones de traço reaproveitados na página. #}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  {# Ícone do logo InoSys (vetorizado de docs/logo_InoSys.png). As cores vêm dos tokens e seguem o tema. #}
+  <symbol id="ino-logo" viewBox="0 0 48 44">
+    <rect x="2" y="2" width="44" height="30" rx="6" fill="var(--primary)"/>
+    <rect x="6.5" y="6.5" width="35" height="21" rx="2.5" fill="var(--on-primary)" fill-opacity="0.16"/>
+    <g fill="none" stroke="var(--on-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="12,23 19.5,15.5 25,20.5 35,11"/>
+      <polyline points="29,11 35,11 35,17"/>
+    </g>
+    <rect x="21" y="31" width="6" height="6" fill="var(--primary)"/>
+    <rect x="13" y="36" width="22" height="5.5" rx="2.75" fill="var(--primary)"/>
+  </symbol>
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></symbol>
   <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></symbol>
@@ -19,7 +30,7 @@
 <header class="ino-landing-topbar">
   <div class="ino-landing-container ino-landing-topbar__inner">
     <a href="#inicio" class="ino-brand" aria-label="InoSys, início">
-      <span class="ino-brand__mark" aria-hidden="true">I</span>
+      <svg class="ino-brand__logo" aria-hidden="true"><use href="#ino-logo"/></svg>
       <span>
         <span class="ino-brand__name d-block">InoSys</span>
         <span class="ino-brand__tag d-block">Estoque e fretes</span>
@@ -193,7 +204,7 @@
 
       <div class="ino-preview">
         <div class="ino-preview__bar">
-          <span class="ino-brand__mark" style="width:24px;height:24px;font-size:11px" aria-hidden="true">I</span>
+          <svg class="ino-brand__logo ino-brand__logo--sm" aria-hidden="true"><use href="#ino-logo"/></svg>
           <span class="crumb">Operação /</span> <strong>Estoque</strong>
         </div>
 
@@ -355,8 +366,11 @@
 </main>
 
 <footer class="ino-landing-footer">
-  <div class="ino-landing-container d-flex flex-column flex-md-row justify-content-between gap-2">
-    <span>© 2026 INOVE. Todos os direitos reservados.</span>
+  <div class="ino-landing-container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+    <span class="d-flex align-items-center gap-2">
+      <svg class="ino-brand__logo ino-brand__logo--sm" aria-hidden="true"><use href="#ino-logo"/></svg>
+      © 2026 INOVE. Todos os direitos reservados.
+    </span>
     <span>PIM IV · Análise e Desenvolvimento de Sistemas · USCS</span>
   </div>
 </footer>
