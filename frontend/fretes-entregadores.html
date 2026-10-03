@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entregadores · Fretes · InoSys</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF07 CRUD de entregadores (tb_entregadores: nome, contato, valor_por_km, status)
+     RNF02: entregador com entregas não é excluído, é desativado.
+     Perfis: Operacional de Fretes, Gestor, Administrador -->
+<body data-modulo="fretes" data-perfis="fretes gestor admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
+
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="conteudo" id="conteudo">
+    <div class="container">
+      <div data-conteudo-tela>
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item"><a href="fretes.html">Fretes</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Entregadores</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Fretes</h1>
+            <p class="text-muted small mb-0">O valor por km de cada entregador é a base do valor sugerido das entregas.</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em "Novo entregador"
+                 Requisição: GET /fretes/entregadores/novo/
+                 Alvo-troca: #modal-entregador .modal-content · innerHTML
+                 Django devolve: _form_entregador.html vazio
+                 Mockup: abre o modal estático com o formulário limpo
+                 ─────────────────── -->
+            <button class="btn btn-primary" type="button"
+                    hx-get="/fretes/entregadores/novo/"
+                    hx-target="#modal-entregador .modal-content" hx-swap="innerHTML"
+                    data-abrir-modal="#modal-entregador" data-acao="novo">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> Novo entregador
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="fretes.html">Entregas</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="fretes-entregadores.html">Entregadores</a></li>
+        </ul>
+
+        <!-- ▸ HTMX ───────────
+             Gatilho: evento entregadoresAtualizados (HX-Trigger após salvar)
+             Requisição: GET /fretes/entregadores/ (filtros atuais via hx-include)
+             Alvo-troca: o card inteiro · outerHTML
+             Django devolve: _lista_entregadores.html
+             Mockup: a simulação redesenha as linhas
+             ─────────────────── -->
+        <section class="card" id="card-entregadores" aria-labelledby="titulo-entregadores"
+                 hx-get="/fretes/entregadores/" hx-trigger="entregadoresAtualizados from:body"
+                 hx-include="#form-filtro-entregadores" hx-target="this" hx-swap="outerHTML">
+          <div class="card-body pb-2">
+            <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+              <div>
+                <h2 class="is-card-title" id="titulo-entregadores">Lista de entregadores</h2>
+                <div class="is-card-subtitle">Contato e valor cobrado por quilômetro</div>
+              </div>
+              <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+            </div>
+
+            <!-- ▸ HTMX ───────────
+                 Gatilho: digitar na busca (400 ms) ou mudar o status
+                 Requisição: GET /fretes/entregadores/?busca=&status=
+                 Alvo-troca: #card-entregadores · outerHTML · hx-push-url
+                 Django devolve: _lista_entregadores.html filtrado, página 1
+                 Mockup: filtra os dados de exemplo
+                 ─────────────────── -->
+            <form class="row g-2" id="form-filtro-entregadores" role="search" data-lista-filtros
+                  hx-get="/fretes/entregadores/" hx-trigger="input delay:400ms, submit"
+                  hx-target="#card-entregadores" hx-swap="outerHTML" hx-push-url="true">
+              <div class="col-md-8">
+                <label class="form-label" for="filtro-busca">Buscar</label>
+                <input class="form-control" type="search" id="filtro-busca" name="busca" placeholder="Nome ou contato">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="filtro-status">Status</label>
+                <select class="form-select" id="filtro-status" name="status">
+                  <option value="ativo">Ativos</option>
+                  <option value="inativo">Desativados</option>
+                  <option value="">Todos</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Contato</th>
+                  <th scope="col" class="text-end">Valor por km</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="is-actions"><span class="visually-hidden">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="5" class="text-center text-muted py-4">Nenhum entregador com esses filtros. Limpe a busca ou mude o status.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do laço for sobre page_obj. -->
+          <template data-lista-linha>
+            <tr>
+              <td class="fw-semibold" data-campo="nome"></td>
+              <td data-campo="contato_texto"></td>
+              <td class="text-end" data-campo="valor_por_km" data-formato="moeda"></td>
+              <td>
+                <span class="is-badge is-badge-success" data-se="ativo">Ativo</span>
+                <span class="is-badge is-badge-neutral" data-se="inativo">Desativado</span>
+              </td>
+              <td class="is-actions">
+                <!-- ▸ HTMX ───────────
+                     Gatilho: clique em Editar / Desativar / Reativar
+                     Requisição: GET da URL de cada botão
+                     Alvo-troca: .modal-content do modal indicado · innerHTML
+                     Django devolve: o formulário ou a confirmação daquele entregador
+                     Mockup: preenche o modal estático com os dados da linha
+                     ─────────────────── -->
+                <a class="btn btn-sm btn-outline-secondary" href="fretes.html" title="Ver entregas" aria-label="Ver entregas" data-ver-entregas>
+                  <i class="bi bi-clock-history" aria-hidden="true"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-secondary" type="button" title="Editar entregador" aria-label="Editar entregador"
+                        hx-get="/fretes/entregadores/__ID__/editar/"
+                        hx-target="#modal-entregador .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-entregador" data-acao="editar">
+                  <i class="bi bi-pencil" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" title="Desativar entregador" aria-label="Desativar entregador" data-se="ativo"
+                        hx-get="/fretes/entregadores/__ID__/desativar/"
+                        hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-status-entregador" data-acao="desativar">
+                  <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" type="button" title="Reativar entregador" aria-label="Reativar entregador" data-se="inativo"
+                        hx-get="/fretes/entregadores/__ID__/reativar/"
+                        hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML"
+                        data-abrir-modal="#modal-status-entregador" data-acao="reativar">
+                  <i class="bi bi-play-circle" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+          </template>
+
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-3 border-top">
+            <span class="small text-muted" data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /fretes/entregadores/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-entregadores · outerHTML
+                 Django devolve: _lista_entregadores.html da página pedida
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação de entregadores">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/fretes/entregadores/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-entregadores"
+                     hx-target="#card-entregadores" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item disabled"><span class="page-link" data-pagina-texto></span></li>
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/fretes/entregadores/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-entregadores"
+                     hx-target="#card-entregadores" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== Modal: novo / editar entregador (RF07) ===================== -->
+  <div class="modal fade" id="modal-entregador" tabindex="-1" aria-labelledby="modal-entregador-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: enviar o formulário
+             Requisição: POST /fretes/entregadores/novo/ (ou /fretes/entregadores/__ID__/editar/)
+             Alvo-troca: #modal-entregador .modal-content · innerHTML
+             Django devolve: com erro, o formulário com as mensagens (200);
+                             salvo, 204 + HX-Trigger: entregadoresAtualizados
+             Mockup: valida no navegador e atualiza a tabela
+             ─────────────────── -->
+        <form id="form-entregador" novalidate
+              hx-post="/fretes/entregadores/novo/"
+              hx-target="#modal-entregador .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-entregador-titulo">Novo entregador</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="is-swap-error alert alert-danger" role="alert"></div>
+            <div class="mb-3">
+              <label class="form-label is-required" for="entregador-nome">Nome</label>
+              <input class="form-control" type="text" id="entregador-nome" name="nome" maxlength="120" autocomplete="off" required>
+              <div class="invalid-feedback">Informe o nome do entregador.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="entregador-contato">Contato</label>
+              <input class="form-control" type="text" id="entregador-contato" name="contato" maxlength="120" autocomplete="off" placeholder="Telefone ou e-mail">
+            </div>
+            <div>
+              <label class="form-label is-required" for="entregador-valor">Valor por km (R$)</label>
+              <input class="form-control" type="number" id="entregador-valor" name="valor_por_km" min="0.01" step="0.01" inputmode="decimal" required aria-describedby="ajuda-valor">
+              <div class="form-text" id="ajuda-valor">Mudar este valor não altera entregas já registradas: só as próximas.</div>
+              <div class="invalid-feedback">Informe um valor maior que zero.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-campo="rotulo_salvar">Cadastrar entregador</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Modal: desativar / reativar entregador ===================== -->
+  <div class="modal fade" id="modal-status-entregador" tabindex="-1" aria-labelledby="modal-status-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- ▸ HTMX ───────────
+             Gatilho: confirmar
+             Requisição: POST /fretes/entregadores/__ID__/desativar/ (ou /reativar/)
+             Alvo-troca: #modal-status-entregador .modal-content · innerHTML
+             Django devolve: 204 + HX-Trigger: entregadoresAtualizados
+             Mockup: muda o status na tabela
+             ─────────────────── -->
+        <form id="form-status-entregador"
+              hx-post="/fretes/entregadores/__ID__/desativar/"
+              hx-target="#modal-status-entregador .modal-content" hx-swap="innerHTML">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-status-titulo" data-campo="titulo">Desativar entregador</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="fw-semibold mb-2" data-campo="nome"></p>
+            <p class="text-muted mb-0" data-se="desativar">Ele deixa de aparecer na hora de registrar novas entregas.
+              As entregas antigas continuam no histórico: por isso o sistema desativa em vez de excluir (RNF02).</p>
+            <p class="text-muted mb-0" data-se="reativar">Ele volta a aparecer na hora de registrar novas entregas.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-outline-danger" data-se="desativar"><i class="bi bi-pause-circle" aria-hidden="true"></i> Desativar</button>
+            <button type="submit" class="btn btn-primary" data-se="reativar"><i class="bi bi-play-circle" aria-hidden="true"></i> Reativar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Simulação dos entregadores.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+
+      var entregadores = [
+        { id: 1, nome: 'Carlos Menezes', contato: '(11) 98765-4321', valor_por_km: 2.80, status: 'ativo' },
+        { id: 2, nome: 'Juliana Prado',  contato: '(11) 97654-1122', valor_por_km: 3.10, status: 'ativo' },
+        { id: 3, nome: 'Roberto Alves',  contato: 'roberto.alves@exemplo.com', valor_por_km: 2.50, status: 'ativo' },
+        { id: 4, nome: 'Sérgio Nunes',   contato: '', valor_por_km: 2.90, status: 'inativo' }
+      ];
+      var proximoId = 5;
+
+      var lista = is.lista({
+        card: document.getElementById('card-entregadores'),
+        dados: entregadores,
+        ordenar: function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); },
+        filtro: function (x, f) {
+          var termo = (f.busca || '').trim().toLowerCase();
+          if (termo && (x.nome + ' ' + x.contato).toLowerCase().indexOf(termo) === -1) return false;
+          if (f.status && x.status !== f.status) return false;
+          return true;
+        },
+        preencher: function (tr, x) {
+          var ativo = x.status === 'ativo';
+          is.preencher(tr, Object.assign({}, x, { contato_texto: x.contato || '—' }));
+          is.mostrarSe(tr, { ativo: ativo, inativo: !ativo });
+          tr.classList.toggle('is-row-inactive', !ativo);
+          tr.querySelector('[data-ver-entregas]').href = 'fretes.html?entregador=' + x.id;
+        }
+      });
+
+      function atualizado(msg) { lista.render(); is.toast(msg); }  // = HX-Trigger: entregadoresAtualizados
+
+      var form = document.getElementById('form-entregador');
+      var emEdicao = null;
+      function abrirForm(x) {
+        emEdicao = x;
+        form.reset();
+        form.classList.remove('was-validated');
+        if (x) is.preencherForm(form, { nome: x.nome, contato: x.contato, valor_por_km: x.valor_por_km.toFixed(2) });
+        document.getElementById('modal-entregador-titulo').textContent = x ? 'Editar entregador' : 'Novo entregador';
+        is.preencher(form, { rotulo_salvar: x ? 'Salvar alterações' : 'Cadastrar entregador' });
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+        var d = is.lerForm(form);
+        var dados = { nome: d.nome.trim(), contato: d.contato.trim(), valor_por_km: Math.round(Number(d.valor_por_km) * 100) / 100 };
+        if (emEdicao) Object.assign(emEdicao, dados);
+        else entregadores.push(Object.assign({ id: proximoId++, status: 'ativo' }, dados));
+        is.fecharModal('#modal-entregador');
+        atualizado(emEdicao ? 'Entregador atualizado.' : 'Entregador cadastrado.');
+      });
+
+      var formStatus = document.getElementById('form-status-entregador');
+      var alvo = null;
+      function abrirStatus(x, acao) {
+        alvo = x;
+        var desativar = acao === 'desativar';
+        is.preencher(formStatus, { nome: x.nome, titulo: desativar ? 'Desativar entregador' : 'Reativar entregador' });
+        is.mostrarSe(formStatus, { desativar: desativar, reativar: !desativar });
+      }
+      formStatus.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var desativar = alvo.status === 'ativo';
+        alvo.status = desativar ? 'inativo' : 'ativo';
+        is.fecharModal('#modal-status-entregador');
+        atualizado(desativar ? 'Entregador desativado. As entregas antigas foram mantidas.' : 'Entregador reativado.');
+      });
+
+      document.addEventListener('click', function (e) {
+        var botao = e.target.closest('[data-acao]');
+        if (!botao) return;
+        var acao = botao.getAttribute('data-acao');
+        if (acao === 'novo') abrirForm(null);
+        else if (acao === 'editar') abrirForm(lista.daLinha(botao));
+        else if (acao === 'desativar' || acao === 'reativar') abrirStatus(lista.daLinha(botao), acao);
+      });
+    })();
+  </script>
+</body>
+</html>

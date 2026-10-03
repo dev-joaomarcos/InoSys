@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relatórios · Visão Geral · InoSys</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF12 relatórios em tela (sem exportação por ora): movimentações e fretes,
+     com destaque de divergência entre valor sugerido e cobrado. RNF01: até 5 s.
+     Perfis: Gestor, Administrador -->
+<body data-modulo="visao" data-perfis="gestor admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
+
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="conteudo" id="conteudo">
+    <div class="container">
+      <div data-conteudo-tela>
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item"><a href="visao-geral.html">Visão Geral</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Relatórios</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Visão Geral</h1>
+            <p class="text-muted small mb-0">Escolha o período e os filtros; o relatório aparece aqui na tela.</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="visao-geral.html">Resumo</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="relatorios.html">Relatórios</a></li>
+        </ul>
+
+        <div class="btn-group mb-3" role="tablist" aria-label="Tipo de relatório">
+          <button class="btn btn-sm btn-outline-primary active" id="aba-movimentacoes" data-bs-toggle="tab" data-bs-target="#painel-movimentacoes" type="button" role="tab" aria-controls="painel-movimentacoes" aria-selected="true">
+            <i class="bi bi-box-seam" aria-hidden="true"></i> Movimentações
+          </button>
+          <button class="btn btn-sm btn-outline-primary" id="aba-fretes" data-bs-toggle="tab" data-bs-target="#painel-fretes" type="button" role="tab" aria-controls="painel-fretes" aria-selected="false">
+            <i class="bi bi-truck" aria-hidden="true"></i> Fretes
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <!-- ======================= Relatório de movimentações ======================= -->
+          <div class="tab-pane fade show active" id="painel-movimentacoes" role="tabpanel" aria-labelledby="aba-movimentacoes" tabindex="0">
+            <section class="card" id="card-rel-movimentacoes" aria-labelledby="titulo-rel-mov">
+              <div class="card-body pb-2">
+                <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-rel-mov">Movimentações por material</h2>
+                    <div class="is-card-subtitle">Total de entradas e de saídas por motivo no período, com o saldo atual</div>
+                  </div>
+                  <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+                </div>
+
+                <!-- ▸ HTMX ───────────
+                     Gatilho: mudar um filtro
+                     Requisição: GET /relatorios/movimentacoes/?material=&data_inicio=&data_fim=
+                     Alvo-troca: #card-rel-movimentacoes · outerHTML · hx-push-url
+                     Django devolve: _relatorio_movimentacoes.html (agregado por material)
+                     Mockup: recalcula com os dados de exemplo
+                     ─────────────────── -->
+                <form class="row g-2" id="form-rel-movimentacoes" role="search"
+                      hx-get="/relatorios/movimentacoes/" hx-trigger="input delay:400ms, submit"
+                      hx-target="#card-rel-movimentacoes" hx-swap="outerHTML" hx-push-url="true">
+                  <div class="col-md-6">
+                    <label class="form-label" for="rel-mov-material">Material</label>
+                    <select class="form-select" id="rel-mov-material" name="material">
+                      <option value="">Todos</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <label class="form-label" for="rel-mov-inicio">De</label>
+                    <input class="form-control" type="date" id="rel-mov-inicio" name="data_inicio" value="2026-09-02">
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <label class="form-label" for="rel-mov-fim">Até</label>
+                    <input class="form-control" type="date" id="rel-mov-fim" name="data_fim" value="2026-10-02">
+                  </div>
+                </form>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th scope="col">Material</th>
+                      <th scope="col" class="text-end">Entradas</th>
+                      <th scope="col" class="text-end">Saídas · produção</th>
+                      <th scope="col" class="text-end">Saídas · perda/dano</th>
+                      <th scope="col" class="text-end">Saídas · ajuste</th>
+                      <th scope="col" class="text-end">Saldo atual</th>
+                    </tr>
+                  </thead>
+                  <tbody data-rel-itens></tbody>
+                  <tbody data-rel-vazio hidden>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma movimentação no período. Amplie as datas.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Linha · corpo do laço for sobre o agregado por material. -->
+              <template data-rel-linha>
+                <tr>
+                  <td>
+                    <div class="fw-semibold" data-campo="nome"></div>
+                    <div class="small text-muted">em <span data-campo="unidade_medida"></span></div>
+                  </td>
+                  <td class="text-end" data-campo="entradas"></td>
+                  <td class="text-end" data-campo="uso_producao"></td>
+                  <td class="text-end" data-campo="perda_dano"></td>
+                  <td class="text-end" data-campo="ajuste_inventario"></td>
+                  <td class="text-end" data-campo="qtd_atual" data-formato="numero"></td>
+                </tr>
+              </template>
+              <div class="d-flex flex-wrap justify-content-between gap-2 px-3 py-3 border-top small text-muted">
+                <span data-rel-resumo></span>
+                <span>Quantidades na unidade de cada material.</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- ========================== Relatório de fretes ========================== -->
+          <div class="tab-pane fade" id="painel-fretes" role="tabpanel" aria-labelledby="aba-fretes" tabindex="0">
+            <section class="card" id="card-rel-fretes" aria-labelledby="titulo-rel-fretes">
+              <div class="card-body pb-2">
+                <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-rel-fretes">Fretes: sugerido × cobrado</h2>
+                    <div class="is-card-subtitle">Divergência = valor cobrado diferente do valor sugerido pela distância</div>
+                  </div>
+                  <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+                </div>
+
+                <!-- ▸ HTMX ───────────
+                     Gatilho: mudar um filtro
+                     Requisição: GET /relatorios/fretes/?entregador=&status=&data_inicio=&data_fim=&so_divergencias=
+                     Alvo-troca: #card-rel-fretes · outerHTML · hx-push-url
+                     Django devolve: _relatorio_fretes.html (resumo por entregador + entregas)
+                     Mockup: recalcula com os dados de exemplo
+                     ─────────────────── -->
+                <form class="row g-2 align-items-end" id="form-rel-fretes" role="search"
+                      hx-get="/relatorios/fretes/" hx-trigger="input delay:400ms, submit"
+                      hx-target="#card-rel-fretes" hx-swap="outerHTML" hx-push-url="true">
+                  <div class="col-md-3">
+                    <label class="form-label" for="rel-fre-entregador">Entregador</label>
+                    <select class="form-select" id="rel-fre-entregador" name="entregador">
+                      <option value="">Todos</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-status">Status</label>
+                    <select class="form-select" id="rel-fre-status" name="status">
+                      <option value="">Todos</option>
+                      <option value="pendente">Pendente</option>
+                      <option value="em_andamento">Em andamento</option>
+                      <option value="concluida">Concluída</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-inicio">De</label>
+                    <input class="form-control" type="date" id="rel-fre-inicio" name="data_inicio" value="2026-09-02">
+                  </div>
+                  <div class="col-sm-6 col-md-2">
+                    <label class="form-label" for="rel-fre-fim">Até</label>
+                    <input class="form-control" type="date" id="rel-fre-fim" name="data_fim" value="2026-10-02">
+                  </div>
+                  <div class="col-sm-6 col-md-3">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="rel-fre-divergencias" name="so_divergencias" value="1">
+                      <label class="form-check-label" for="rel-fre-divergencias">Só divergências</label>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <div class="card-body pt-2 pb-2">
+                <h3 class="is-card-title">Resumo por entregador</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th scope="col">Entregador</th>
+                      <th scope="col" class="text-end">Entregas</th>
+                      <th scope="col" class="text-end">Distância</th>
+                      <th scope="col" class="text-end">Sugerido</th>
+                      <th scope="col" class="text-end">Cobrado</th>
+                      <th scope="col" class="text-end">Diferença</th>
+                    </tr>
+                  </thead>
+                  <tbody data-rel-resumo-itens></tbody>
+                  <tfoot>
+                    <tr class="fw-semibold">
+                      <td>Total</td>
+                      <td class="text-end" data-campo="total_entregas"></td>
+                      <td class="text-end"><span data-campo="total_km"></span> km</td>
+                      <td class="text-end" data-campo="total_sugerido"></td>
+                      <td class="text-end" data-campo="total_cobrado"></td>
+                      <td class="text-end" data-campo="total_diferenca"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <template data-rel-resumo-linha>
+                <tr>
+                  <td class="fw-semibold" data-campo="nome"></td>
+                  <td class="text-end" data-campo="entregas"></td>
+                  <td class="text-end"><span data-campo="km"></span> km</td>
+                  <td class="text-end" data-campo="sugerido"></td>
+                  <td class="text-end" data-campo="cobrado"></td>
+                  <td class="text-end" data-campo="diferenca"></td>
+                </tr>
+              </template>
+
+              <div class="card-body pt-4 pb-2 border-top">
+                <h3 class="is-card-title">Entregas do período</h3>
+                <div class="is-card-subtitle">Entregas sem valor cobrado ficam fora da soma do cobrado e da diferença</div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead>
+                    <tr>
+                      <th scope="col">Data</th>
+                      <th scope="col">Destino</th>
+                      <th scope="col">Entregador</th>
+                      <th scope="col" class="text-end">Sugerido</th>
+                      <th scope="col" class="text-end">Cobrado</th>
+                      <th scope="col" class="text-end">Diferença</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-rel-entregas></tbody>
+                  <tbody data-rel-entregas-vazio hidden>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma entrega com esses filtros. Amplie o período ou desmarque "Só divergências".</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <template data-rel-entrega-linha>
+                <tr>
+                  <td class="is-metric fw-normal" data-campo="data" data-formato="data"></td>
+                  <td class="fw-semibold" data-campo="destino"></td>
+                  <td data-campo="entregador_nome"></td>
+                  <td class="text-end" data-campo="valor_sugerido" data-formato="moeda"></td>
+                  <td class="text-end" data-campo="cobrado_texto"></td>
+                  <td class="text-end">
+                    <span class="is-badge is-badge-danger" data-se="divergente"><i class="bi bi-cash-coin" aria-hidden="true"></i> <span data-campo="diferenca"></span></span>
+                    <span class="text-muted" data-se="igual">—</span>
+                  </td>
+                  <td>
+                    <span class="is-badge is-badge-warning" data-se="pendente">Pendente</span>
+                    <span class="is-badge is-badge-info" data-se="em_andamento">Em andamento</span>
+                    <span class="is-badge is-badge-success" data-se="concluida">Concluída</span>
+                  </td>
+                </tr>
+              </template>
+              <div class="px-3 py-3 border-top small text-muted">
+                <span data-rel-fretes-resumo></span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Abre o relatório pelo endereço (relatorios.html#fretes). Vale também no Django.
+    (function () {
+      if (location.hash === '#fretes' && window.bootstrap) {
+        window.bootstrap.Tab.getOrCreateInstance(document.getElementById('aba-fretes')).show();
+      }
+    })();
+
+    // Simulação dos relatórios: os mesmos dados de exemplo das telas de estoque e fretes.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+      var f = is.formatar;
+
+      /* ------------------------ dados: estoque ------------------------ */
+      var materiais = [
+        { id: 1,  nome: 'Placa de gesso acartonado ST 12,5 mm', unidade_medida: 'un', quantidade_minima: 40, qtd_atual: 128 },
+        { id: 2,  nome: 'Perfil montante 70 mm', unidade_medida: 'un', quantidade_minima: 60, qtd_atual: 34 },
+        { id: 3,  nome: 'Perfil guia 70 mm', unidade_medida: 'un', quantidade_minima: 60, qtd_atual: 85 },
+        { id: 4,  nome: 'Forro de PVC branco 200 mm', unidade_medida: 'm²', quantidade_minima: 50, qtd_atual: 212 },
+        { id: 5,  nome: 'Lã de vidro 50 mm', unidade_medida: 'm²', quantidade_minima: 80, qtd_atual: 46 },
+        { id: 6,  nome: 'Parafuso GN25', unidade_medida: 'cx', quantidade_minima: 10, qtd_atual: 22 },
+        { id: 7,  nome: 'Massa para drywall', unidade_medida: 'un', quantidade_minima: 15, qtd_atual: 9 },
+        { id: 8,  nome: 'Fita telada 50 mm', unidade_medida: 'un', quantidade_minima: 20, qtd_atual: 41 },
+        { id: 9,  nome: 'Placa de forro mineral 625 × 625 mm', unidade_medida: 'cx', quantidade_minima: 12, qtd_atual: 30 },
+        { id: 10, nome: 'Painel de divisória 35 mm', unidade_medida: 'un', quantidade_minima: 20, qtd_atual: 26 },
+        { id: 11, nome: 'Cantoneira de aço para forro', unidade_medida: 'un', quantidade_minima: 30, qtd_atual: 64 }
+      ];
+      var semente = 7;
+      function sorteio(n) { semente = (semente * 9301 + 49297) % 233280; return Math.floor(semente / 233280 * n); }
+      var movimentacoes = [];
+      var dia = new Date(2026, 9, 2);
+      for (var i = 0; i < 46; i++) {
+        var m = materiais[sorteio(materiais.length)];
+        var tipo = sorteio(10) < 4 ? 'entrada' : 'saida';
+        var motivo = tipo === 'saida' ? ['uso_producao', 'uso_producao', 'uso_producao', 'perda_dano', 'ajuste_inventario'][sorteio(5)] : '';
+        var qtd = tipo === 'entrada' ? 20 + sorteio(80) : 1 + sorteio(25);
+        sorteio(4);
+        movimentacoes.push({ material_id: m.id, tipo: tipo, quantidade: qtd, motivo: motivo, data: dia.toISOString().slice(0, 10) });
+        if (sorteio(3) === 0) dia.setDate(dia.getDate() - 1);
+      }
+
+      /* ------------------------ dados: fretes ------------------------ */
+      var entregadores = [
+        { id: 1, nome: 'Carlos Menezes', valor_por_km: 2.80 },
+        { id: 2, nome: 'Juliana Prado',  valor_por_km: 3.10 },
+        { id: 3, nome: 'Roberto Alves',  valor_por_km: 2.50 },
+        { id: 4, nome: 'Sérgio Nunes',   valor_por_km: 2.90 }
+      ];
+      function entregador(id) { return entregadores.filter(function (x) { return x.id === id; })[0]; }
+      function arred(v) { return Math.round(v * 100) / 100; }
+      var base = [
+        [2, 'Av. Goiás, 1.200 · São Caetano do Sul', '2026-10-02', 6.4, 'pendente', ''],
+        [1, 'Rua Senador Flaquer, 310 · Santo André', '2026-10-02', 9.8, 'pendente', ''],
+        [3, 'Av. Kennedy, 700 · São Bernardo do Campo', '2026-10-01', 14.2, 'em_andamento', null],
+        [1, 'Rua Oriente, 55 · São Caetano do Sul', '2026-10-01', 3.1, 'em_andamento', null],
+        [2, 'Av. Industrial, 600 · Santo André', '2026-10-01', 11.5, 'pendente', ''],
+        [3, 'Rua Marechal Deodoro, 1.500 · São Bernardo do Campo', '2026-09-30', 16.0, 'concluida', 45.00],
+        [1, 'Av. Presidente Kennedy, 2.100 · São Caetano do Sul', '2026-09-30', 4.7, 'concluida', null],
+        [2, 'Rua das Figueiras, 820 · Santo André', '2026-09-29', 8.9, 'concluida', null],
+        [1, 'Av. Lions, 450 · Diadema', '2026-09-29', 18.3, 'concluida', null],
+        [4, 'Rua Visconde de Inhaúma, 90 · São Caetano do Sul', '2026-09-26', 2.6, 'concluida', null],
+        [3, 'Av. Mauá, 1.000 · Mauá', '2026-09-26', 21.4, 'concluida', 60.00],
+        [2, 'Rua Coronel Oliveira Lima, 400 · Santo André', '2026-09-25', 9.2, 'concluida', null],
+        [1, 'Av. Barão de Mauá, 3.200 · Mauá', '2026-09-24', 22.0, 'concluida', null],
+        [3, 'Rua Jurubatuba, 1.100 · São Bernardo do Campo', '2026-09-24', 13.6, 'concluida', null],
+        [2, 'Av. Guido Aliberti, 2.500 · São Caetano do Sul', '2026-09-23', 5.3, 'concluida', null],
+        [1, 'Rua Giovanni Battista Pirelli, 155 · Santo André', '2026-09-22', 10.4, 'concluida', null],
+        [4, 'Av. Fábio Eduardo Ramos Esquivel, 2.000 · Diadema', '2026-09-19', 17.8, 'concluida', null],
+        [3, 'Rua Rio Grande do Sul, 320 · São Caetano do Sul', '2026-09-18', 2.9, 'concluida', null],
+        [2, 'Av. Atlântica, 950 · Santo André', '2026-09-17', 12.1, 'concluida', null],
+        [1, 'Rua Manoel Coelho, 600 · São Caetano do Sul', '2026-09-16', 3.8, 'concluida', null],
+        [3, 'Av. Robert Kennedy, 4.000 · São Bernardo do Campo', '2026-09-15', 15.5, 'concluida', null],
+        [2, 'Rua Catequese, 1.300 · Santo André', '2026-09-12', 8.1, 'concluida', null],
+        [1, 'Av. Senador Vergueiro, 2.900 · São Bernardo do Campo', '2026-09-11', 12.9, 'concluida', null],
+        [3, 'Rua Amazonas, 800 · São Caetano do Sul', '2026-09-10', 3.4, 'concluida', null]
+      ];
+      var entregas = base.map(function (b) {
+        var sugerido = arred(b[3] * entregador(b[0]).valor_por_km);
+        return { entregador_id: b[0], destino: b[1], data: b[2], distancia: b[3], status: b[4], valor_sugerido: sugerido, valor_cobrado: b[5] === null ? sugerido : b[5] };
+      });
+      function temCobrado(e) { return e.valor_cobrado !== ''; }
+      function divergente(e) { return temCobrado(e) && arred(e.valor_cobrado) !== e.valor_sugerido; }
+      function sinal(v) { v = arred(v); return v === 0 ? f.moeda(0) : (v > 0 ? '+' : '−') + f.moeda(Math.abs(v)); }
+
+      function clonar(card, seletor) { return card.querySelector(seletor).content.firstElementChild.cloneNode(true); }
+
+      /* --------------------- relatório de movimentações --------------------- */
+      var cardMov = document.getElementById('card-rel-movimentacoes');
+      var formMov = document.getElementById('form-rel-movimentacoes');
+      materiais.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); })
+        .forEach(function (x) { formMov.elements.material.add(new Option(x.nome, x.id)); });
+
+      function relatorioMovimentacoes() {
+        var filtros = is.lerForm(formMov);
+        var porMaterial = {};
+        movimentacoes.forEach(function (mov) {
+          if (filtros.material && String(mov.material_id) !== filtros.material) return;
+          if (filtros.data_inicio && mov.data < filtros.data_inicio) return;
+          if (filtros.data_fim && mov.data > filtros.data_fim) return;
+          var a = porMaterial[mov.material_id] || (porMaterial[mov.material_id] = { entradas: 0, uso_producao: 0, perda_dano: 0, ajuste_inventario: 0, total: 0 });
+          if (mov.tipo === 'entrada') a.entradas += mov.quantidade; else a[mov.motivo] += mov.quantidade;
+          a.total += 1;
+        });
+        var corpo = cardMov.querySelector('[data-rel-itens]');
+        corpo.replaceChildren();
+        var linhas = materiais.filter(function (x) { return porMaterial[x.id]; })
+          .sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); });
+        var totalMov = 0;
+        linhas.forEach(function (x) {
+          var a = porMaterial[x.id];
+          totalMov += a.total;
+          var tr = clonar(cardMov, '[data-rel-linha]');
+          function n(v) { return v ? f.numero(v) : '—'; }
+          is.preencher(tr, { nome: x.nome, unidade_medida: x.unidade_medida, qtd_atual: x.qtd_atual,
+            entradas: a.entradas ? '+' + f.numero(a.entradas) : '—', uso_producao: n(a.uso_producao), perda_dano: n(a.perda_dano), ajuste_inventario: n(a.ajuste_inventario) });
+          var baixo = x.qtd_atual < x.quantidade_minima;
+          is.mostrarSe(tr, { baixo: baixo });
+          tr.classList.toggle('is-row-alert', baixo);
+          corpo.appendChild(tr);
+        });
+        cardMov.querySelector('[data-rel-vazio]').hidden = linhas.length > 0;
+        cardMov.querySelector('[data-rel-resumo]').textContent =
+          f.numero(totalMov) + ' movimentações · ' + f.numero(linhas.length) + ' materiais';
+      }
+      formMov.addEventListener('input', relatorioMovimentacoes);
+      formMov.addEventListener('submit', function (e) { e.preventDefault(); relatorioMovimentacoes(); });
+      relatorioMovimentacoes();
+
+      /* ------------------------ relatório de fretes ------------------------ */
+      var cardFre = document.getElementById('card-rel-fretes');
+      var formFre = document.getElementById('form-rel-fretes');
+      entregadores.forEach(function (x) { formFre.elements.entregador.add(new Option(x.nome, x.id)); });
+
+      function relatorioFretes() {
+        var filtros = is.lerForm(formFre);
+        var lista = entregas.filter(function (e) {
+          if (filtros.entregador && String(e.entregador_id) !== filtros.entregador) return false;
+          if (filtros.status && e.status !== filtros.status) return false;
+          if (filtros.data_inicio && e.data < filtros.data_inicio) return false;
+          if (filtros.data_fim && e.data > filtros.data_fim) return false;
+          if (filtros.so_divergencias && !divergente(e)) return false;
+          return true;
+        });
+
+        // Resumo por entregador. Diferença só conta entregas com valor cobrado.
+        var resumo = {};
+        var total = { entregas: 0, km: 0, sugerido: 0, cobrado: 0, diferenca: 0 };
+        lista.forEach(function (e) {
+          var r = resumo[e.entregador_id] || (resumo[e.entregador_id] = { entregas: 0, km: 0, sugerido: 0, cobrado: 0, diferenca: 0 });
+          [r, total].forEach(function (alvo) {
+            alvo.entregas += 1;
+            alvo.km += e.distancia;
+            alvo.sugerido += e.valor_sugerido;
+            if (temCobrado(e)) { alvo.cobrado += e.valor_cobrado; alvo.diferenca += e.valor_cobrado - e.valor_sugerido; }
+          });
+        });
+        var corpoResumo = cardFre.querySelector('[data-rel-resumo-itens]');
+        corpoResumo.replaceChildren();
+        entregadores.forEach(function (x) {
+          var r = resumo[x.id];
+          if (!r) return;
+          var tr = clonar(cardFre, '[data-rel-resumo-linha]');
+          is.preencher(tr, { nome: x.nome, entregas: f.numero(r.entregas), km: f.decimal(r.km), sugerido: f.moeda(r.sugerido), cobrado: f.moeda(r.cobrado), diferenca: sinal(r.diferenca) });
+          tr.querySelector('[data-campo="diferenca"]').classList.toggle('text-danger', arred(r.diferenca) !== 0);
+          corpoResumo.appendChild(tr);
+        });
+        is.preencher(cardFre, {
+          total_entregas: f.numero(total.entregas), total_km: f.decimal(total.km),
+          total_sugerido: f.moeda(total.sugerido), total_cobrado: f.moeda(total.cobrado), total_diferenca: sinal(total.diferenca)
+        });
+        cardFre.querySelector('[data-campo="total_diferenca"]').classList.toggle('text-danger', arred(total.diferenca) !== 0);
+
+        var corpo = cardFre.querySelector('[data-rel-entregas]');
+        corpo.replaceChildren();
+        var divergencias = 0;
+        lista.forEach(function (e) {
+          var div = divergente(e);
+          if (div) divergencias += 1;
+          var tr = clonar(cardFre, '[data-rel-entrega-linha]');
+          is.preencher(tr, Object.assign({}, e, {
+            entregador_nome: entregador(e.entregador_id).nome,
+            cobrado_texto: temCobrado(e) ? f.moeda(e.valor_cobrado) : '—',
+            diferenca: div ? sinal(e.valor_cobrado - e.valor_sugerido) : ''
+          }));
+          is.mostrarSe(tr, { divergente: div, igual: !div, pendente: e.status === 'pendente', em_andamento: e.status === 'em_andamento', concluida: e.status === 'concluida' });
+          corpo.appendChild(tr);
+        });
+        cardFre.querySelector('[data-rel-entregas-vazio]').hidden = lista.length > 0;
+        cardFre.querySelector('[data-rel-fretes-resumo]').textContent =
+          f.numero(lista.length) + ' entregas · ' + f.numero(divergencias) + ' com divergência de valor';
+      }
+      formFre.addEventListener('input', relatorioFretes);
+      formFre.addEventListener('submit', function (e) { e.preventDefault(); relatorioFretes(); });
+      relatorioFretes();
+    })();
+  </script>
+</body>
+</html>

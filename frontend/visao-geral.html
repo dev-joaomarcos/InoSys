@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visão Geral · InoSys</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- Dashboard de visão geral (app relatorios): junta estoque e fretes.
+     Página montada pelo Django no carregamento, sem HTMX. O gráfico usa só CSS
+     (.is-chart-bars do design system); a altura de cada barra é dado, por isso
+     é o único style inline. Perfis: Gestor, Administrador -->
+<body data-modulo="visao" data-perfis="gestor admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
+
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="conteudo" id="conteudo">
+    <div class="container">
+      <div data-conteudo-tela>
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Visão Geral</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Visão Geral</h1>
+            <p class="text-muted small mb-0">Situação de hoje e números dos últimos 30 dias (<span class="is-metric">02/09/2026</span> a <span class="is-metric">02/10/2026</span>).</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="visao-geral.html">Resumo</a></li>
+          <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
+        </ul>
+
+        <section class="row g-3 mb-4" aria-label="Indicadores">
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Abaixo do mínimo</div>
+              <div class="is-kpi-value is-metric">3</div>
+              <a class="is-kpi-link" href="estoque.html">Ver estoque <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon warning" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Entregas em aberto</div>
+              <div class="is-kpi-value is-metric">5</div>
+              <a class="is-kpi-link" href="fretes.html">Ver entregas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon info" aria-hidden="true"><i class="bi bi-truck"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Fretes cobrados · 30 dias</div>
+              <div class="is-kpi-value is-metric text-nowrap">R$ 589,70</div>
+              <a class="is-kpi-link" href="relatorios.html#fretes">19 entregas concluídas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon success" aria-hidden="true"><i class="bi bi-check-circle"></i></span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card is-kpi">
+              <div class="is-kpi-label">Divergências de valor</div>
+              <div class="is-kpi-value is-metric">2</div>
+              <a class="is-kpi-link" href="relatorios.html#fretes">Ver relatório <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              <span class="is-kpi-icon danger" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+            </div>
+          </div>
+        </section>
+
+        <div class="row g-3">
+          <div class="col-xl-7">
+            <section class="card h-100" aria-labelledby="titulo-grafico">
+              <div class="card-body">
+                <div class="is-card-header">
+                  <h2 class="is-card-title" id="titulo-grafico">Fretes concluídos: sugerido × cobrado</h2>
+                  <div class="is-card-subtitle">Soma por entregador nos últimos 30 dias</div>
+                </div>
+                <!-- No Django: laço for sobre o agregado por entregador; altura = valor ÷ maior valor. -->
+                <div class="is-chart-bars" role="img"
+                     aria-label="Sugerido e cobrado por entregador. Carlos Menezes: R$ 201,88 e R$ 201,88. Juliana Prado: R$ 135,16 e R$ 135,16. Roberto Alves: R$ 182,00 e R$ 193,50. Sérgio Nunes: R$ 59,16 e R$ 59,16.">
+                  <div class="grupo"><div class="barra" style="height:100%"></div><div class="barra saida" style="height:100%"></div></div>
+                  <div class="grupo"><div class="barra" style="height:67%"></div><div class="barra saida" style="height:67%"></div></div>
+                  <div class="grupo"><div class="barra" style="height:90%"></div><div class="barra saida" style="height:96%"></div></div>
+                  <div class="grupo"><div class="barra" style="height:29%"></div><div class="barra saida" style="height:29%"></div></div>
+                </div>
+                <div class="d-flex text-center small text-muted mt-2" aria-hidden="true">
+                  <span class="flex-fill">Carlos</span><span class="flex-fill">Juliana</span><span class="flex-fill">Roberto</span><span class="flex-fill">Sérgio</span>
+                </div>
+                <div class="is-legend">
+                  <span><span class="swatch"></span> Sugerido</span>
+                  <span><span class="swatch muted"></span> Cobrado</span>
+                  <span class="text-danger"><i class="bi bi-cash-coin" aria-hidden="true"></i> Roberto Alves cobrou R$ 11,50 a mais</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-5">
+            <section class="card h-100" aria-labelledby="titulo-baixo">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-baixo">Estoque baixo</h2>
+                    <div class="is-card-subtitle">Saldo atual / quantidade mínima</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="estoque.html">Ver estoque</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <tbody>
+                    <tr class="is-row-alert"><td class="fw-semibold">Massa para drywall</td><td class="text-end">9 / 15 un</td></tr>
+                    <tr class="is-row-alert"><td class="fw-semibold">Lã de vidro 50 mm</td><td class="text-end">46 / 80 m²</td></tr>
+                    <tr class="is-row-alert"><td class="fw-semibold">Perfil montante 70 mm</td><td class="text-end">34 / 60 un</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-6">
+            <section class="card h-100" aria-labelledby="titulo-abertas">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-abertas">Entregas em aberto</h2>
+                    <div class="is-card-subtitle">Pendentes e em andamento, das mais recentes</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="fretes.html">Ver entregas</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <tbody>
+                    <tr><td><div class="fw-semibold">Av. Goiás, 1.200 · São Caetano do Sul</div><div class="small text-muted">Juliana Prado · 02/10/2026</div></td><td class="is-actions"><span class="is-badge is-badge-warning">Pendente</span></td></tr>
+                    <tr><td><div class="fw-semibold">Rua Senador Flaquer, 310 · Santo André</div><div class="small text-muted">Carlos Menezes · 02/10/2026</div></td><td class="is-actions"><span class="is-badge is-badge-warning">Pendente</span></td></tr>
+                    <tr><td><div class="fw-semibold">Av. Kennedy, 700 · São Bernardo do Campo</div><div class="small text-muted">Roberto Alves · 01/10/2026</div></td><td class="is-actions"><span class="is-badge is-badge-info">Em andamento</span></td></tr>
+                    <tr><td><div class="fw-semibold">Rua Oriente, 55 · São Caetano do Sul</div><div class="small text-muted">Carlos Menezes · 01/10/2026</div></td><td class="is-actions"><span class="is-badge is-badge-info">Em andamento</span></td></tr>
+                    <tr><td><div class="fw-semibold">Av. Industrial, 600 · Santo André</div><div class="small text-muted">Juliana Prado · 01/10/2026</div></td><td class="is-actions"><span class="is-badge is-badge-warning">Pendente</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-xl-6">
+            <section class="card h-100" aria-labelledby="titulo-divergencias">
+              <div class="card-body pb-0 flex-grow-0">
+                <div class="is-card-header d-flex justify-content-between align-items-start gap-2 mb-0">
+                  <div>
+                    <h2 class="is-card-title" id="titulo-divergencias">Divergências de valor</h2>
+                    <div class="is-card-subtitle">Cobrado diferente do sugerido</div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" href="relatorios.html#fretes">Relatório</a>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr><th scope="col">Entrega</th><th scope="col" class="text-end">Sugerido</th><th scope="col" class="text-end">Cobrado</th><th scope="col" class="text-end">Diferença</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><div class="fw-semibold">Rua Marechal Deodoro, 1.500</div><div class="small text-muted">Roberto Alves · 30/09/2026</div></td>
+                      <td class="text-end">R$ 40,00</td><td class="text-end">R$ 45,00</td>
+                      <td class="text-end"><span class="is-badge is-badge-danger">+R$ 5,00</span></td>
+                    </tr>
+                    <tr>
+                      <td><div class="fw-semibold">Av. Mauá, 1.000</div><div class="small text-muted">Roberto Alves · 26/09/2026</div></td>
+                      <td class="text-end">R$ 53,50</td><td class="text-end">R$ 60,00</td>
+                      <td class="text-end"><span class="is-badge is-badge-danger">+R$ 6,50</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+</body>
+</html>

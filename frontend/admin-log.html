@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log de ações · Administração · InoSys</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-inosys-icon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/estilos.css" rel="stylesheet">
+</head>
+<!-- RF14 log de ações (registro manual nas views) · paginação de 20 itens
+     tb_log_acoes: usuario_id, usuario_nome_snapshot, acao (criação/edição/exclusão), data_hora
+     Perfil: Administrador -->
+<body data-modulo="admin" data-perfis="admin">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra do topo: só no celular (< 992px). Abre a sidebar como painel deslizante. -->
+  <header class="is-topbar d-lg-none">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menu">
+      <i class="bi bi-list fs-5" aria-hidden="true"></i>
+    </button>
+    <a href="selecao.html"><img src="assets/img/logo-inosys.png" alt="InoSys" width="96" height="27"></a>
+  </header>
+
+  <!-- Sidebar · no Django vira o include de partials/sidebar.html.
+       Os itens com data-perfis entram por condição no template, pelo perfil de request.user. -->
+  <aside class="offcanvas-lg offcanvas-start is-sidebar" tabindex="-1" id="sidebar" aria-label="Menu principal">
+    <div class="offcanvas-header d-lg-none">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Fechar menu"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="is-brand" href="selecao.html">
+        <img class="is-brand-logo" src="assets/img/logo-inosys-reversed.png" alt="InoSys" width="116" height="33">
+      </a>
+      <div class="is-section-label">Módulos</div>
+      <ul class="is-nav">
+        <li><a class="is-nav-link" href="selecao.html" data-modulo="inicio"><i class="bi bi-grid" aria-hidden="true"></i> Início</a></li>
+        <li data-perfis="estoque gestor admin"><a class="is-nav-link" href="estoque.html" data-modulo="estoque"><i class="bi bi-box-seam" aria-hidden="true"></i> Estoque</a></li>
+        <li data-perfis="fretes gestor admin"><a class="is-nav-link" href="fretes.html" data-modulo="fretes"><i class="bi bi-truck" aria-hidden="true"></i> Fretes</a></li>
+        <li data-perfis="gestor admin"><a class="is-nav-link" href="visao-geral.html" data-modulo="visao"><i class="bi bi-speedometer2" aria-hidden="true"></i> Visão Geral</a></li>
+        <li data-perfis="admin"><a class="is-nav-link" href="admin-usuarios.html" data-modulo="admin"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administração</a></li>
+      </ul>
+
+      <div class="is-sidebar-bottom">
+        <!-- Só no mockup: some no Django. -->
+        <div data-somente-mockup>
+          <label class="is-section-label d-block px-0" for="mockup-perfil">Simular perfil</label>
+          <select class="is-profile-select" id="mockup-perfil" data-mockup-perfil>
+            <option value="estoque">Operacional de Estoque</option>
+            <option value="fretes">Operacional de Fretes</option>
+            <option value="gestor">Gestor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="is-profile">
+          <span class="is-profile-avatar" data-usuario-iniciais aria-hidden="true">AS</span>
+          <div>
+            <div class="is-profile-name" data-usuario-nome>Ana Souza</div>
+            <div class="is-profile-role" data-usuario-perfil>Administrador</div>
+          </div>
+        </div>
+        <a class="is-logout" href="login.html"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="conteudo" id="conteudo">
+    <div class="container">
+      <div data-conteudo-tela>
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+          <div>
+            <nav aria-label="Trilha">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="selecao.html">Início</a></li>
+                <li class="breadcrumb-item"><a href="admin-usuarios.html">Administração</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Log de ações</li>
+              </ol>
+            </nav>
+            <h1 class="h4 mb-1">Administração</h1>
+            <p class="text-muted small mb-0">Quem criou, editou ou excluiu registros, e quando. O nome fica guardado mesmo se o usuário for removido.</p>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item"><a class="nav-link" href="admin-usuarios.html">Usuários</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-log.html">Log de ações</a></li>
+        </ul>
+
+        <section class="card" id="card-log" aria-labelledby="titulo-log">
+          <div class="card-body pb-2">
+            <div class="is-card-header d-flex align-items-start justify-content-between gap-2">
+              <div>
+                <h2 class="is-card-title" id="titulo-log"><i class="bi bi-clock-history" aria-hidden="true"></i> Registros</h2>
+                <div class="is-card-subtitle">Filtre por usuário, ação e período</div>
+              </div>
+              <span class="htmx-indicator spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Carregando…</span></span>
+            </div>
+
+            <!-- ▸ HTMX ───────────
+                 Gatilho: mudar um filtro
+                 Requisição: GET /log/?usuario=&acao=&data_inicio=&data_fim=
+                 Alvo-troca: #card-log · outerHTML · hx-push-url
+                 Django devolve: _lista_log.html filtrado, página 1
+                 Mockup: filtra os dados de exemplo
+                 ─────────────────── -->
+            <form class="row g-2 align-items-end" id="form-filtro-log" role="search" data-lista-filtros
+                  hx-get="/log/" hx-trigger="input delay:400ms, submit"
+                  hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+              <div class="col-md-4">
+                <label class="form-label" for="filtro-usuario">Usuário</label>
+                <select class="form-select" id="filtro-usuario" name="usuario">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filtro-acao">Ação</label>
+                <select class="form-select" id="filtro-acao" name="acao">
+                  <option value="">Todas</option>
+                  <option value="criacao">Criação</option>
+                  <option value="edicao">Edição</option>
+                  <option value="exclusao">Exclusão</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filtro-inicio">De</label>
+                <input class="form-control" type="date" id="filtro-inicio" name="data_inicio">
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filtro-fim">Até</label>
+                <input class="form-control" type="date" id="filtro-fim" name="data_fim">
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <button class="btn btn-outline-secondary w-100" type="reset">Limpar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">Data e hora</th>
+                  <th scope="col">Usuário</th>
+                  <th scope="col">Ação</th>
+                </tr>
+              </thead>
+              <tbody data-lista-itens></tbody>
+              <tbody data-lista-vazia hidden>
+                <tr><td colspan="3" class="text-center text-muted py-4">Nenhum registro com esses filtros. Amplie o período ou limpe os filtros.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Linha · corpo do laço for sobre page_obj. Mostra usuario_nome_snapshot, não o nome atual.
+               Ação não é status: badge cinza com ícone. -->
+          <template data-lista-linha>
+            <tr>
+              <td class="is-metric fw-normal" data-campo="data_hora_texto"></td>
+              <td class="fw-semibold" data-campo="usuario_nome_snapshot"></td>
+              <td>
+                <span class="is-badge is-badge-neutral" data-se="criacao"><i class="bi bi-plus-lg" aria-hidden="true"></i> Criação</span>
+                <span class="is-badge is-badge-neutral" data-se="edicao"><i class="bi bi-pencil" aria-hidden="true"></i> Edição</span>
+                <span class="is-badge is-badge-neutral" data-se="exclusao"><i class="bi bi-trash3" aria-hidden="true"></i> Exclusão</span>
+              </td>
+            </tr>
+          </template>
+
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-3 border-top">
+            <span class="small text-muted" data-contador></span>
+            <!-- ▸ HTMX ───────────
+                 Gatilho: clique em Anterior / Próxima
+                 Requisição: GET /log/?pagina=N (filtros atuais via hx-include)
+                 Alvo-troca: #card-log · outerHTML
+                 Django devolve: _lista_log.html da página pedida (Paginator, 20 por página)
+                 Mockup: troca a página nos dados de exemplo
+                 ─────────────────── -->
+            <nav aria-label="Paginação do log">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" role="button" data-pagina-acao="anterior"
+                     hx-get="/log/?pagina=__PAGINA_ANTERIOR__" hx-include="#form-filtro-log"
+                     hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Anterior</span>
+                  </a>
+                </li>
+                <li class="page-item disabled"><span class="page-link" data-pagina-texto></span></li>
+                <li class="page-item">
+                  <a class="page-link" role="button" data-pagina-acao="proxima"
+                     hx-get="/log/?pagina=__PROXIMA_PAGINA__" hx-include="#form-filtro-log"
+                     hx-target="#card-log" hx-swap="outerHTML" hx-push-url="true">
+                    <span class="visually-hidden">Próxima</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+  <script src="assets/sidebar.js"></script>
+  <script>
+    // Simulação do log: 58 registros de exemplo, sempre os mesmos.
+    (function () {
+      if (!window.inosysMockup) return;
+      var is = window.inosys;
+      var nomes = ['Paula Ribeiro', 'Paula Ribeiro', 'Diego Santos', 'Diego Santos', 'Marcos Lima', 'Ana Souza', 'Renata Gomes'];
+      var acoes = ['criacao', 'criacao', 'criacao', 'edicao', 'edicao', 'exclusao'];
+      var semente = 11;
+      function sorteio(n) { semente = (semente * 9301 + 49297) % 233280; return Math.floor(semente / 233280 * n); }
+
+      var registros = [];
+      var momento = new Date(2026, 9, 2, 17, 40);
+      for (var i = 0; i < 58; i++) {
+        var nome = nomes[sorteio(nomes.length)];
+        registros.push({ id: 900 - i, usuario_nome_snapshot: nome, acao: acoes[sorteio(acoes.length)], data_hora: new Date(momento.getTime()) });
+        momento.setMinutes(momento.getMinutes() - (20 + sorteio(300)));
+      }
+      function dia(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+      var filtroUsuario = document.getElementById('filtro-usuario');
+      registros.map(function (r) { return r.usuario_nome_snapshot; })
+        .filter(function (n, i, todos) { return todos.indexOf(n) === i; })
+        .sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); })
+        .forEach(function (n) { filtroUsuario.add(new Option(n, n)); });
+
+      is.lista({
+        card: document.getElementById('card-log'),
+        dados: registros,
+        ordenar: function (a, b) { return b.data_hora - a.data_hora; },
+        filtro: function (r, f) {
+          if (f.usuario && r.usuario_nome_snapshot !== f.usuario) return false;
+          if (f.acao && r.acao !== f.acao) return false;
+          if (f.data_inicio && dia(r.data_hora) < f.data_inicio) return false;
+          if (f.data_fim && dia(r.data_hora) > f.data_fim) return false;
+          return true;
+        },
+        preencher: function (tr, r) {
+          var h = String(r.data_hora.getHours()).padStart(2, '0') + ':' + String(r.data_hora.getMinutes()).padStart(2, '0');
+          is.preencher(tr, { usuario_nome_snapshot: r.usuario_nome_snapshot, data_hora_texto: is.formatar.data(dia(r.data_hora)) + ' ' + h });
+          is.mostrarSe(tr, { criacao: r.acao === 'criacao', edicao: r.acao === 'edicao', exclusao: r.acao === 'exclusao' });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
