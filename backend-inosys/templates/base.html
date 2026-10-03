@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ pagina }} · InoSys{% endblock %}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;900&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.titulo,h1,h2,h3,[role=tab],b{font-family:"Archivo",system-ui,sans-serif}
+.htmx-request #tb{opacity:.6}
+</style>
+<style type="text/tailwindcss">
+@layer components {
+  .card{@apply rounded border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800}
+  .mute{@apply text-slate-500 dark:text-slate-400}
+  .field{@apply rounded border border-slate-300 bg-white px-3 py-2 dark:border-slate-600 dark:bg-slate-800}
+  .btn{@apply inline-block rounded border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-100 dark:border-slate-600 dark:hover:bg-slate-700}
+  .btn-pri{@apply border-transparent bg-[#0E2038] text-white hover:bg-[#17304F] dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300}
+  .btn-sm{@apply px-2.5 py-1 text-sm}
+  .btn-del{@apply text-red-700 dark:text-red-300}
+}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+<header class="bg-[#0E2038] px-4 pt-6 text-white md:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 class="titulo text-4xl font-black leading-none tracking-tight md:text-6xl">{% block h1 %}{{ pagina }}{% endblock %}</h1>
+        <p class="mt-2 text-sm text-[#9FB3CB]">InoSys · Estoque e Fretes</p>
+      </div>
+      {% if user.is_authenticated %}
+      <div class="flex flex-wrap items-center gap-3">
+        <form action="{% url 'busca' %}" method="get">
+          <input type="search" name="q" placeholder="Buscar em todo o painel" aria-label="Buscar em todo o painel"
+                 class="min-w-56 rounded border border-[#2C4A70] bg-[#17304F] px-3 py-2 text-white placeholder:text-[#8FA4BE]">
+        </form>
+        <form action="{% url 'logout' %}" method="post">{% csrf_token %}
+          <button class="text-sm text-slate-300 hover:text-white">Sair ({{ user.get_username }})</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% if user.is_authenticated %}
+    <nav role="tablist" class="mt-5 flex gap-1 overflow-x-auto">
+      {% for url, rotulo, ativa in abas %}
+      <a role="tab" href="{% url url %}" aria-selected="{{ ativa|yesno:'true,false' }}"
+         class="whitespace-nowrap border-b-4 px-4 py-3 font-bold {% if ativa %}border-amber-400 text-white{% else %}border-transparent text-slate-300 hover:text-white{% endif %}">{{ rotulo }}</a>
+      {% endfor %}
+    </nav>
+    {% else %}<div class="h-6"></div>{% endif %}
+  </div>
+</header>
+<main class="mx-auto max-w-7xl px-4 py-6 md:px-8">
+  {% for m in messages %}
+  <div role="status" class="mb-4 rounded border px-4 py-3 font-semibold {% if m.tags == 'error' %}border-red-200 bg-red-100 text-red-800 dark:border-red-800 dark:bg-red-900 dark:text-red-200{% else %}border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900 dark:text-emerald-200{% endif %}">{{ m }}</div>
+  {% endfor %}
+  {% block conteudo %}{% endblock %}
+</main>
+</body>
+</html>

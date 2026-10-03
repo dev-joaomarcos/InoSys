@@ -1,0 +1,25 @@
+{% load ui %}
+<table class="w-full min-w-[720px] text-left">
+  <thead><tr>
+    {% include "crud/_th.html" with campo="data" titulo="Data" %}
+    {% include "crud/_th.html" with campo="produto__nome" titulo="Produto" %}
+    {% include "crud/_th.html" with campo="tipo" titulo="Tipo" %}
+    {% include "crud/_th.html" with campo="quantidade" titulo="Quantidade" num=True %}
+    <th class="px-3 py-2.5 font-semibold mute">Observação</th>
+    <th class="px-3 py-2.5 font-semibold mute">Registrado por</th>
+  </tr></thead>
+  <tbody>
+  {% for m in object_list %}
+    <tr class="border-t border-slate-200 dark:border-slate-700">
+      <td class="whitespace-nowrap px-3 py-2.5">{{ m.data|date:"d/m/Y" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ m.produto.nome }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{% badge m.get_tipo_display %}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">{% if m.tipo == "E" %}+{% else %}−{% endif %}{{ m.quantidade|num }} {{ m.produto.unidade }}</td>
+      <td class="px-3 py-2.5">{{ m.observacao|default:"–" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ m.usuario|default:"–" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="p-6 text-center mute">Nenhuma movimentação encontrada. Registre uma entrada ou saída na lista de produtos.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

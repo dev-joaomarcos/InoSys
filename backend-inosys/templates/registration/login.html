@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Entrar · InoSys{% endblock %}
+{% block h1 %}Entrar{% endblock %}
+{% block conteudo %}
+<div class="card mx-auto max-w-sm">
+  <form method="post">{% csrf_token %}
+    {% if form.errors %}<p class="mb-3 font-semibold text-red-700 dark:text-red-300">Usuário ou senha incorretos.</p>{% endif %}
+    <label for="id_username" class="mb-1 block text-sm font-semibold mute">Usuário</label>
+    <input id="id_username" name="username" autofocus required autocomplete="username" class="field mb-4 w-full">
+    <label for="id_password" class="mb-1 block text-sm font-semibold mute">Senha</label>
+    <input id="id_password" name="password" type="password" required autocomplete="current-password" class="field mb-5 w-full">
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn-pri w-full">Entrar</button>
+  </form>
+</div>
+{% endblock %}

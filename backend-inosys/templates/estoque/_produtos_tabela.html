@@ -1,0 +1,29 @@
+{% load ui %}
+<table class="w-full min-w-[720px] text-left">
+  <thead><tr>
+    {% include "crud/_th.html" with campo="nome" titulo="Produto" %}
+    {% include "crud/_th.html" with campo="sku" titulo="Código" %}
+    {% include "crud/_th.html" with campo="quantidade" titulo="Em estoque" num=True %}
+    {% include "crud/_th.html" with campo="estoque_minimo" titulo="Mínimo" num=True %}
+    <th class="px-3 py-2.5 font-semibold mute">Situação</th><th></th>
+  </tr></thead>
+  <tbody>
+  {% for p in object_list %}
+    <tr class="border-t border-slate-200 dark:border-slate-700">
+      <td class="whitespace-nowrap px-3 py-2.5">{{ p.nome }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ p.sku }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">{{ p.quantidade|num }} {{ p.unidade }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">{{ p.estoque_minimo|num }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{% badge p.situacao %}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">
+        <a class="btn btn-sm" href="{% url 'entrada' p.pk %}">Entrada</a>
+        <a class="btn btn-sm" href="{% url 'saida' p.pk %}">Saída</a>
+        <a class="btn btn-sm" href="{% url 'produto_editar' p.pk %}">Editar</a>
+        <a class="btn btn-sm btn-del" href="{% url 'produto_excluir' p.pk %}">Excluir</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="p-6 text-center mute">Nenhum produto encontrado. Limpe os filtros ou cadastre um novo produto.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

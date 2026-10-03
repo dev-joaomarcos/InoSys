@@ -1,0 +1,10 @@
+<form id="filtro" class="mb-4 flex flex-wrap gap-2" hx-get="{{ request.path }}" hx-target="#tb"
+      hx-trigger="input delay:250ms, change" onsubmit="return false">
+  <input name="q" value="{{ q }}" type="search" placeholder="Filtrar esta lista" aria-label="Filtrar esta lista" class="field min-w-56">
+  {% if opcoes_status %}
+  <select name="st" aria-label="Filtrar por situação" class="field">
+    <option value="">Todas as situações</option>
+    {% for valor, rotulo in opcoes_status %}<option value="{{ valor }}" {% if valor == st %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+  </select>
+  {% endif %}
+</form>

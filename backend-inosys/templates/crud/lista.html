@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+  <h2 class="text-xl font-extrabold">{{ titulo_lista }}</h2>
+  {% if url_novo %}<a class="btn btn-pri" href="{% url url_novo %}">{{ rotulo_novo }}</a>{% endif %}
+</div>
+{% include "crud/_filtros.html" %}
+<div id="tb" class="card overflow-x-auto !p-0">{% include partial %}</div>
+{% endblock %}

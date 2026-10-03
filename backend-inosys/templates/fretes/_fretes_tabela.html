@@ -1,0 +1,36 @@
+{% load ui %}
+<table class="w-full min-w-[980px] text-left">
+  <thead><tr>
+    {% include "crud/_th.html" with campo="codigo" titulo="Rastreio" %}
+    {% include "crud/_th.html" with campo="cliente" titulo="Cliente" %}
+    {% include "crud/_th.html" with campo="origem" titulo="Origem" %}
+    {% include "crud/_th.html" with campo="destino" titulo="Destino" %}
+    {% include "crud/_th.html" with campo="entregador__nome" titulo="Entregador" %}
+    {% include "crud/_th.html" with campo="modal" titulo="Modal" %}
+    {% include "crud/_th.html" with campo="previsao" titulo="Previsão" %}
+    {% include "crud/_th.html" with campo="status" titulo="Status" %}
+    {% include "crud/_th.html" with campo="valor" titulo="Valor cobrado" num=True %}
+    <th></th>
+  </tr></thead>
+  <tbody>
+  {% for f in object_list %}
+    <tr class="border-t border-slate-200 dark:border-slate-700">
+      <td class="whitespace-nowrap px-3 py-2.5 font-semibold">{{ f.codigo }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.cliente|default:"–" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.origem }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.destino }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.entregador.nome }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.modal }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ f.previsao|date:"d/m/Y" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{% badge f.status %}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">{{ f.valor|brl }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">
+        <a class="btn btn-sm" href="{% url 'frete_editar' f.pk %}">Editar</a>
+        <a class="btn btn-sm btn-del" href="{% url 'frete_excluir' f.pk %}">Excluir</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="10" class="p-6 text-center mute">Nenhum frete encontrado. Cadastre um entregador e clique em “Novo frete”.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

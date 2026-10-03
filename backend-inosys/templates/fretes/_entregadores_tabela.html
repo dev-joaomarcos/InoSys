@@ -1,0 +1,25 @@
+<table class="w-full min-w-[640px] text-left">
+  <thead><tr>
+    {% include "crud/_th.html" with campo="nome" titulo="Nome" %}
+    {% include "crud/_th.html" with campo="telefone" titulo="Telefone" %}
+    {% include "crud/_th.html" with campo="veiculo" titulo="Veículo" %}
+    {% include "crud/_th.html" with campo="n_fretes" titulo="Fretes" num=True %}
+    <th></th>
+  </tr></thead>
+  <tbody>
+  {% for e in object_list %}
+    <tr class="border-t border-slate-200 dark:border-slate-700">
+      <td class="whitespace-nowrap px-3 py-2.5">{{ e.nome }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ e.telefone|default:"–" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5">{{ e.veiculo|default:"–" }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">{{ e.n_fretes }}</td>
+      <td class="whitespace-nowrap px-3 py-2.5 text-right">
+        <a class="btn btn-sm" href="{% url 'entregador_editar' e.pk %}">Editar</a>
+        <a class="btn btn-sm btn-del" href="{% url 'entregador_excluir' e.pk %}">Excluir</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5" class="p-6 text-center mute">Nenhum entregador encontrado. Clique em “Novo entregador” para cadastrar.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

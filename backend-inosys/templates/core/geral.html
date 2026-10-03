@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block conteudo %}
+<div class="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded border border-l-[6px] border-slate-200 border-l-amber-500 bg-white p-4 dark:border-slate-700 dark:border-l-amber-500 dark:bg-slate-800"><small class="mute">Produtos para repor</small><b class="block text-3xl font-black leading-tight">{{ n_alertas }}</b></div>
+  <div class="rounded border border-l-[6px] border-slate-200 border-l-blue-600 bg-white p-4 dark:border-slate-700 dark:border-l-blue-600 dark:bg-slate-800"><small class="mute">Fretes em trânsito</small><b class="block text-3xl font-black leading-tight">{{ em_transito }}</b></div>
+  <div class="rounded border border-l-[6px] border-slate-200 border-l-red-600 bg-white p-4 dark:border-slate-700 dark:border-l-red-600 dark:bg-slate-800"><small class="mute">Fretes atrasados</small><b class="block text-3xl font-black leading-tight">{{ atrasados }}</b></div>
+  <div class="rounded border border-l-[6px] border-slate-200 border-l-emerald-600 bg-white p-4 dark:border-slate-700 dark:border-l-emerald-600 dark:bg-slate-800"><small class="mute">Entregas no prazo</small><b class="block text-3xl font-black leading-tight">{% if no_prazo is None %}–{% else %}{{ no_prazo }}%{% endif %}</b></div>
+</div>
+<div class="grid gap-4 lg:grid-cols-3">
+  <div class="card lg:col-span-2">
+    <h2 class="text-xl font-extrabold">Valor cobrado por modal</h2>
+    <p class="mb-2 text-sm mute">Total: {{ valor_total|brl }}</p>
+    {% for m in por_modal %}
+    <div class="my-3 grid items-center gap-3" style="grid-template-columns:100px 1fr 120px">
+      <span>{{ m.modal }}</span>
+      <div class="h-[22px] overflow-hidden rounded bg-slate-200 dark:bg-slate-700"><div class="h-full bg-slate-800 dark:bg-amber-400" style="width:{{ m.pct|floatformat:0 }}%"></div></div>
+      <b class="text-right">{{ m.total|brl }}</b>
+    </div>
+    {% empty %}<p class="mute">Nenhum frete registrado ainda.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h2 class="mb-3 text-xl font-extrabold">Reposição necessária</h2>
+    <ul>
+    {% for p in alertas %}
+      <li class="flex items-center justify-between gap-2 border-b border-slate-200 py-2.5 dark:border-slate-700">
+        <span>{{ p.nome }}<br><small class="mute">{{ p.quantidade|num }} {{ p.unidade }} · mínimo {{ p.estoque_minimo|num }}</small></span>
+        {% badge p.situacao %}
+      </li>
+    {% empty %}<li class="mute">Nenhum produto abaixo do mínimo.</li>{% endfor %}
+    </ul>
+  </div>
+  <div class="card lg:col-span-3">
+    <h2 class="mb-3 text-xl font-extrabold">Últimas movimentações</h2>
+    <ul>
+    {% for m in ultimas %}
+      <li class="flex justify-between gap-2 border-b border-slate-200 py-2.5 dark:border-slate-700">
+        <span>{{ m.get_tipo_display }} de {{ m.quantidade|num }} {{ m.produto.unidade }} · {{ m.produto.nome }}<br><small class="mute">{{ m.observacao|default:"Sem observação" }}</small></span>
+        <small class="mute">{{ m.data|date:"d/m/Y" }}</small>
+      </li>
+    {% empty %}<li class="mute">As entradas e saídas registradas aparecem aqui.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
