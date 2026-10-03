@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+
+{% block title %}InoSys · Estoque e fretes da INOVE{% endblock %}
+
+{% block content %}
+{# Ícones de traço reaproveitados na página. #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 14.8c1.6.8 2.7 2.5 3 5.2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></symbol>
+</svg>
+
+<header class="ino-landing-topbar">
+  <div class="ino-landing-container ino-landing-topbar__inner">
+    <a href="#inicio" class="ino-brand" aria-label="InoSys, início">
+      <span class="ino-brand__mark" aria-hidden="true">I</span>
+      <span>
+        <span class="ino-brand__name d-block">InoSys</span>
+        <span class="ino-brand__tag d-block">Estoque e fretes</span>
+      </span>
+    </a>
+
+    <nav class="ino-landing-nav" aria-label="Seções da página">
+      <a href="#modulos">Módulos</a>
+      <a href="#previa">Prévia</a>
+      <a href="#perfis">Perfis</a>
+    </nav>
+
+    <div class="ino-landing-topbar__actions">
+      <button type="button" class="ino-theme-toggle" data-ino-theme-toggle aria-label="Alternar tema claro e escuro">
+        <svg class="ino-icon icon-moon"><use href="#i-moon"/></svg>
+        <svg class="ino-icon icon-sun"><use href="#i-sun"/></svg>
+      </button>
+      <a href="/admin/" class="btn btn-outline-secondary">Entrar</a>
+    </div>
+  </div>
+</header>
+
+<main id="inicio">
+  {# Hero #}
+  <section class="ino-landing-hero">
+    <div class="ino-landing-container ino-landing-hero__grid">
+      <div>
+        <span class="ino-badge ino-badge--primary has-dot">Sistema interno da INOVE</span>
+        <h1>Estoque e fretes <span class="ino-accent">em um só lugar</span></h1>
+        <p class="ino-landing-hero__lead">
+          Acompanhe entradas, saídas e custos de entrega sem planilhas.
+        </p>
+        <div class="ino-landing-hero__actions">
+          <a href="/admin/" class="btn btn-primary btn-lg d-inline-flex align-items-center gap-2">
+            Entrar no sistema
+            <svg class="ino-icon" style="width:18px;height:18px"><use href="#i-arrow"/></svg>
+          </a>
+          <a href="#modulos" class="btn btn-outline-secondary btn-lg">Conhecer os módulos</a>
+        </div>
+        <div class="ino-landing-hero__facts">
+          <span><svg class="ino-icon"><use href="#i-check"/></svg>Saldo atualizado a cada movimentação</span>
+          <span><svg class="ino-icon"><use href="#i-check"/></svg>Valor de frete sugerido por km</span>
+          <span><svg class="ino-icon"><use href="#i-check"/></svg>Acesso por perfil</span>
+        </div>
+      </div>
+
+      <div class="ino-shapes" aria-hidden="true">
+        <div class="ino-shape ino-shape--square"></div>
+        <div class="ino-shape ino-shape--dots"></div>
+        <div class="ino-shape ino-shape--circle"></div>
+        <div class="ino-shape ino-shape--pill"></div>
+
+        <div class="ino-float-card ino-float-card--a">
+          <div class="ino-label">Itens em estoque</div>
+          <div class="ino-float-card__value">1.240</div>
+          <span class="ino-badge ino-badge--success">▲ +3,1%</span>
+        </div>
+        <div class="ino-float-card ino-float-card--b">
+          <div class="ino-label">Fretes no mês</div>
+          <div class="ino-float-card__value">R$ 48.310</div>
+          <span class="ino-badge ino-badge--info has-dot">14 em rota</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Indicadores #}
+  <section class="ino-landing-container" aria-label="Indicadores de exemplo">
+    <div class="row g-4">
+      <div class="col-6 col-lg-3">
+        <div class="ino-indicator">
+          <div class="ino-label">Itens em estoque</div>
+          <div class="ino-indicator__value">1.240</div>
+          <div class="ino-indicator__foot"><span class="ino-badge ino-badge--success">▲ +3,1%</span> em 3 depósitos</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="ino-indicator">
+          <div class="ino-label">Fretes no mês</div>
+          <div class="ino-indicator__value">R$ 48.310</div>
+          <div class="ino-indicator__foot"><span class="ino-badge ino-badge--danger">▼ −2,4%</span> vs. mês anterior</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="ino-indicator">
+          <div class="ino-label">Abaixo do mínimo</div>
+          <div class="ino-indicator__value">27</div>
+          <div class="ino-indicator__foot"><span class="ino-badge ino-badge--danger">▲ +6</span> desde ontem</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="ino-indicator">
+          <div class="ino-label">Entregas em rota</div>
+          <div class="ino-indicator__value">14</div>
+          <div class="ino-indicator__foot"><span class="ino-badge ino-badge--success">▲ +2</span> hoje</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Módulos #}
+  <section class="ino-landing-section" id="modulos">
+    <div class="ino-landing-container">
+      <div class="ino-landing-section__head">
+        <span class="ino-label">Módulos</span>
+        <h2>Quatro módulos, uma operação</h2>
+        <p>Cada área cuida de uma parte do trabalho. O painel de relatórios junta tudo para quem decide.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-xl-3">
+          <article class="ino-card ino-module">
+            <div class="ino-module__icon"><svg class="ino-icon"><use href="#i-box"/></svg></div>
+            <h3 class="ino-h3 m-0">Estoque</h3>
+            <p class="ino-muted m-0">Materiais, entradas e saídas com saldo atualizado automaticamente.</p>
+            <ul>
+              <li>Cadastro de materiais</li>
+              <li>Alerta de estoque baixo</li>
+              <li>Histórico de movimentações</li>
+            </ul>
+          </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <article class="ino-card ino-module">
+            <div class="ino-module__icon"><svg class="ino-icon"><use href="#i-truck"/></svg></div>
+            <h3 class="ino-h3 m-0">Fretes</h3>
+            <p class="ino-muted m-0">Entregadores e entregas, com valor sugerido calculado pela distância.</p>
+            <ul>
+              <li>Valor sugerido por km</li>
+              <li>Status de cada entrega</li>
+              <li>Histórico com filtros</li>
+            </ul>
+          </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <article class="ino-card ino-module">
+            <div class="ino-module__icon"><svg class="ino-icon"><use href="#i-chart"/></svg></div>
+            <h3 class="ino-h3 m-0">Relatórios</h3>
+            <p class="ino-muted m-0">Visão geral para o gestor, cruzando estoque e fretes.</p>
+            <ul>
+              <li>Dashboard de visão geral</li>
+              <li>Divergência sugerido x cobrado</li>
+              <li>Filtros por período</li>
+            </ul>
+          </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <article class="ino-card ino-module">
+            <div class="ino-module__icon"><svg class="ino-icon"><use href="#i-users"/></svg></div>
+            <h3 class="ino-h3 m-0">Contas</h3>
+            <p class="ino-muted m-0">Usuários, perfis de acesso e registro das ações feitas no sistema.</p>
+            <ul>
+              <li>Senha temporária no cadastro</li>
+              <li>Controle por perfil</li>
+              <li>Log de ações</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Prévia do sistema #}
+  <section class="ino-landing-section ino-landing-section--alt" id="previa">
+    <div class="ino-landing-container">
+      <div class="ino-landing-section__head">
+        <span class="ino-label">Prévia</span>
+        <h2>Tudo à vista, sem procurar</h2>
+        <p>Saldos, mínimos e ocupação na mesma tela. Dados de exemplo.</p>
+      </div>
+
+      <div class="ino-preview">
+        <div class="ino-preview__bar">
+          <span class="ino-brand__mark" style="width:24px;height:24px;font-size:11px" aria-hidden="true">I</span>
+          <span class="crumb">Operação /</span> <strong>Estoque</strong>
+        </div>
+
+        <div class="ino-preview__body">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="ino-card">
+                <div class="ino-table-wrap">
+                  <table class="ino-table">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Produto</th>
+                        <th class="num">Qtd.</th>
+                        <th class="num">Custo</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="code">PAL-0042</td>
+                        <td>Paleta PBR</td>
+                        <td class="num">1.240</td>
+                        <td class="num">R$ 38,50</td>
+                        <td><span class="ino-badge ino-badge--success has-dot">Em estoque</span></td>
+                      </tr>
+                      <tr>
+                        <td class="code">FIT-0110</td>
+                        <td>Fita de arqueação</td>
+                        <td class="num">18</td>
+                        <td class="num">R$ 212,00</td>
+                        <td><span class="ino-badge ino-badge--warning has-dot">Estoque baixo</span></td>
+                      </tr>
+                      <tr>
+                        <td class="code">CX-0007</td>
+                        <td>Caixa papelão</td>
+                        <td class="num">0</td>
+                        <td class="num">R$ 4,90</td>
+                        <td><span class="ino-badge ino-badge--danger has-dot">Sem estoque</span></td>
+                      </tr>
+                      <tr>
+                        <td class="code">FR-2041</td>
+                        <td>Frete para Santos</td>
+                        <td class="num">1</td>
+                        <td class="num">R$ 1.850,00</td>
+                        <td><span class="ino-badge ino-badge--info has-dot">Em trânsito</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4 d-flex flex-column gap-4">
+              <div class="ino-card p-4">
+                <h3 class="ino-h3 mb-1">Ocupação</h3>
+                <p class="ino-body-sm ino-muted mb-4">Capacidade dos depósitos</p>
+                <div class="ino-progress">
+                  <div class="ino-progress__head"><span>Central</span><span>88%</span></div>
+                  <div class="ino-progress__track" role="progressbar" aria-label="Central" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"><div class="ino-progress__bar" style="width:88%"></div></div>
+                </div>
+                <div class="ino-progress">
+                  <div class="ino-progress__head"><span>Norte</span><span>74% · Atenção</span></div>
+                  <div class="ino-progress__track" role="progressbar" aria-label="Norte" aria-valuenow="74" aria-valuemin="0" aria-valuemax="100"><div class="ino-progress__bar ino-progress__bar--warning" style="width:74%"></div></div>
+                </div>
+                <div class="ino-progress">
+                  <div class="ino-progress__head"><span>Sul</span><span>96% · Quase cheio</span></div>
+                  <div class="ino-progress__track" role="progressbar" aria-label="Sul" aria-valuenow="96" aria-valuemin="0" aria-valuemax="100"><div class="ino-progress__bar ino-progress__bar--danger" style="width:96%"></div></div>
+                </div>
+              </div>
+
+              <fieldset class="ino-card p-4">
+                <legend class="ino-h3 mb-3 float-none">Veículo da entrega</legend>
+                <label class="ino-select-card">
+                  <span class="d-flex justify-content-between align-items-start">
+                    <span>
+                      <strong class="d-block">TRK-102</strong>
+                      <span class="ino-body-sm ino-muted">Kenworth T680</span>
+                    </span>
+                    <input type="radio" name="veiculo" checked>
+                  </span>
+                  <span class="ino-select-card__details">
+                    <span><span class="ino-body-sm ino-muted d-block">Status</span><span class="ino-badge ino-badge--success has-dot">Disponível</span></span>
+                    <span><span class="ino-body-sm ino-muted d-block">Capacidade</span><strong>3.500 kg</strong></span>
+                  </span>
+                </label>
+                <label class="ino-select-card">
+                  <span class="d-flex justify-content-between align-items-start">
+                    <span>
+                      <strong class="d-block">VAN-404</strong>
+                      <span class="ino-body-sm ino-muted">Peterbilt 579</span>
+                    </span>
+                    <input type="radio" name="veiculo">
+                  </span>
+                  <span class="ino-select-card__details">
+                    <span><span class="ino-body-sm ino-muted d-block">Status</span><span class="ino-badge ino-badge--warning has-dot">Em manutenção</span></span>
+                    <span><span class="ino-body-sm ino-muted d-block">Capacidade</span><strong>1.200 kg</strong></span>
+                  </span>
+                </label>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# Perfis #}
+  <section class="ino-landing-section" id="perfis">
+    <div class="ino-landing-container">
+      <div class="ino-landing-section__head">
+        <span class="ino-label">Perfis de acesso</span>
+        <h2>Cada pessoa vê o que precisa</h2>
+        <p>Usuários são cadastrados pelo Administrador, com senha temporária trocada no primeiro login.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-sm-6 col-lg-3">
+          <div class="ino-card ino-profile">
+            <div class="ino-profile__num">01</div>
+            <h3 class="ino-h3 mt-2">Operacional de Estoque</h3>
+            <p class="ino-muted m-0">Acessa apenas o módulo de estoque.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="ino-card ino-profile">
+            <div class="ino-profile__num">02</div>
+            <h3 class="ino-h3 mt-2">Operacional de Fretes</h3>
+            <p class="ino-muted m-0">Acessa apenas o módulo de fretes.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="ino-card ino-profile">
+            <div class="ino-profile__num">03</div>
+            <h3 class="ino-h3 mt-2">Gestor</h3>
+            <p class="ino-muted m-0">Estoque, fretes, dashboard de visão geral e relatórios.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="ino-card ino-profile">
+            <div class="ino-profile__num">04</div>
+            <h3 class="ino-h3 mt-2">Administrador</h3>
+            <p class="ino-muted m-0">Acesso completo, incluindo usuários, log de ações e anonimização.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ino-landing-cta mt-5">
+        <div class="ino-landing-cta__dots" aria-hidden="true"></div>
+        <h2>Pronto para começar o dia?</h2>
+        <p>Entre com as credenciais fornecidas pelo Administrador. Em caso de dúvida, solicite ajuda à equipe.</p>
+        <a href="/admin/" class="btn btn-light btn-lg d-inline-flex align-items-center gap-2">
+          <svg class="ino-icon" style="width:18px;height:18px"><use href="#i-lock"/></svg>
+          Acessar o InoSys
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="ino-landing-footer">
+  <div class="ino-landing-container d-flex flex-column flex-md-row justify-content-between gap-2">
+    <span>© 2026 INOVE. Todos os direitos reservados.</span>
+    <span>PIM IV · Análise e Desenvolvimento de Sistemas · USCS</span>
+  </div>
+</footer>
+{% endblock %}

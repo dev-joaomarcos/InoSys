@@ -106,9 +106,9 @@ ROOT_URLCONF = 'inosys.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Pastas extras de templates (globais ao projeto). Vazio por enquanto:
-        # os templates ficam dentro de cada app (APP_DIRS).
-        'DIRS': [],
+        # Pasta de templates globais do projeto (base.html, landing.html).
+        # Templates específicos de cada app ficam dentro do próprio app (APP_DIRS).
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             # Variáveis disponíveis automaticamente em todo template.
@@ -195,6 +195,7 @@ USE_TZ = True                        # guarda datas em UTC no banco e converte a
 
 STATIC_URL = 'static/'                    # prefixo da URL pública dos estáticos
 STATIC_ROOT = BASE_DIR / 'staticfiles'    # destino do `collectstatic` (ignorado pelo git)
+STATICFILES_DIRS = [BASE_DIR / 'static']  # estáticos globais (ex.: css/inosys.css do Design System)
 
 STORAGES = {
     # Armazenamento de uploads. Sem uso por enquanto (fotos de entrega estão
