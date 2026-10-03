@@ -72,7 +72,7 @@ Cadastro de usuário é feito exclusivamente pelo Administrador, que gera uma se
 *Dependência: nenhuma. Obrigatória antes de tudo.*
 
 - [x] Projeto Django configurado, `venv` documentado no README/guia de setup
-- [ ] Configuração do banco via `.env` (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`)
+- [ ] Configuração do banco via `.env` (`DATABASE_URL`; sem ela, usa SQLite local)
 - [ ] `tb_usuarios` criada e migrada
 - [ ] RF01 — Login com redirecionamento por perfil
 - [ ] RNF04 — Senha armazenada com hash (padrão Django)
