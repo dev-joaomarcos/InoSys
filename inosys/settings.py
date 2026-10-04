@@ -63,8 +63,12 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = not DEBUG      # redireciona http -> https
 SESSION_COOKIE_SECURE = not DEBUG    # cookie de sessão só trafega por HTTPS
 CSRF_COOKIE_SECURE = not DEBUG       # cookie CSRF só trafega por HTTPS
-# HSTS: o navegador passa a exigir HTTPS por 1 ano (31536000 s) neste domínio.
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+# HSTS: o navegador passa a exigir HTTPS neste domínio pelo tempo (em segundos)
+# definido em SECURE_HSTS_SECONDS. O padrão é 1 hora, para o primeiro deploy: o
+# navegador guarda esse valor e não dá para desfazer antes do prazo. Depois de
+# validar o HTTPS, suba pela variável de ambiente (86400 = 1 dia,
+# 2592000 = 30 dias). Em DEBUG fica 0, para não prender o localhost em HTTPS.
+SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', default=3600) if not DEBUG else 0
 
 
 # ---------------------------------------------------------------------------
