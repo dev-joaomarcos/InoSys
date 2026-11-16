@@ -115,7 +115,7 @@ Decisões que moldam o modelo:
 
 | Prefixo | App | Rotas principais |
 | --- | --- | --- |
-| `/` | contas | `/` (seleção), `/login/`, `/sair/`, `/senha/trocar/`, `/usuarios/...`, `/log/` |
+| `/` | contas | `/` (apresentação sem login; seleção com login), `/sobre/`, `/login/`, `/sair/`, `/senha/trocar/`, `/usuarios/...`, `/log/` |
 | `/estoque/` | estoque | `materiais/`, `materiais/resumo/`, `movimentacoes/` |
 | `/fretes/` | fretes | `entregas/`, `entregas/valor-sugerido/`, `entregadores/` |
 | `/` | relatorios | `/visao-geral/`, `/relatorios/`, `/relatorios/movimentacoes/`, `/relatorios/fretes/` |

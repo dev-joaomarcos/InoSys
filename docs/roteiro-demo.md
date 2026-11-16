@@ -13,7 +13,8 @@ Para quem vai apresentar. Duração: cerca de 10 minutos, mais perguntas. Os nom
 
 ### Dez minutos antes
 
-- [ ] Abrir a URL e entrar com `gustavo`. A tela precisa aparecer com estilo e logo.
+- [ ] Abrir a URL. A página de apresentação precisa aparecer com estilo, logo e as capturas de tela.
+- [ ] Entrar com `gustavo` e conferir a Visão Geral.
 - [ ] Se a tela vier sem estilo, a rede do local está bloqueando CDN (Bootstrap, HTMX e fontes vêm da internet). Plano B: rotear pelo celular.
 - [ ] Deixar duas janelas prontas: uma normal e uma anônima, para trocar de usuário sem perder tempo com logout.
 - [ ] Zoom do navegador em 110% ou 125% se for projetar.
@@ -34,7 +35,9 @@ Os três primeiros usam a senha passada ao `popular_demo`.
 
 > "A INOVE instala divisórias e forros. Ela tinha dois problemas: não saber quando o material ia acabar e não saber se o frete cobrado batia com o combinado. O InoSys resolve os dois: um controle de estoque que calcula o saldo sozinho e um monitor de fretes que confere o valor de cada entrega."
 
-Mostre a tela de login e diga que não existe "criar conta": o acesso é dado pelo Administrador.
+Faça essa fala com a página de apresentação aberta (o endereço do sistema, sem login): ela mostra o problema, o que o sistema faz e as telas. Depois clique em "Entrar no sistema" e, na tela de login, diga que não existe "criar conta": o acesso é dado pelo Administrador.
+
+Se já estiver logado, a apresentação fica em `/sobre/`.
 
 ## Parte 1: Estoque, com `paula` (3 min)
 
@@ -102,7 +105,7 @@ Números de referência antes de qualquer alteração: 3 materiais em falta, 5 e
 | O log mostra o que foi alterado? | Hoje mostra quem, o tipo de ação e quando. Detalhar o registro alterado é uma melhoria já mapeada. |
 | Funciona no celular? | Sim. O menu vira um painel deslizante e as tabelas rolam na horizontal. (Mostre com F12, se der tempo.) |
 | E se alguém esquecer o sistema aberto? | A sessão expira após 60 minutos sem uso e ao fechar o navegador. O prazo é conferido no servidor. |
-| Como é testado? | Há 101 testes automatizados cobrindo regras de estoque, cálculo de frete, permissões e relatórios. |
+| Como é testado? | Há 106 testes automatizados cobrindo regras de estoque, cálculo de frete, permissões e relatórios. |
 | Onde está hospedado? | No Railway, com banco PostgreSQL. |
 
 ## Se algo der errado

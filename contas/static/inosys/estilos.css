@@ -506,3 +506,86 @@ tr.is-row-inactive > td { color: var(--is-muted); }
 
 /* Marcador de campo obrigatório */
 .is-required::after { content: " *"; color: var(--is-danger); }
+
+/* ============================================================
+   12. Apresentação (landing page pública: contas/apresentacao.html)
+   Abertura em navy, como o painel do login; o restante sobre o
+   fundo da página. As capturas de tela ficam em img/telas/.
+   ============================================================ */
+.is-lp { background: var(--is-page-bg); }
+.is-lp-largura { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: 24px; }
+.is-lp-rotulo {
+  margin: 0 0 10px; font-family: var(--is-font-mono); font-size: .72rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--is-brand);
+}
+.is-lp-titulo { margin: 0 0 28px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; }
+.is-lp-subtitulo { margin: 44px 0 14px; font-size: 1.05rem; font-weight: 700; }
+
+/* Abertura */
+.is-lp-abertura { background: linear-gradient(170deg, var(--is-navy) 0%, var(--is-navy-2) 140%); color: #D2DCE8; }
+.is-lp-topo { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+.is-lp-botao-claro {
+  --bs-btn-color: #fff; --bs-btn-border-color: rgba(255,255,255,.35);
+  --bs-btn-hover-color: var(--is-navy); --bs-btn-hover-bg: #fff; --bs-btn-hover-border-color: #fff;
+  --bs-btn-active-color: var(--is-navy); --bs-btn-active-bg: #fff; --bs-btn-active-border-color: #fff;
+}
+.is-lp-heroi { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px; align-items: center; padding-block: 40px 0; }
+.is-lp-heroi .is-lp-rotulo { color: var(--is-amber); }
+.is-lp-heroi h1 { margin: 0 0 18px; color: #fff; font-size: clamp(1.8rem, 3.3vw, 2.6rem); font-weight: 700; line-height: 1.15; letter-spacing: -.025em; }
+.is-lp-resumo { margin: 0 0 28px; max-width: 34rem; font-size: 1rem; line-height: 1.6; }
+.is-lp-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-bottom: 56px; }
+.is-lp-acoes .btn { padding: .65rem 1.4rem; }
+.is-lp-link { color: #fff; font-weight: 600; font-size: .9rem; text-decoration: none; }
+.is-lp-link:hover { color: #fff; text-decoration: underline; }
+/* a captura da abertura desce além do navy e pousa sobre o fundo da página */
+.is-lp-heroi .is-lp-tela { align-self: end; margin-bottom: -56px; }
+
+/* Captura de tela em moldura */
+.is-lp-tela { margin: 0; border: 1px solid var(--is-border); border-radius: var(--is-radius-card); background: var(--is-surface); box-shadow: 0 18px 40px -22px rgba(13,35,64,.45); overflow: hidden; }
+.is-lp-tela img { display: block; width: 100%; height: auto; }
+
+/* Seções */
+.is-lp-secao { padding-block: 72px 0; }
+.is-lp-abertura + main > .is-lp-secao:first-child { padding-top: 120px; }
+.is-lp-problemas { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--is-border); }
+.is-lp-problemas > div { padding: 24px 32px 0 0; }
+.is-lp-problemas > div + div { padding-left: 32px; padding-right: 0; border-left: 1px solid var(--is-border); }
+.is-lp-problemas h3, .is-lp-bloco h3 { margin: 0 0 10px; font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
+.is-lp-problemas p, .is-lp-bloco p { margin: 0; color: var(--is-muted); line-height: 1.6; }
+
+/* Blocos alternados: texto de um lado, tela real do outro */
+.is-lp-bloco { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 48px; align-items: center; padding-block: 28px; }
+.is-lp-bloco + .is-lp-bloco { margin-top: 28px; }
+.is-lp-bloco-invertido .is-lp-bloco-texto { order: 2; }
+.is-lp-bloco-invertido { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+.is-lp-lista { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: .9rem; }
+.is-lp-lista li { position: relative; padding-left: 26px; }
+.is-lp-lista li::before { content: "\f26e"; font-family: "bootstrap-icons"; position: absolute; left: 0; top: 1px; color: var(--is-success); font-size: 1.05rem; line-height: 1.2; }
+
+/* Como funciona */
+.is-lp-faixa { margin-top: 72px; padding-block: 64px; background: var(--is-surface); border-block: 1px solid var(--is-border); scroll-margin-top: 0; }
+.is-lp-passos { margin: 0; padding: 0; list-style: none; counter-reset: passo; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+.is-lp-passos li { counter-increment: passo; padding-top: 14px; border-top: 2px solid var(--is-ink); }
+.is-lp-passos li::before { content: counter(passo, decimal-leading-zero); display: block; margin-bottom: 10px; font-family: var(--is-font-mono); font-weight: 600; font-size: .85rem; color: var(--is-brand); }
+.is-lp-passos h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 700; }
+.is-lp-passos p { margin: 0; color: var(--is-muted); font-size: .875rem; line-height: 1.55; }
+
+/* Rodapé */
+.is-lp-rodape { padding-block: 28px; font-size: .8rem; color: var(--is-muted); }
+.is-lp-rodape .is-lp-largura { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; }
+.is-lp-rodape strong { color: var(--is-ink); }
+.is-lp-rodape div > span { display: block; margin-top: 2px; }
+
+@media (max-width: 991.98px) {
+  .is-lp-heroi, .is-lp-bloco, .is-lp-bloco-invertido { grid-template-columns: 1fr; gap: 28px; }
+  .is-lp-bloco-invertido .is-lp-bloco-texto { order: 0; }
+  .is-lp-acoes { padding-bottom: 8px; }
+  .is-lp-passos { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 575.98px) {
+  .is-lp-largura { padding-inline: 16px; }
+  .is-lp-problemas { grid-template-columns: 1fr; }
+  .is-lp-problemas > div + div { padding-left: 0; border-left: 0; }
+  .is-lp-passos { grid-template-columns: 1fr; }
+  .is-lp-secao { padding-top: 56px; }
+}

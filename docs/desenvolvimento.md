@@ -31,7 +31,7 @@ Mantenha `DEBUG=True` no `.env` local. Com `DEBUG=False`, o Django redireciona t
 ## Testes
 
 ```powershell
-python manage.py test               # tudo (101 testes)
+python manage.py test               # tudo (106 testes)
 python manage.py test estoque       # um app
 python manage.py test fretes.tests.NomeDaClasse.test_algo
 ```

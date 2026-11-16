@@ -34,5 +34,7 @@ Atualizado em 16/11/2026. Ao resolver um item, remova-o daqui e atualize o docum
 | Tema | Situação | O que fazer |
 | --- | --- | --- |
 | `docs/arquivo/mockups-front/` | Arquivamento temporário dos mockups | Remover |
-| Integração contínua | Os 101 testes só rodam se alguém lembrar | Workflow simples do GitHub Actions |
+| Integração contínua | Os 106 testes só rodam se alguém lembrar | Workflow simples do GitHub Actions |
+| Capturas da landing page | Imagens estáticas com data fixa; ficam defasadas se as telas mudarem | Refazer após mudança visual ([frontend.md](frontend.md#capturas-de-tela)) |
+| CDN sem verificação de integridade | As tags de Bootstrap, ícones e HTMX não têm `integrity` | Acrescentar SRI ou servir os arquivos localmente |
 | Healthcheck no Railway | Não configurado; exige ajuste no `settings.py` | Ver [deploy-railway.md](deploy-railway.md) |

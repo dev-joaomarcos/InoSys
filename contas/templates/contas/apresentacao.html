@@ -1,0 +1,163 @@
+{% load static %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InoSys · estoque e fretes da INOVE</title>
+  <meta name="description" content="Sistema interno da INOVE Divisórias e Forros para controlar o estoque de materiais e conferir o custo dos fretes.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="{% static 'inosys/img/logo-inosys-icon.png' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'inosys/estilos.css' %}" rel="stylesheet">
+</head>
+<body class="is-lp">
+  <a class="visually-hidden-focusable" href="#conteudo">Pular para o conteúdo</a>
+
+  <div class="is-lp-abertura">
+    <header class="is-lp-topo is-lp-largura">
+      <img src="{% static 'inosys/img/logo-inosys-reversed.png' %}" alt="InoSys" width="126" height="36">
+      {% if user.is_authenticated %}
+      <a class="btn btn-sm is-lp-botao-claro" href="{% url 'contas:selecao' %}">Abrir o sistema <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      {% else %}
+      <a class="btn btn-sm is-lp-botao-claro" href="{% url 'contas:login' %}">Entrar <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i></a>
+      {% endif %}
+    </header>
+
+    <section class="is-lp-heroi is-lp-largura" aria-labelledby="lp-titulo">
+      <div>
+        <p class="is-lp-rotulo">INOVE Divisórias e Forros · sistema interno</p>
+        <h1 id="lp-titulo">O estoque que faz a conta sozinho e o frete que confere o valor cobrado</h1>
+        <p class="is-lp-resumo">O InoSys reúne em um só lugar o controle de materiais e o acompanhamento das entregas.
+          Quem opera registra o que aconteceu; o saldo, o alerta de reposição e o valor esperado do frete ficam por conta do sistema.</p>
+        <div class="is-lp-acoes">
+          {% if user.is_authenticated %}
+          <a class="btn btn-primary" href="{% url 'contas:selecao' %}">Abrir o sistema</a>
+          {% else %}
+          <a class="btn btn-primary" href="{% url 'contas:login' %}">Entrar no sistema</a>
+          {% endif %}
+          <a class="is-lp-link" href="#como-funciona">Ver como funciona <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      <figure class="is-lp-tela">
+        <img src="{% static 'inosys/img/telas/tela-visao.png' %}" width="1280" height="800"
+             alt="Tela Visão Geral: três materiais abaixo do mínimo, cinco entregas em aberto, total de fretes cobrados e gráfico de valor sugerido e cobrado por entregador">
+      </figure>
+    </section>
+  </div>
+
+  <main id="conteudo">
+    <section class="is-lp-secao is-lp-largura" aria-labelledby="lp-problema">
+      <h2 id="lp-problema" class="is-lp-titulo">Dois problemas do dia a dia</h2>
+      <div class="is-lp-problemas">
+        <div>
+          <h3>O material acaba sem aviso</h3>
+          <p>Com o controle em caderno e planilha, só se descobre que falta placa de gesso quando a obra já parou.
+            O saldo depende de alguém lembrar de somar e subtrair.</p>
+        </div>
+        <div>
+          <h3>O frete é pago sem conferência</h3>
+          <p>O entregador é pago por quilômetro, mas ninguém compara o valor cobrado com o combinado.
+            Uma diferença pequena em cada entrega passa despercebida no fim do mês.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="is-lp-secao is-lp-largura" aria-labelledby="lp-faz">
+      <h2 id="lp-faz" class="is-lp-titulo">O que o sistema faz</h2>
+
+      <article class="is-lp-bloco">
+        <div class="is-lp-bloco-texto">
+          <p class="is-lp-rotulo">Estoque</p>
+          <h3>Ninguém digita o saldo</h3>
+          <p>Cada entrada e cada saída é registrada com data, responsável e motivo. O saldo é consequência desses registros, calculado pelo sistema.</p>
+          <ul class="is-lp-lista">
+            <li>Saída maior que o saldo é recusada, com o aviso de quanto há.</li>
+            <li>Material abaixo da quantidade mínima aparece em destaque.</li>
+            <li>O histórico não se edita nem se apaga.</li>
+          </ul>
+        </div>
+        <figure class="is-lp-tela">
+          <img src="{% static 'inosys/img/telas/tela-estoque.png' %}" width="1280" height="800" loading="lazy"
+               alt="Tela Estoque: aviso de três materiais abaixo da quantidade mínima e lista de materiais com saldo atual, quantidade mínima e situação">
+        </figure>
+      </article>
+
+      <article class="is-lp-bloco is-lp-bloco-invertido">
+        <div class="is-lp-bloco-texto">
+          <p class="is-lp-rotulo">Fretes</p>
+          <h3>O valor esperado aparece antes da cobrança</h3>
+          <p>Ao registrar uma entrega, o sistema multiplica a distância pelo valor por quilômetro do entregador e mostra quanto ela deveria custar.</p>
+          <ul class="is-lp-lista">
+            <li>Valor cobrado diferente do sugerido vira divergência.</li>
+            <li>A diferença aparece para mais ou para menos, sem tolerância.</li>
+            <li>Cada entrega tem situação: pendente, em andamento ou concluída.</li>
+          </ul>
+        </div>
+        <figure class="is-lp-tela">
+          <img src="{% static 'inosys/img/telas/tela-fretes.png' %}" width="1280" height="800" loading="lazy"
+               alt="Tela Fretes: indicadores de entregas pendentes, em andamento, concluídas e com divergência, e histórico de entregas com valor sugerido e cobrado">
+        </figure>
+      </article>
+
+      <article class="is-lp-bloco">
+        <div class="is-lp-bloco-texto">
+          <p class="is-lp-rotulo">Gestão</p>
+          <h3>Uma tela para decidir</h3>
+          <p>O gestor vê de uma vez o que precisa de atenção, sem pedir planilha a ninguém.</p>
+          <ul class="is-lp-lista">
+            <li>Materiais em falta e entregas em aberto.</li>
+            <li>Total cobrado em fretes nos últimos 30 dias.</li>
+            <li>Relatórios por material e por entregador, com as divergências.</li>
+          </ul>
+        </div>
+        <figure class="is-lp-tela">
+          <img src="{% static 'inosys/img/telas/tela-relatorios.png' %}" width="1280" height="800" loading="lazy"
+               alt="Relatório de fretes: resumo por entregador com entregas, distância, valor sugerido, valor cobrado e diferença">
+        </figure>
+      </article>
+    </section>
+
+    <section class="is-lp-secao is-lp-faixa" id="como-funciona" aria-labelledby="lp-como">
+      <div class="is-lp-largura">
+        <h2 id="lp-como" class="is-lp-titulo">Como funciona</h2>
+        <ol class="is-lp-passos">
+          <li><h3>O administrador cadastra a pessoa</h3>
+            <p>Não existe "criar conta". O sistema gera uma senha temporária, mostrada uma única vez.</p></li>
+          <li><h3>A pessoa cria a própria senha</h3>
+            <p>No primeiro acesso a troca é obrigatória. Nenhuma outra tela abre antes disso.</p></li>
+          <li><h3>A operação registra o que acontece</h3>
+            <p>Entradas e saídas de material, entregas e valores cobrados. O sistema faz as contas.</p></li>
+          <li><h3>O gestor acompanha</h3>
+            <p>Visão geral e relatórios mostram o que está em falta e onde o valor não bateu.</p></li>
+        </ol>
+
+        <h3 class="is-lp-subtitulo">Cada pessoa vê só o que usa</h3>
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead><tr><th>Perfil</th><th>Acesso</th></tr></thead>
+              <tbody>
+                <tr><td><span class="is-badge is-badge-neutral"><i class="bi bi-box-seam" aria-hidden="true"></i> Operacional de Estoque</span></td><td>Materiais e movimentações</td></tr>
+                <tr><td><span class="is-badge is-badge-neutral"><i class="bi bi-truck" aria-hidden="true"></i> Operacional de Fretes</span></td><td>Entregadores e entregas</td></tr>
+                <tr><td><span class="is-badge is-badge-info"><i class="bi bi-speedometer2" aria-hidden="true"></i> Gestor</span></td><td>Os dois módulos, visão geral e relatórios</td></tr>
+                <tr><td><span class="is-badge is-badge-dark"><i class="bi bi-shield-lock" aria-hidden="true"></i> Administrador</span></td><td>Tudo, mais usuários, registro de ações e anonimização de dados</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="is-lp-rodape">
+    <div class="is-lp-largura">
+      <div>
+        <strong>InoSys</strong> · INOVE Divisórias e Forros
+        <span>Projeto Integrado Multidisciplinar IV · Análise e Desenvolvimento de Sistemas · USCS</span>
+      </div>
+      <span><i class="bi bi-shield-check" aria-hidden="true"></i> Acesso restrito a colaboradores cadastrados pelo administrador.</span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -14,7 +14,7 @@ O front é renderizado pelo Django. Não há framework JS nem build: são templa
 | Telas | `<app>/templates/<app>/tela.html` |
 | Trechos HTMX | `<app>/templates/<app>/_trecho.html` |
 
-Login e troca de senha não herdam do `base_app.html`: têm HTML próprio e carregam os mesmos CDNs.
+Login, troca de senha e apresentação não herdam do `base_app.html`: têm HTML próprio e carregam os mesmos CDNs.
 
 Dependências externas, todas por CDN: Bootstrap 5.3.3 (CSS e JS), Bootstrap Icons 1.11.3, HTMX 2.0.3 e as fontes IBM Plex (Google Fonts, importadas no `estilos.css`). Sem internet, as telas perdem o estilo.
 
@@ -102,6 +102,25 @@ Não ponha `<i class="bi">` no começo do alerta: o ícone apareceria duas vezes
 | `is-badge-dark` | contínua navy | `square-fill` | Administrador, Anonimizado |
 
 Se o badge já traz um ícone próprio (`<i class="bi bi-box-arrow-up">` em "Saída", por exemplo), o ícone padrão do status não é acrescentado.
+
+## Apresentação (landing page)
+
+Template `contas/templates/contas/apresentacao.html`, página pública sem sidebar e sem JavaScript próprio. As classes ficam na seção 12 do `estilos.css`, com o prefixo `is-lp-`.
+
+| Parte | Classes | Observação |
+| --- | --- | --- |
+| Abertura em navy | `is-lp-abertura`, `is-lp-topo`, `is-lp-heroi` | A captura da abertura desce além do navy e pousa sobre o fundo da página |
+| Captura em moldura | `is-lp-tela` | Sempre com `width`, `height` e texto alternativo descritivo |
+| Blocos de funcionalidade | `is-lp-bloco`, `is-lp-bloco-invertido` | Texto de um lado e tela real do outro, alternando |
+| Passos numerados | `is-lp-passos` | A numeração vem do CSS (`counter`) |
+
+Abaixo de 992px os blocos empilham; abaixo de 576px os passos e os dois problemas ficam em uma coluna.
+
+### Capturas de tela
+
+Ficam em `contas/static/inosys/img/telas/` (estoque, fretes, visão geral e relatórios), em PNG de 1280 × 800. Foram feitas com os dados do `popular_demo`, logado como gestor, e as datas ficam fixas no dia da captura.
+
+Para refazer depois de uma mudança visual: subir o sistema com um banco recém-populado pelo `popular_demo`, entrar como `gustavo`, deixar a janela em 1280 × 800 com o navegador em português e capturar `/estoque/materiais/?status=`, `/fretes/entregas/`, `/visao-geral/` e `/relatorios/fretes/`.
 
 ## Design system: v1, v2 e o que está implementado
 

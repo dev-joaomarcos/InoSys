@@ -61,9 +61,39 @@ class FluxoContasTests(TestCase):
         self.assertNotContains(r, "Abrir fretes")
         self.assertNotContains(r, "Abrir administração")
 
-    def test_selecao_exige_login(self):
+    def test_raiz_sem_login_mostra_a_apresentacao(self):
         r = self.client.get(reverse("contas:selecao"))
-        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.status_code, 200)
+        self.assertTemplateUsed(r, "contas/apresentacao.html")
+        self.assertContains(r, 'href="/login/"')
+        self.assertContains(r, "Entrar no sistema")
+
+    def test_raiz_com_login_mostra_a_selecao(self):
+        self.client.force_login(self.estoque)
+        r = self.client.get(reverse("contas:selecao"))
+        self.assertTemplateUsed(r, "contas/selecao.html")
+        self.assertTemplateNotUsed(r, "contas/apresentacao.html")
+
+    def test_sobre_abre_com_e_sem_login(self):
+        r = self.client.get(reverse("contas:apresentacao"))
+        self.assertContains(r, "Entrar no sistema")
+        self.client.force_login(self.estoque)
+        r = self.client.get(reverse("contas:apresentacao"))
+        self.assertTemplateUsed(r, "contas/apresentacao.html")
+        self.assertContains(r, "Abrir o sistema")
+        self.assertNotContains(r, "Entrar no sistema")
+
+    def test_sobre_nao_dispensa_a_troca_de_senha(self):
+        self.client.force_login(self.temp)
+        r = self.client.get(reverse("contas:apresentacao"))
+        self.assertRedirects(r, reverse("contas:trocar_senha"), fetch_redirect_response=False)
+
+    def test_pagina_protegida_sem_login_continua_indo_para_o_login(self):
+        r = self.client.get(reverse("estoque:material_lista"))
+        self.assertRedirects(r, "/login/?next=/estoque/materiais/", fetch_redirect_response=False)
+
+    def test_login_tem_link_para_a_apresentacao(self):
+        self.assertContains(self.client.get(reverse("contas:login")), 'href="/sobre/"')
 
 
 @override_settings(STORAGES=ARMAZENAMENTO_SIMPLES)

@@ -27,5 +27,16 @@ class TrocarSenhaView(LoginRequiredMixin, auth_views.PasswordChangeView):
         return resposta
 
 
-class SelecaoView(LoginRequiredMixin, TemplateView):
+class ApresentacaoView(TemplateView):
+    """Landing page pública: apresenta o sistema e leva ao login."""
+    template_name = "contas/apresentacao.html"
+
+
+class SelecaoView(TemplateView):
+    """Raiz do site. Quem está logado escolhe o módulo; quem não está vê a apresentação."""
     template_name = "contas/selecao.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return ApresentacaoView.as_view()(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

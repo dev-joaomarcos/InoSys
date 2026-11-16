@@ -44,10 +44,11 @@
   <main class="is-login">
     <div class="is-login-frame">
       <section class="is-login-aside" aria-label="Sobre o InoSys">
-        <img src="{% static 'inosys/img/logo-inosys-reversed.png' %}" alt="InoSys" width="150" height="43">
+        <a href="{% url 'contas:apresentacao' %}" title="Conhecer o sistema"><img src="{% static 'inosys/img/logo-inosys-reversed.png' %}" alt="InoSys: conhecer o sistema" width="150" height="43"></a>
         <h1>Gestão de estoque e monitor financeiro de fretes</h1>
         <p>Sistema interno da INOVE Divisórias e Forros: saldo atualizado a cada movimentação,
           alerta de reposição e valor sugerido do frete pela distância.</p>
+        <p><a class="is-lp-link" href="{% url 'contas:apresentacao' %}">Conhecer o sistema <i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
         <div class="is-login-chips" aria-hidden="true">
           <span><i class="bi bi-box-seam"></i> Estoque</span>
           <span><i class="bi bi-truck"></i> Fretes</span>

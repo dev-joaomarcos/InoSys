@@ -36,10 +36,18 @@ O log registra quem, o tipo de ação e quando. Ele não registra qual registro 
 
 ## Fluxos
 
+### Apresentação (landing page)
+
+- `/` sem login mostra a apresentação pública do sistema (`ApresentacaoView`, template `contas/apresentacao.html`). Com login, `/` continua sendo a seleção de módulos.
+- `/sobre/` mostra a mesma página sempre, mesmo com login. Nesse caso o botão vira "Abrir o sistema".
+- A página não exibe dado do banco. As capturas de tela são imagens estáticas feitas com os dados fictícios do `popular_demo`.
+- A tela de login tem o link "Conhecer o sistema" de volta para ela.
+- As demais páginas continuam exigindo login e redirecionando para `/login/` com `next`.
+
 ### Login e seleção
 
 - `LoginView` em `/login/`. Usuário já autenticado é redirecionado.
-- Após o login, vai para `/` (`SelecaoView`), que mostra os cartões dos módulos liberados para o perfil.
+- Após o login, vai para `/` (`SelecaoView`), que mostra os cartões dos módulos liberados para o perfil. Sem login, a mesma view entrega a apresentação.
 - A tela de login tem o botão "Solicitar ajuda aos administradores", que abre um modal com instruções. Não grava nem envia nada.
 
 ### Sessão
