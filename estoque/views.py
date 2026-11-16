@@ -1,16 +1,13 @@
-import json
-
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.db.models.functions import Lower
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from django.utils.cache import patch_vary_headers
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 
+from contas.htmx import eh_htmx, pagina_ou_trecho, salvo
 from contas.logs import registrar_log
 from contas.models import LogAcao
 from contas.permissoes import ESTOQUE, perfil_requerido
@@ -19,25 +16,8 @@ from .forms import MaterialForm, MovimentacaoForm
 from .models import Material, Movimentacao
 from .services import registrar_movimentacao
 
-POR_PAGINA = 20  # README: Paginator nativo, 20 itens por página
-
-
-def eh_htmx(request):
-    """Pedido do htmx que quer só o trecho. Ao voltar no histórico do navegador, vai a página inteira."""
-    return request.headers.get("HX-Request") == "true" and request.headers.get("HX-History-Restore-Request") != "true"
-
-
-def pagina_ou_trecho(request, pagina, trecho, contexto):
-    resposta = render(request, trecho if eh_htmx(request) else pagina, contexto)
-    patch_vary_headers(resposta, ["HX-Request"])
-    return resposta
-
-
-def salvo(mensagem):
-    """204 + HX-Trigger: o modal fecha, as listas recarregam e aparece o aviso."""
-    resposta = HttpResponse(status=204)
-    resposta["HX-Trigger"] = json.dumps({"estoqueAtualizado": {"mensagem": mensagem}})  # ASCII puro (\uXXXX)
-    return resposta
+POR_PAGINA = 20  # Paginator nativo, 20 itens por página
+EVENTO = "estoqueAtualizado"
 
 
 # ------------------------------------------------------------------ materiais
@@ -79,7 +59,7 @@ def _form_material(request, material=None):
     if request.method == "POST" and form.is_valid():
         form.save()
         registrar_log(request.user, LogAcao.EDICAO if material else LogAcao.CRIACAO)
-        return salvo("Material atualizado." if material else "Material cadastrado com saldo 0.")
+        return salvo(EVENTO, "Material atualizado." if material else "Material cadastrado com saldo 0.")
     return render(request, "estoque/_form_material.html", {"form": form, "material": material, "acao": request.path})
 
 
@@ -101,7 +81,7 @@ def _mudar_status(request, pk, ativar):
         material.status = Material.ATIVO if ativar else Material.INATIVO
         material.save(update_fields=["status"])
         registrar_log(request.user, LogAcao.EDICAO)
-        return salvo("Material reativado." if ativar else "Material desativado. O histórico foi mantido.")
+        return salvo(EVENTO, "Material reativado." if ativar else "Material desativado. O histórico foi mantido.")
     return render(request, "estoque/_form_status_material.html",
                   {"material": material, "desativar": not ativar, "acao": request.path})
 
@@ -159,7 +139,7 @@ def movimentacao_nova(request):
                 form.add_error("quantidade" if "Saldo" in erro.messages[0] else "material", erro.messages[0])
             else:
                 rotulo = "Saída" if d["tipo"] == Movimentacao.SAIDA else "Entrada"
-                return salvo(f"{rotulo} de {d['quantidade']} {d['material'].unidade_medida} registrada.")
+                return salvo(EVENTO, f"{rotulo} de {d['quantidade']} {d['material'].unidade_medida} registrada.")
     else:
         tipo = request.GET.get("tipo")
         valores = {"tipo": tipo if tipo in ("entrada", "saida") else "entrada",

@@ -2,234 +2,64 @@
 
 Gestor de estoque e monitor financeiro de fretes para a INOVE Divisórias e Forros.
 
-Sistema web dividido em dois módulos: controle de estoque com atualização automática de saldo e alertas de reposição, e monitoramento de fretes com cálculo automático de valor sugerido por quilômetro. Desenvolvido como Projeto Integrado Multidisciplinar do curso de Análise e Desenvolvimento de Sistemas.
+Sistema web com dois módulos: controle de estoque, com saldo atualizado automaticamente e alerta de reposição, e monitoramento de fretes, com cálculo do valor sugerido por quilômetro e destaque das divergências. Desenvolvido como Projeto Integrado Multidisciplinar (PIM IV) do curso de Análise e Desenvolvimento de Sistemas da USCS.
 
-Este README serve como guia de referência rápida do projeto.
+O escopo do MVP está implementado e em preparação para a demo. O que ficou em aberto está em [docs/pendencias.md](docs/pendencias.md).
 
----
+## Documentação
+
+| Para... | Leia |
+| --- | --- |
+| Entender o sistema sem termos técnicos | [docs/visao-simples.md](docs/visao-simples.md) |
+| Entender a arquitetura | [docs/arquitetura.md](docs/arquitetura.md) |
+| Desenvolver | [docs/desenvolvimento.md](docs/desenvolvimento.md) |
+| Publicar no Railway | [docs/deploy-railway.md](docs/deploy-railway.md) |
+| Apresentar a demo | [docs/roteiro-demo.md](docs/roteiro-demo.md) |
+| Ver tudo | [docs/README.md](docs/README.md) |
+
+Quem usa agente de IA (Claude Code, Codex, Cursor): as regras do projeto estão em [AGENTS.md](AGENTS.md).
 
 ## Stack
 
 | Item | Versão |
-|---|---|
-| Python | 3.14.6 |
+| --- | --- |
+| Python | 3.14 |
 | Django | 6.1.1 |
-| PostgreSQL | 18 |
-| psycopg (driver) | 3.3.5 (`psycopg[binary]`) |
-| Configuração de ambiente | django-environ 0.13.0 |
-| Idioma / fuso horário | Português do Brasil / America/Sao_Paulo |
-| Frontend | HTML + HTMX + Bootstrap 5 ou DaisyUI (tailwind) |
+| Banco | PostgreSQL em produção; SQLite local |
+| Front | Templates Django + Bootstrap 5.3.3 + HTMX 2.0.3 |
+| Hospedagem | Railway (gunicorn + WhiteNoise) |
 
-## Deploy no Railway
+## Rodar local
 
-O projeto usa `django-environ` para ler variáveis de ambiente. No Railway, adicione um serviço PostgreSQL e configure estas variáveis no serviço Django:
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+Copy-Item .env.example .env         # depois troque a SECRET_KEY
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py popular_demo --senha "uma-senha-de-teste"   # opcional: dados de exemplo
+python manage.py runserver
+```
 
-| Variável | Valor |
-|---|---|
-| `SECRET_KEY` | Chave secreta forte e exclusiva para produção |
-| `DEBUG` | `False` |
-| `ALLOWED_HOSTS` | Domínio público do app, sem `https://`; múltiplos hosts separados por vírgula |
-| `CSRF_TRUSTED_ORIGINS` | Origem completa, como `https://seu-dominio.up.railway.app`; múltiplas origens separadas por vírgula |
-| `DATABASE_URL` | Referência à URL de conexão do serviço PostgreSQL provisionado |
+Abra http://127.0.0.1:8000/. Testes: `python manage.py test`.
 
-Localmente, sem `DATABASE_URL`, o projeto usa `db.sqlite3`. Em produção, configure `DATABASE_URL` para o PostgreSQL; não coloque segredos no repositório.
+## Apps
 
-Configure os comandos do serviço Railway assim:
-
-- **Build command:** `python manage.py collectstatic --noinput`
-- **Pre-deploy command:** `python manage.py migrate`
-- **Start command:** `gunicorn inosys.wsgi:application --bind 0.0.0.0:$PORT`
-
-O middleware do WhiteNoise serve os arquivos estáticos coletados. O Railway deve encaminhar `X-Forwarded-Proto` para que o Django reconheça HTTPS e aplique o redirecionamento seguro.
-
-## Estrutura de apps
-
-| App | Responsabilidade | Complexidade |
-|---|---|---|
-| `contas` | Autenticação, perfis de usuário, permissões e log de ações | Alta |
-| `estoque` | Materiais, entradas, saídas, alertas e histórico | Média |
-| `fretes` | Entregadores, entregas, cálculo de valor sugerido e histórico | Média |
-| `relatorios` | Dashboard de visão geral, relatórios e integração entre módulos | Baixa |
-
-O app `relatorios` é o único que importa dados dos demais. Os outros são independentes entre si.
-
----
+| App | Responsabilidade |
+| --- | --- |
+| `contas` | Autenticação, perfis, permissões, administração de usuários e log de ações |
+| `estoque` | Materiais, entradas, saídas, alerta de estoque baixo e histórico |
+| `fretes` | Entregadores, entregas, valor sugerido e histórico |
+| `relatorios` | Visão geral e relatórios; é o único que lê dados dos outros módulos |
 
 ## Perfis de usuário
 
-- **Operacional de Estoque** — acessa apenas o módulo de estoque
-- **Operacional de Fretes** — acessa apenas o módulo de fretes
-- **Gestor** — acessa os dois módulos + dashboard de visão geral + relatórios
-- **Administrador** — acesso completo, incluindo gestão de usuários, log de ações e anonimização de dados
+| Perfil | Acesso |
+| --- | --- |
+| Operacional de Estoque | Módulo de estoque |
+| Operacional de Fretes | Módulo de fretes |
+| Gestor | Os dois módulos, visão geral e relatórios |
+| Administrador | Tudo, mais gestão de usuários, log de ações e anonimização |
 
-Cadastro de usuário é feito exclusivamente pelo Administrador, que gera uma senha temporária exibida uma única vez em tela. Não há autocadastro nem envio de credenciais por e-mail. No primeiro login, a troca de senha é obrigatória. Recuperação de senha esquecida segue o mesmo fluxo: o Administrador gera uma nova senha temporária.
-
----
-
-## Checklist de entregas
-
-### Fase 1 — Base do sistema
-*Dependência: nenhuma. Obrigatória antes de tudo.*
-
-- [x] Projeto Django configurado, `venv` documentado no README/guia de setup
-- [ ] Configuração do banco via `.env` (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`)
-- [ ] `tb_usuarios` criada e migrada
-- [ ] RF01 — Login com redirecionamento por perfil
-- [ ] RNF04 — Senha armazenada com hash (padrão Django)
-- [ ] RNF05 — Decorators/middleware de controle de acesso por perfil
-- [ ] Fluxo de senha temporária + troca obrigatória no primeiro login
-- [ ] Botão "Solicitar ajuda aos administradores" (substitui recuperação por e-mail)
-- [ ] Documentar como criar o Administrador inicial (`createsuperuser`)
-
-**Entregável:** qualquer usuário autentica e é redirecionado ao dashboard correto.
-
-### Fase 2 — Estoque e Fretes (paralelo)
-*Dependência: Fase 1 concluída.*
-
-**Estoque**
-- [ ] `tb_materiais` criada e migrada (com `qtd_atual`)
-- [ ] RF02 — CRUD de materiais
-- [ ] RF03 — Registro de entradas (atualiza `qtd_atual` automaticamente)
-- [ ] RF04 — Registro de saídas (valida saldo, atualiza `qtd_atual`)
-- [ ] RF05 — Alerta de estoque baixo (checagem simples ao carregar a tela)
-- [ ] `tb_movimentacoes` criada e migrada
-
-**Fretes**
-- [ ] `tb_entregadores` criada e migrada
-- [ ] RF07 — CRUD de entregadores
-- [ ] RF08 — Registro de entregas com cálculo automático de valor sugerido
-- [ ] RF09 — Edição de entregas (independente do status)
-- [ ] RF10 — Status de entregas (pendente/em andamento/concluída)
-- [ ] `tb_entregas` criada e migrada
-
-**Entregável:** usuário operacional registra movimentações e entregas completas.
-
-### Fase 3 — Histórico e relatórios
-*Dependência: Fase 2 concluída.*
-
-- [ ] RF06 — Histórico de movimentações com filtros (material, tipo, período)
-- [ ] RF11 — Histórico de entregas com filtros (entregador, status, período)
-- [ ] Paginação com `Paginator` nativo do Django (20 itens/página) nas duas listas acima
-- [ ] RF12 — Relatório de movimentações (somente em tela, sem exportação por ora)
-- [ ] RF12 — Relatório de fretes com destaque de divergência (valor sugerido x cobrado)
-- [ ] RNF01 — Consultas/relatórios respondendo em até 5s
-
-**Entregável:** gestor consulta históricos paginados e relatórios filtrados.
-
-### Fase 4 — Administração e finalização
-*Dependência: Fase 3 concluída.*
-
-- [ ] RF13 — CRUD de usuários pelo Administrador (com geração de senha temporária)
-- [ ] RF14 — Log de ações — registro manual dentro das views (sem lib de auditoria automática)
-- [ ] `tb_log_acoes` criada e migrada (com snapshot do nome do usuário)
-- [ ] Paginação também no log de ações
-- [ ] RF15 — Anonimização de dados pessoais — substituição por valores fixos genéricos
-- [ ] RNF02 — Integridade referencial (bloqueio de exclusão de material/entregador com histórico vinculado)
-- [ ] RNF10 — Rotina de backup do banco (mínimo diário)
-
-**Entregável:** sistema funcional completo, cobrindo todo o escopo do MVP.
-
-### Transversais (validar continuamente)
-
-- [ ] RNF03 — Usabilidade (interface simples, poucos cliques)
-- [ ] RNF06 — Responsividade (Bootstrap padrão, evitar CSS customizado excessivo)
-- [ ] RNF07 — Separação clara entre models, views e templates
-- [ ] RNF08 — Disponibilidade (depende da plataforma escolhida no deploy)
-- [ ] RNF09 — Escalabilidade moderada
-- [ ] RNF11 — Suporte a 5 usuários simultâneos
-
----
-
-## Modelo de dados
-
-> Campos confirmados pelo texto do relatório original estão sem marcação especial. Os destacados em **negrito** foram decisões tomadas durante o planejamento deste guia.
-
-### tb_usuarios
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| nome | |
-| username | único |
-| senha_hash | RNF04 |
-| perfil | Operacional Estoque / Operacional Fretes / Gestor / Administrador |
-| status | ativo/inativo — exclusão lógica |
-| senha_temporaria | booleano — controla obrigatoriedade de troca no 1º login |
-| data_criacao | |
-
-### tb_materiais
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| nome | obrigatório |
-| descricao | |
-| unidade_medida | obrigatório |
-| quantidade_minima | obrigatório, aciona alerta (RF05) |
-| **qtd_atual** | evita somar histórico a cada leitura |
-| status | ativo/inativo |
-
-### tb_movimentacoes
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| material_id (FK) | → tb_materiais |
-| usuario_id (FK) | → tb_usuarios, responsável pelo registro |
-| tipo | entrada / saída |
-| quantidade | |
-| data | |
-| motivo | só para saída: uso em produção, perda ou dano, ajuste de inventário |
-
-### tb_entregadores
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| nome | obrigatório |
-| contato | |
-| valor_por_km | obrigatório |
-| status | ativo/inativo |
-
-### tb_entregas
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| entregador_id (FK) | → tb_entregadores |
-| usuario_id (FK) | → tb_usuarios, responsável pelo registro |
-| destino | obrigatório |
-| data | obrigatório |
-| distancia | obrigatório |
-| valor_sugerido | calculado automaticamente |
-| valor_cobrado | manual ou aceito do sugerido |
-| status | pendente / em andamento / concluída |
-
-### tb_log_acoes
-| Campo | Observação |
-|---|---|
-| id (PK) | |
-| usuario_id (FK) | → tb_usuarios |
-| usuario_nome_snapshot | preserva nome mesmo após exclusão do usuário |
-| acao | criação / edição / exclusão |
-| data_hora | |
-
----
-
-## Decisões de simplicidade
-
-| Tema | Decisão | Por quê |
-|---|---|---|
-| Saldo do estoque | Campo `qtd_atual` armazenado | Evita somar histórico a cada leitura de tela |
-| Cadastro de usuário | Admin gera senha temporária manualmente | Volume pequeno de usuários, sem infra de e-mail |
-| Recuperação de senha | Admin gera nova senha temporária | Reaproveita o mesmo fluxo do cadastro |
-| Log de ações | Registro manual nas views | Mais simples e explícito que lib de auditoria automática |
-| Anonimização (LGPD) | Substituição por valores fixos genéricos | Suficiente para o escopo do RF15 |
-| Comprovantes de entrega (fotos) | Fora do escopo | Não fazia parte do MVP definido |
-| Exportação de relatórios | Somente em tela por ora | Evita libs extras; revisar se for exigido depois |
-| Paginação | `Paginator` nativo do Django, 20 itens/página | Nativo do framework, sem dependência externa |
-| Ambientes | Dev local + 1 ambiente de apresentação do MVP | Sem staging separado por ora |
-| Banco de dados | PostgreSQL 18 local via venv | Docker fica como esqueleto para ativação futura |
-| Driver do banco | psycopg 3 (`psycopg[binary]`) | Versão atual recomendada pelo próprio PostgreSQL |
-
----
-
-## Pendências em aberto
-
-- [ ] Confirmar se o diagrama original do modelo lógico (relatório do PIM) define tipos de dado, tamanhos de campo ou constraints além dos listados aqui
-- [ ] Definir biblioteca de gráficos para o dashboard de visão geral (provavelmente chart.js)
+Não há autocadastro. O Administrador cadastra cada usuário e o sistema gera uma senha temporária, exibida uma única vez; no primeiro acesso a troca é obrigatória.

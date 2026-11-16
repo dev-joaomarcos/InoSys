@@ -1,3 +1,8 @@
+> **ARQUIVADO em 16/11/2026.** Estes mockups serviram para aprovar o visual antes da integração.
+> A fonte da verdade agora são os templates Django e o `contas/static/inosys/estilos.css`.
+> A prévia pelo `runserver` (`previa_settings.py`) foi removida; abra os `.html` com duplo clique.
+> Ver [docs/arquivo/README.md](../README.md).
+
 # InoSys · front-end (mockups navegáveis)
 
 Telas em HTML + Bootstrap 5.3.3 + HTMX 2.0.3, com dados de exemplo, para aprovar o

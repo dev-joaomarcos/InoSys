@@ -8,7 +8,7 @@
    2. Reskin das variáveis nativas do Bootstrap 5.3
       (faz btn, card, table, badge, tabs e modal do Bootstrap
       já saírem na identidade InoSys, sem trocar classes no HTML)
-   3. Sidebar institucional (injetada por assets/sidebar.js)
+   3. Sidebar institucional (marcação em templates/inosys/base_app.html)
    4. Layout das telas internas
    5. Componentes de dashboard (KPI, gráfico, relatórios)
    6. Badges de status
@@ -45,6 +45,13 @@
   --is-danger: #B42318;
   --is-danger-tint: rgba(180,35,24,.09);
   --is-info-tint: rgba(23,92,211,.09);
+  --is-neutral-tint: #EEF1F4;
+  --is-dark-tint: rgba(13,35,64,.10);
+  /* traço das texturas (pontos, hachura, linhas): o status não depende só da cor */
+  --is-info-hatch: rgba(23,92,211,.24);
+  --is-warning-hatch: rgba(146,64,14,.28);
+  --is-warning-hatch-soft: rgba(146,64,14,.13);   /* sob texto (badge) */
+  --is-danger-hatch: rgba(180,35,24,.24);
 
   --is-radius: 10px;       /* botões, inputs */
   --is-radius-card: 16px;  /* cards, tabelas, modais */
@@ -116,9 +123,6 @@ body { font-family: var(--is-font); color: var(--is-ink); background: var(--is-p
   --bs-btn-color: var(--is-danger); --bs-btn-border-color: var(--is-danger);
   --bs-btn-hover-bg: var(--is-danger); --bs-btn-hover-border-color: var(--is-danger);
 }
-.btn-group > .btn { border-radius: var(--is-radius); }
-.btn-group > .btn:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
-.btn-group > .btn:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 
 /* Formulários */
 .form-control, .form-select { border-color: var(--is-border); border-radius: var(--is-radius); }
@@ -181,10 +185,48 @@ body { font-family: var(--is-font); color: var(--is-ink); background: var(--is-p
 .modal-backdrop { --bs-backdrop-bg: #0D2340; --bs-backdrop-opacity: .45; }
 
 /* Alertas */
-.alert { border-radius: var(--is-radius); font-size: .875rem; }
-.alert-success { --bs-alert-bg: var(--is-success-tint); --bs-alert-color: var(--is-success); --bs-alert-border-color: rgba(21,128,61,.2); }
-.alert-danger  { --bs-alert-bg: var(--is-danger-tint);  --bs-alert-color: var(--is-danger);  --bs-alert-border-color: rgba(180,35,24,.2); }
-.alert-warning { --bs-alert-bg: var(--is-warning-tint); --bs-alert-color: var(--is-warning-text); --bs-alert-border-color: rgba(245,165,36,.35); }
+/* Trilho de ícone: bloco de largura fixa à esquerda com o ícone e a textura do status.
+   O texto fica sobre fundo liso. O ícone vem do CSS: não ponha <i class="bi"> no começo do alerta. */
+.alert {
+  --is-alert-rail: 40px;
+  --is-alert-accent: var(--is-brand);
+  --is-alert-tint: var(--is-info-tint);
+  --is-alert-texture: radial-gradient(circle, var(--is-info-hatch) 1px, transparent 1.4px) 0 0 / 6px 6px;
+  --is-alert-icon: "\f431";            /* bi-info-circle */
+  --is-alert-edge: color-mix(in srgb, var(--is-alert-accent) 32%, transparent);
+  --bs-alert-bg: var(--is-surface);
+  --bs-alert-color: var(--is-ink);
+  --bs-alert-border-color: var(--is-alert-edge);
+  --bs-alert-link-color: var(--is-brand);
+  position: relative; overflow: hidden;
+  padding-left: calc(var(--is-alert-rail) + .875rem);
+  border-radius: var(--is-radius); font-size: .875rem;
+}
+.alert::before {
+  content: var(--is-alert-icon);
+  font-family: "bootstrap-icons"; font-size: 1.05rem; line-height: 1;
+  position: absolute; inset: 0 auto 0 0; width: var(--is-alert-rail);
+  display: grid; place-items: center;
+  color: var(--is-alert-accent);
+  background: var(--is-alert-texture), var(--is-alert-tint);
+  border-right: 1px solid var(--is-alert-edge);
+}
+.alert strong { color: var(--is-alert-accent); }
+.alert-success {
+  --is-alert-accent: var(--is-success); --is-alert-tint: var(--is-success-tint);
+  --is-alert-texture: none;             /* liso */
+  --is-alert-icon: "\f26b";            /* bi-check-circle */
+}
+.alert-warning {
+  --is-alert-accent: var(--is-warning-text); --is-alert-tint: var(--is-warning-tint);
+  --is-alert-texture: repeating-linear-gradient(135deg, var(--is-warning-hatch) 0 1.5px, transparent 1.5px 6px);
+  --is-alert-icon: "\f33b";            /* bi-exclamation-triangle */
+}
+.alert-danger {
+  --is-alert-accent: var(--is-danger); --is-alert-tint: var(--is-danger-tint);
+  --is-alert-texture: repeating-linear-gradient(0deg, var(--is-danger-hatch) 0 1.5px, transparent 1.5px 5px);
+  --is-alert-icon: "\f627";            /* bi-x-octagon */
+}
 
 /* Badges do Bootstrap já usados nos mockups (text-bg-*) → tinta suave + texto forte */
 .badge { font-weight: 600; font-size: .72rem; padding: .35em .65em; }
@@ -203,7 +245,7 @@ body { font-family: var(--is-font); color: var(--is-ink); background: var(--is-p
 .is-metric { font-family: var(--is-font-mono); font-weight: 600; letter-spacing: -.02em; }
 
 /* ---------- 3. Sidebar institucional ----------
-   Marcação gerada por assets/sidebar.js dentro de #sidebar-root.
+   Marcação em templates/inosys/base_app.html; o item ativo é marcado pelo app.js.
    Usa .offcanvas-lg do Bootstrap: fixa em telas ≥992px e painel
    deslizante abaixo disso (abre pelo botão hambúrguer das telas). */
 .is-sidebar {
@@ -303,12 +345,27 @@ body { font-family: var(--is-font); color: var(--is-ink); background: var(--is-p
 /* Aviso de estoque baixo dentro de tabela */
 
 /* ---------- 6. Badges de status (para markup novo) ---------- */
-.is-badge { display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 600; }
-.is-badge-success { background: var(--is-success-tint); color: var(--is-success); }
-.is-badge-warning { background: var(--is-warning-tint); color: var(--is-warning-text); }
-.is-badge-danger  { background: var(--is-danger-tint);  color: var(--is-danger); }
-.is-badge-info    { background: var(--is-info-tint);    color: var(--is-brand); }
-.is-badge-neutral { background: #EEF1F4; color: var(--is-muted); }
+/* Quatro marcas por status: cor, estilo da borda, ícone e palavra.
+   O ícone vem do CSS; badge que já traz um <i class="bi"> próprio (Entrada, Saída, Edição...) fica só com ele. */
+.is-badge {
+  display: inline-flex; align-items: center; gap: .3rem; padding: calc(.22rem - 1.5px) calc(.6rem - 1.5px);
+  border: 1.5px solid transparent; border-radius: 999px; font-size: .72rem; font-weight: 600; white-space: nowrap;
+}
+.is-badge:not(:has(> .bi))::before { content: var(--is-badge-icon, none); font-family: "bootstrap-icons"; font-size: .95em; line-height: 1; }
+/* sucesso: borda contínua · bi-check */
+.is-badge-success { background: var(--is-success-tint); color: var(--is-success); border-color: currentColor; --is-badge-icon: "\f26e"; }
+/* andamento: borda pontilhada · bi-circle-fill */
+.is-badge-info { background: var(--is-info-tint); color: var(--is-brand); border-color: currentColor; border-style: dotted; --is-badge-icon: "\f287"; }
+.is-badge-info:not(:has(> .bi))::before { font-size: .5em; }
+/* atenção: borda tracejada + hachura · bi-exclamation-triangle-fill */
+.is-badge-warning {
+  background: repeating-linear-gradient(135deg, var(--is-warning-hatch-soft) 0 1px, transparent 1px 6px), var(--is-warning-tint);
+  color: var(--is-warning-text); border-color: currentColor; border-style: dashed; --is-badge-icon: "\f33a";
+}
+/* problema: borda dupla · bi-x */
+.is-badge-danger { background: var(--is-danger-tint); color: var(--is-danger); border: 3px double currentColor; padding: calc(.22rem - 3px) calc(.6rem - 3px); --is-badge-icon: "\f62a"; }
+/* neutro: borda contínua cinza · bi-dash */
+.is-badge-neutral { background: var(--is-neutral-tint); color: var(--is-muted); border-color: currentColor; --is-badge-icon: "\f2ea"; }
 
 /* ---------- 7. Estados do HTMX ----------
    htmx adiciona .htmx-request ao elemento enquanto a requisição
@@ -328,7 +385,8 @@ body { font-family: var(--is-font); color: var(--is-ink); background: var(--is-p
    ============================================================ */
 
 /* Badge escuro (perfil Administrador, dados anonimizados) e badge de perfil (não é status) */
-.is-badge-dark { background: rgba(13,35,64,.10); color: var(--is-navy); }
+.is-badge-dark { background: var(--is-dark-tint); color: var(--is-navy); border-color: currentColor; --is-badge-icon: "\f582"; }  /* bi-square-fill */
+.is-badge-dark:not(:has(> .bi))::before { font-size: .6em; }
 .badge.text-bg-dark { background: rgba(13,35,64,.10) !important; color: var(--is-navy) !important; }
 
 /* Paginação (20 itens/página — Paginator do Django) */
@@ -363,28 +421,6 @@ code { color: var(--is-navy); background: var(--is-page-bg); border: 1px dashed 
 
 /* Foco visível padronizado (acessibilidade) */
 :focus-visible { outline-color: var(--is-brand); }
-
-/* ============================================================
-   9. Modo de desenvolvimento do HTMX  (abra qualquer tela com ?htmx=1)
-   Destaca todos os elementos com hx-* e lista os pontos de troca
-   de conteúdo no painel flutuante montado por assets/sidebar.js.
-   ============================================================ */
-.htmx-debug [hx-get], .htmx-debug [hx-post], .htmx-debug [hx-put], .htmx-debug [hx-delete] {
-  outline: 2px dashed var(--is-amber); outline-offset: 3px;
-}
-.htmx-debug [hx-target], .htmx-debug .is-swap-target { position: relative; }
-.is-htmx-panel {
-  position: fixed; left: 16px; bottom: 16px; z-index: 1100; width: min(420px, calc(100vw - 32px));
-  max-height: 55vh; overflow: auto; padding: 14px 16px;
-  background: var(--is-navy); color: #fff; border-radius: var(--is-radius-card);
-  box-shadow: 0 12px 32px rgba(13,35,64,.35); font-size: .78rem;
-}
-.is-htmx-panel h2 { margin: 0 0 8px; font-size: .85rem; font-weight: 700; }
-.is-htmx-panel .hook { display: block; width: 100%; text-align: left; margin-top: 6px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: rgba(255,255,255,.05); color: #fff; }
-.is-htmx-panel .hook:hover { background: rgba(255,255,255,.12); }
-.is-htmx-panel .verbo { display: inline-block; min-width: 42px; margin-right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--is-amber); color: var(--is-navy); font-family: var(--is-font-mono); font-weight: 600; font-size: .7rem; text-align: center; }
-.is-htmx-panel .url { font-family: var(--is-font-mono); font-size: .74rem; }
-.is-htmx-panel .meta { display: block; margin-top: 3px; color: #9FB0C4; }
 
 /* Aviso de erro devolvido pelo servidor dentro de um modal: some quando está vazio */
 .is-swap-error:empty { display: none; }
@@ -426,7 +462,7 @@ svg g[stroke="#dee2e6"] { stroke: var(--is-border-soft); }
 }
 
 /* Ícone neutro do KPI (ex.: itens desativados) */
-.is-kpi-icon.neutral { background: #EEF1F4; color: var(--is-muted); }
+.is-kpi-icon.neutral { background: var(--is-neutral-tint); color: var(--is-muted); }
 
 /* Tabela encostada nas bordas do card: alinha com o padding do card-body */
 .card > .table-responsive > .table > :not(caption) > * > * { padding-top: .7rem; padding-bottom: .7rem; }
@@ -451,12 +487,7 @@ tr.is-row-inactive > td { color: var(--is-muted); }
 
 /* Avisos flutuantes (canto inferior direito, somem em 4 s) */
 .is-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 1090; display: grid; gap: 8px; max-width: calc(100vw - 32px); }
-.is-toasts .alert {
-  margin: 0; box-shadow: var(--is-shadow);
-  /* a tinta do alerta é translúcida: base branca por baixo para não vazar o conteúdo */
-  background-image: linear-gradient(var(--bs-alert-bg), var(--bs-alert-bg));
-  background-color: var(--is-surface);
-}
+.is-toasts .alert { margin: 0; box-shadow: var(--is-shadow); }
 
 /* Validação: só o erro ganha cor; campo válido continua neutro */
 .was-validated .form-control:valid, .was-validated .form-select:valid { border-color: var(--is-border); }

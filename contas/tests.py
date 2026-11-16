@@ -1,5 +1,9 @@
+from datetime import timedelta
+
+from django.contrib.sessions.models import Session
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import PerfilUsuario, Usuario
 
@@ -60,3 +64,53 @@ class FluxoContasTests(TestCase):
     def test_selecao_exige_login(self):
         r = self.client.get(reverse("contas:selecao"))
         self.assertEqual(r.status_code, 302)
+
+
+@override_settings(STORAGES=ARMAZENAMENTO_SIMPLES)
+class SessaoTests(TestCase):
+    """A sessão cai ao fechar o navegador e após 60 minutos sem uso; o prazo é conferido no servidor."""
+
+    def setUp(self):
+        self.paula = Usuario.objects.create_user("paula", SENHA, nome="Paula Ribeiro", perfil=PerfilUsuario.ESTOQUE)
+        self.lista = reverse("estoque:material_lista")
+
+    def _sessao(self):
+        return Session.objects.get(pk=self.client.session.session_key)
+
+    def test_login_cria_sessao_que_cai_ao_fechar_o_navegador(self):
+        self.client.post(reverse("contas:login"), {"username": "paula", "password": SENHA})
+        self.assertEqual(self.client.cookies["sessionid"]["max-age"], "")  # cookie de sessão do navegador
+        self.assertTrue(self.client.session.get_expire_at_browser_close())
+
+    def test_validade_no_servidor_e_de_60_minutos(self):
+        self.client.force_login(self.paula)
+        self.client.get(self.lista)
+        restante = (self._sessao().expire_date - timezone.now()).total_seconds()
+        self.assertAlmostEqual(restante, 3600, delta=30)
+
+    def test_sessao_vencida_volta_para_o_login(self):
+        self.client.force_login(self.paula)
+        Session.objects.update(expire_date=timezone.now() - timedelta(minutes=1))
+        r = self.client.get(self.lista)
+        self.assertRedirects(r, reverse("contas:login") + "?next=" + self.lista, fetch_redirect_response=False)
+
+    def test_cada_requisicao_renova_o_prazo(self):
+        self.client.force_login(self.paula)
+        Session.objects.update(expire_date=timezone.now() + timedelta(minutes=1))
+        self.assertEqual(self.client.get(self.lista).status_code, 200)
+        restante = (self._sessao().expire_date - timezone.now()).total_seconds()
+        self.assertGreater(restante, 3000)
+
+    def test_htmx_sem_sessao_manda_a_pagina_inteira_para_o_login(self):
+        r = self.client.get(reverse("estoque:material_novo"), headers={
+            "HX-Request": "true", "HX-Current-URL": "http://testserver/estoque/materiais/?status=inativo"})
+        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r["HX-Redirect"], "/login/?next=/estoque/materiais/%3Fstatus%3Dinativo")
+        self.assertEqual(r.content, b"")
+
+    def test_htmx_com_senha_temporaria_manda_para_a_troca(self):
+        temp = Usuario.objects.create_user("novo", "Temp-123456", perfil=PerfilUsuario.ESTOQUE, senha_temporaria=True)
+        self.client.force_login(temp)
+        r = self.client.get(reverse("estoque:material_novo"), headers={"HX-Request": "true"})
+        self.assertEqual(r.status_code, 403)
+        self.assertEqual(r["HX-Redirect"], reverse("contas:trocar_senha"))

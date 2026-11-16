@@ -3,7 +3,6 @@
          hx-target="this" hx-swap="outerHTML">
   {% if qtd_baixo %}
   <div class="alert alert-warning d-flex align-items-start gap-2" role="status" id="alerta-estoque-baixo">
-    <i class="bi bi-exclamation-triangle mt-1" aria-hidden="true"></i>
     <div class="flex-grow-1">
       <strong><span class="is-metric">{{ qtd_baixo }}</span> {{ qtd_baixo|pluralize:"material abaixo,materiais abaixo" }} da quantidade mínima:</strong>
       {% for m in baixos %}{{ m.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}

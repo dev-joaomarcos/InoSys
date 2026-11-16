@@ -21,6 +21,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    SESSAO_MINUTOS=(int, 60),
 )
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -42,6 +43,13 @@ SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+
+# Sessão: cai ao fechar o navegador e após SESSAO_MINUTOS sem uso.
+# A validade fica gravada no servidor e cada requisição renova o prazo (tempo de inatividade, não tempo total).
+# Reiniciar o servidor não encerra sessões: elas ficam no banco.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = env('SESSAO_MINUTOS') * 60
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Application definition
@@ -154,15 +162,5 @@ STORAGES = {
     },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    },
-}
-
-
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }

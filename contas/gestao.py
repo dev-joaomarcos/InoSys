@@ -7,9 +7,8 @@ from django.db import transaction
 ALFABETO = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 NOME_ANONIMO = "Usuário anonimizado"
 
-# PENDÊNCIA DO GRUPO (LEIA-ME): o nome guardado no log também é dado pessoal?
-# True  = a anonimização troca o nome nos registros de log desse usuário (LGPD completa).
-# False = o log mantém o nome original.
+# Decisão do grupo (16/11/2026): o nome guardado no log também é dado pessoal,
+# então a anonimização troca o nome nos registros de log desse usuário.
 ANONIMIZAR_LOG = True
 
 

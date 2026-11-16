@@ -1,4 +1,7 @@
 from django.shortcuts import redirect
+from django.urls import reverse
+
+from .htmx import ir_para
 
 
 class TrocaSenhaObrigatoriaMiddleware:
@@ -15,4 +18,6 @@ class TrocaSenhaObrigatoriaMiddleware:
         usuario = request.user
         if usuario.is_authenticated and getattr(usuario, "senha_temporaria", False):
             if request.resolver_match and request.resolver_match.view_name not in self.LIBERADAS:
+                if request.headers.get("HX-Request") == "true":  # a página inteira vai para a troca de senha
+                    return ir_para(reverse("contas:trocar_senha"), status=403)
                 return redirect("contas:trocar_senha")
